@@ -10,6 +10,8 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
+apply plugin: 'java'
+
 // Apply the java-library plugin to add support for Java Library
 apply plugin: 'java-library'
 
@@ -37,6 +39,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 }
 
+// I never got this working.
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_API_KEY')
@@ -44,7 +47,7 @@ bintray {
     pkg {
         // repo = 'generic'
         repo = 'maven'
-        name = 'gradle-project'
+        name = 'plume-gradle-project'
         userOrg = 'plumelib'
         licenses = ['MIT']
         vcsUrl = 'https://github.com/plume-lib/options.git'
@@ -58,4 +61,17 @@ bintray {
     }
 }
 
-apply plugin: 'java'
+// run: ./gradlew publish
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'org.plumelib'
+            artifactId 'options'
+            version '0.1'
+
+            from components.java
+        }
+    }
+}
