@@ -23,10 +23,10 @@ repositories {
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api 'org.apache.commons:commons-math3:3.6.1'
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    // These dependencies are used internally, but not exposed to consumers.
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-text:1.2'
     implementation 'com.google.guava:guava:20.0'
 
     // Use JUnit test framework
@@ -61,17 +61,95 @@ bintray {
     }
 }
 
-// run: ./gradlew publish
-apply plugin: 'maven-publish'
+///////////////////////////////////////////////////////////////////////////
+/// Maven Central upload:  run:  gradle uploadArchives
+///
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'org.plumelib'
-            artifactId 'options'
-            version '0.1'
+// // run: ./gradlew publish
+// apply plugin: 'maven-publish'
+//
+// publishing {
+//     publications {
+//         mavenJava(MavenPublication) {
+//             groupId 'org.plumelib'
+//             artifactId 'options'
+//             version '0.1'
+//
+//             from components.java
+//         }
+//     }
+// }
 
-            from components.java
+// From http://central.sonatype.org/pages/gradle.html
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+// Is this needed?
+//     useGpgCmd()
+    sign configurations.archives
+}
+
+group = "org.plumelib"
+archivesBaseName = "options"
+version = "0.1"
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'Plume-lib Options'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description 'Command-line option processing for Java.'
+        url 'https://github.com/plume-lib/options'
+
+        scm {
+          connection 'scm:git:git@github.com:plume-lib/options.git'
+          developerConnection 'scm:git:git@github.com:plume-lib/options.git'
+          url 'git@github.com:plume-lib/options.git'
         }
+
+        licenses {
+          license {
+            name 'MIT License'
+            url 'https://opensource.org/licenses/MIT'
+          }
+        }
+
+        developers {
+          developer {
+            id 'mernst'
+            name 'Michael Ernst'
+            email 'mernst@alum.mit.edu'
+          }
+        }
+      }
     }
+  }
 }
