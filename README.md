@@ -16,4 +16,4 @@ automatically set from a command-line option of the same name, and usage
 messages and printed documentation are generated automatically.
 
 For more details, see the Javadoc for the [`Options`
-class](https://github.com/plume-lib/options/blob/master/src/main/java/org/plumelib/options/Options.java)..
+class](https://github.com/plume-lib/options/blob/master/src/main/java/org/plumelib/options/Options.java).
