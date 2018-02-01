@@ -8,6 +8,8 @@
 
 package org.plumelib.options;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.DocErrorReporter;
@@ -18,13 +20,12 @@ import com.sun.javadoc.Tag;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.LinkedHashMap;
@@ -32,69 +33,70 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 /*>>>
 import org.checkerframework.checker.formatter.qual.*;
+import org.checkerframework.checker.index.qual.*;
 import org.checkerframework.checker.nullness.qual.*;
 import org.checkerframework.checker.signature.qual.*;
+import org.checkerframework.common.value.qual.*;
 */
 
 /**
- * Generates HTML documentation of command-line options. Works with the {@link plume.Options} class.
+ * Generates HTML documentation of command-line options. Works with the {@link org.plumelib.options.Options} class.
  *
  * <p><b>Usage</b>
  *
  * <p>This doclet is typically invoked with:
  *
- * <pre>javadoc -quiet -doclet plume.OptionsDoclet [doclet options] [java files]</pre>
+ * <pre>javadoc -quiet -doclet org.plumelib.options.OptionsDoclet [doclet options] [java files]</pre>
  *
  * <p><b>Doclet Options</b>
  *
  * <p>The following doclet options are supported:
  *
  * <ul>
- *   <li> <b>-docfile</b> <i>file</i> When specified, the output of this doclet is the result of
+ *   <li><b>-docfile</b> <i>file</i> When specified, the output of this doclet is the result of
  *       replacing everything between the two lines
  *       <pre>&lt;!-- start options doc (DO NOT EDIT BY HAND) --&gt;</pre>
  *       and
  *       <pre>&lt;!-- end options doc --&gt;</pre>
  *       in <i>file</i> with the options documentation. This can be used for inserting option
  *       documentation into an existing manual. The existing docfile is not modified; output goes to
- *       the <code>-outfile</code> argument, or to standard out.
- *   <li> <b>-outfile</b> <i>file</i> The destination for the output (the default is standard out).
- *       If both <code>-outfile</code> and <code>-docfile</code> are specified, they must be
- *       different. When <code>-d</code> is used, the output is written to a file with the given
- *       name relative to that destination directory.
- *   <li> <b>-d</b> <i>directory</i> The destination directory for the output file. Only used if
- *       <code>-outfile</code> is used, in which case, the file is written in this directory.
- *       Otherwise, this option is ignored.
- *   <li> <b>-i</b> Specifies that the docfile should be edited in-place. This option can only be
- *       used if the <code>-docfile</code> option is used, and may not be used at the same time as
- *       the <code>-outfile</code> option.
- *   <li> <b>-format</b> <i>format</i> This option sets the output format of this doclet. Currently,
+ *       the {@code -outfile} argument, or to standard out.
+ *   <li><b>-outfile</b> <i>file</i> The destination for the output (the default is standard out).
+ *       If both {@code -outfile} and {@code -docfile} are specified, they must be different. When
+ *       {@code -d} is used, the output is written to a file with the given name relative to that
+ *       destination directory.
+ *   <li><b>-d</b> <i>directory</i> The destination directory for the output file. Only used if
+ *       {@code -outfile} is used, in which case, the file is written in this directory. Otherwise,
+ *       this option is ignored.
+ *   <li><b>-i</b> Specifies that the docfile should be edited in-place. This option can only be
+ *       used if the {@code -docfile} option is used, and may not be used at the same time as the
+ *       {@code -outfile} option.
+ *   <li><b>-format</b> <i>format</i> This option sets the output format of this doclet. Currently,
  *       the following values for <i>format</i> are supported:
  *       <ul>
- *         <li> <b>javadoc</b> When this format is specified, the output of this doclet is formatted
+ *         <li><b>javadoc</b> When this format is specified, the output of this doclet is formatted
  *             as a Javadoc comment. This is useful for including option documentation inside Java
- *             source code. When this format is used with the <code>-docfile</code> option, the
- *             generated documentation is inserted between the lines
+ *             source code. When this format is used with the {@code -docfile} option, the generated
+ *             documentation is inserted between the lines
  *             <pre>* &lt;!-- start options doc (DO NOT EDIT BY HAND) --&gt;</pre>
  *             and
  *             <pre>* &lt;!-- end options doc --&gt;</pre>
  *             using the same indentation. Inline {@code @link} and {@code @see} tags in the Javadoc
  *             input are left untouched.
- *         <li> <b>html</b> This format outputs HTML for general-purpose use, meaning inline
+ *         <li><b>html</b> This format outputs HTML for general-purpose use, meaning inline
  *             {@code @link} and {@code @see} tags in the Javadoc input are suitably replaced. This
  *             is the default output format and does not need to be specified explicitly.
  *       </ul>
- *
- *   <li> <b>-classdoc</b> When specified, the output of this doclet includes the class
- *       documentation of the first class specified on the command-line.
- *   <li> <b>-singledash</b> When specified, <code>use_single_dash(true)</code> is called on the
+ *   <li><b>-classdoc</b> When specified, the output of this doclet includes the class documentation
+ *       of the first class specified on the command-line.
+ *   <li><b>-singledash</b> When specified, {@code use_single_dash(true)} is called on the
  *       underlying instance of Options used to generate documentation. See {@link
- *       plume.Options#use_single_dash(boolean)}.
+ *       org.plumelib.options.Options#use_single_dash(boolean)}.
  * </ul>
  *
  * <p><b>Examples</b>
@@ -102,32 +104,32 @@ import org.checkerframework.checker.signature.qual.*;
  * <p>To update the Javarifier HTML manual with option documentation run:
  *
  * <pre>
- * javadoc -quiet -doclet plume.OptionsDoclet -i -docfile javarifier.html src/javarifier/Main.java
+ * javadoc -quiet -doclet org.plumelib.options.OptionsDoclet -i -docfile javarifier.html src/javarifier/Main.java
  * </pre>
  *
- * <p>To update the class Javadoc for plume.Lookup with option documentation run:
+ * <p>To update the class Javadoc for org.plumelib.options.Lookup with option documentation run:
  *
  * <pre>
- * javadoc -quiet -doclet plume.OptionsDoclet -i -docfile Lookup.java -format javadoc Lookup.java
+ * javadoc -quiet -doclet org.plumelib.options.OptionsDoclet -i -docfile Lookup.java -format javadoc Lookup.java
  * </pre>
  *
- * <p>For a more extensive example, see file <code>java/Makefile</code> in plume-lib itself.
+ * <p>For a more extensive example, see file {@code java/Makefile} in plume-lib itself.
  *
  * <p><b>Requirements</b>
  *
- * <p>Classes passed to OptionsDoclet that have <code>@</code>{@link Option} annotations on
- * non-static fields should have a nullary (no-argument) constructor. The nullary constructor may be
- * private or public. This is required because an object instance is needed to get the default value
- * of a non-static field. It is cleaner to require a nullary constructor instead of trying to guess
+ * <p>Classes passed to OptionsDoclet that have {@code @}{@link Option} annotations on non-static
+ * fields should have a nullary (no-argument) constructor. The nullary constructor may be private or
+ * public. This is required because an object instance is needed to get the default value of a
+ * non-static field. It is cleaner to require a nullary constructor instead of trying to guess
  * arguments to pass to another constructor.
  *
  * <p><b>Hiding default value strings</b>
  *
  * <p>By default, the documentation generated by OptionsDoclet includes a default value string for
  * each option in square brackets after the option's description, similar to the usage messages
- * generated by {@link plume.Options#usage(String...)}. The {@link plume.Option#noDocDefault} field
- * in the {@code @Option} annotation can be set to <code>true</code> to omit the default value
- * string from the generated documentation for that option.
+ * generated by {@link org.plumelib.options.Options#usage(String...)}. The {@link org.plumelib.options.Option#noDocDefault} field
+ * in the {@code @Option} annotation can be set to {@code true} to omit the default value string
+ * from the generated documentation for that option.
  *
  * <p>Omitting the generated default value string is useful for options that have system-dependent
  * defaults. Such options are not an issue for usage messages that are generated at runtime.
@@ -139,17 +141,18 @@ import org.checkerframework.checker.signature.qual.*;
  * &#64;Option(value="&lt;timezone&gt; Set the time zone")
  * public static String timezone = TimeZone.getDefault().getID();</pre>
  *
- * The default value for <code>timezone</code> depends on the system's timezone setting. HTML
+ * The default value for {@code timezone} depends on the system's timezone setting. HTML
  * documentation of this option generated in Chicago would not apply to a user in New York. To work
  * around this problem, the default value should be hidden; instead the Javadoc for this field
  * should indicate a special default as follows.
  *
- * <pre>
+ * <pre>{@code
  * &#47;**
- *  * &lt;other stuff...&gt;  This option defaults to the system timezone.
+ *  * <other stuff...>  This option defaults to the system timezone.
  *  *&#47;
- * &#64;Option(value="&lt;timezone&gt; Set the timezone", noDocDefault=true)
- * public static String timezone = TimeZone.getDefault().getID();</pre>
+ * &#64;Option(value="<timezone> Set the timezone", noDocDefault=true)
+ * public static String timezone = TimeZone.getDefault().getID();
+ * }</pre>
  *
  * This keeps the documentation system-agnostic.
  *
@@ -161,19 +164,19 @@ import org.checkerframework.checker.signature.qual.*;
  *
  * <p><b>Troubleshooting</b>
  *
- * <p>If you get an error such as "<code>ARGH! @Option</code>", then you are using a buggy version
- * of gjdoc, the GNU Classpath implementation of Javadoc. To avoid the problem, upgrade or use a
+ * <p>If you get an error such as "{@code ARGH! @Option}", then you are using a buggy version of
+ * gjdoc, the GNU Classpath implementation of Javadoc. To avoid the problem, upgrade or use a
  * different Javadoc implementation.
  *
- * @see plume.Option
- * @see plume.Options
- * @see plume.OptionGroup
- * @see plume.Unpublicized
+ * @see org.plumelib.options.Option
+ * @see org.plumelib.options.Options
+ * @see org.plumelib.options.OptionGroup
+ * @see org.plumelib.options.Unpublicized
  */
 
-// This doesn't itself use plume.Options for its command-line option
-// processing because a Doclet is required to implement the optionLength
-// and validOptions methods.
+// This doesn't itself use org.plumelib.options.Options for its command-line option processing because a Doclet is
+// required to implement the optionLength() and validOptions() methods.
+@SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
 public class OptionsDoclet {
 
   private static String eol = System.getProperty("line.separator");
@@ -186,7 +189,7 @@ public class OptionsDoclet {
           + "-i                     Edit the docfile in-place%n"
           + "-format javadoc        Format output as a Javadoc comment%n"
           + "-classdoc              Include 'main' class documentation in output%n"
-          + "-singledash            Use single dashes for long options (see plume.Options)%n"
+          + "-singledash            Use single dashes for long options (see org.plumelib.options.Options)%n"
           + "See the OptionsDoclet documentation for more details.%n";
 
   private static final String LIST_HELP =
@@ -285,12 +288,12 @@ public class OptionsDoclet {
   /**
    * Given a command-line option of this doclet, returns the number of arguments you must specify on
    * the command line for the given option. Returns 0 if the argument is not recognized. This method
-   * is automatically invoked.
+   * is automatically invoked by Javadoc.
    *
    * @param option the command-line option
    * @return the number of command-line arguments needed when using the option
    * @see <a
-   *     href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
+   *     href="https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
    *     overview</a>
    */
   public static int optionLength(String option) {
@@ -312,16 +315,18 @@ public class OptionsDoclet {
 
   /**
    * Tests the validity of command-line arguments passed to this doclet. Returns true if the option
-   * usage is valid, and false otherwise. This method is automatically invoked.
+   * usage is valid, and false otherwise. This method is automatically invoked by Javadoc.
    *
-   * @param options the command-line options to be checked: an array of 1- or 2-element arrays
+   * @param options the command-line options to be checked: an array of 1- or 2-element arrays,
+   *     where the length depends on {@link #optionLength} applied to the first element
    * @param reporter where to report errors
    * @return true iff the command-line options are valid
    * @see <a
-   *     href="http://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
+   *     href="https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
    *     overview</a>
    */
-  public static boolean validOptions(String[][] options, DocErrorReporter reporter) {
+  @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
+  public static boolean validOptions(String[] /*@MinLen(1)*/[] options, DocErrorReporter reporter) {
     boolean hasDocFile = false;
     boolean hasOutFile = false;
     boolean hasDestDir = false;
@@ -400,7 +405,8 @@ public class OptionsDoclet {
    *
    * @param options the command-line options to parse: a list of 1- or 2-element arrays
    */
-  public void setOptions(String[][] options) {
+  @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
+  public void setOptions(String[] /*@MinLen(1)*/[] options) {
     String outFilename = null;
     File destDir = null;
     for (int oi = 0; oi < options.length; oi++) {
@@ -457,13 +463,13 @@ public class OptionsDoclet {
     String output = output();
 
     if (outFile != null) {
-      out = new PrintWriter(new BufferedWriter(new FileWriter(outFile)));
+      out = new PrintWriter(Files.newBufferedWriter(outFile.toPath(), UTF_8));
     } else if (inPlace) {
       assert docFile != null
           : "@AssumeAssertion(nullness): dependent: docFile is non-null if inPlace is true";
-      out = new PrintWriter(new BufferedWriter(new FileWriter(docFile)));
+      out = new PrintWriter(Files.newBufferedWriter(docFile.toPath(), UTF_8));
     } else {
-      out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
+      out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
     }
 
     out.println(output);
@@ -494,7 +500,7 @@ public class OptionsDoclet {
   /*@RequiresNonNull("docFile")*/
   private String newDocFileText() throws Exception {
     StringJoiner b = new StringJoiner(eol);
-    BufferedReader doc = new BufferedReader(new FileReader(docFile));
+    BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);
     String docline;
     boolean replacing = false;
     boolean replaced_once = false;
@@ -563,7 +569,7 @@ public class OptionsDoclet {
     }
   }
 
-  /** Initializes {@link Options.OptionInfo.enum_jdoc} for the given <code>OptionInfo</code>. */
+  /** Initializes {@link Options.OptionInfo.enum_jdoc} for the given {@code OptionInfo}. */
   private void processEnumJavadoc(Options.OptionInfo oi) {
     Enum<?>[] constants = (Enum<?>[]) oi.base_type.getEnumConstants();
     if (constants == null) {
@@ -630,15 +636,14 @@ public class OptionsDoclet {
         b.add("      <ul>");
         b.add(optionListToHtml(gi.optionList, 12, 8, refillWidth));
         b.add("      </ul>");
-        b.add("");
         // b.add("  </li>");
       }
     }
     b.add("</ul>");
-    b.add("");
 
     for (Options.OptionInfo oi : options.getOptions()) {
       if (oi.list != null && !oi.unpublicized) {
+        b.add("");
         b.add(LIST_HELP);
         break;
       }
@@ -705,12 +710,15 @@ public class OptionsDoclet {
     String suffix = null;
     int ulPos = in.indexOf(eol + "<ul>" + eol);
     if (ulPos != -1) {
-      suffix = in.substring(ulPos + eol.length());
+      @SuppressWarnings("index") // https://github.com/panacekcz/checker-framework/issues/23
+      String suffix_temp = in.substring(ulPos + eol.length());
+      suffix = suffix_temp;
       in = in.substring(0, ulPos);
     }
 
     String compressedSpaces = in.replaceAll("[ \n\r]+", " ");
-    // google-java-format bug: https://github.com/google/google-java-format/issues/84
+    // Accommodate google-java-format bug: https://github.com/google/google-java-format/issues/84 .
+    // In general, prefer {@code ...} to <code>...</code>.
     compressedSpaces = compressedSpaces.replaceAll("<code> ", "<code>");
     if (compressedSpaces.startsWith(" ")) {
       compressedSpaces = compressedSpaces.substring(1);
@@ -790,7 +798,7 @@ public class OptionsDoclet {
         // b.append("</li>");
         b.append(eol);
       }
-      b.append("</ul>").append(eol).append(eol);
+      b.append("</ul>").append(eol);
     }
     return b.toString();
   }
@@ -809,11 +817,16 @@ public class OptionsDoclet {
     StringBuilder b = new StringBuilder();
     Tag[] tags = doc.inlineTags();
     for (Tag tag : tags) {
-      String text = tag.text().replace('#', '.'); // is this replacement always desirable?
+      String kind = tag.kind();
+      String text = tag.text();
       if (tag instanceof SeeTag) {
-        b.append("<code>" + text + "</code>");
+        b.append("<code>" + text.replace('#', '.') + "</code>");
       } else {
-        b.append(text);
+        if (kind.equals("@code")) {
+          b.append("<code>" + StringEscapeUtils.escapeHtml4(text) + "</code>");
+        } else {
+          b.append(text);
+        }
       }
     }
     SeeTag[] seetags = doc.seeTags();

@@ -19,26 +19,26 @@ import org.checkerframework.framework.qual.IgnoreInWholeProgramInference;
 
 /**
  * Indicates that the annotated field is set via command-line option. Takes a single string argument
- * that describes the option. The string is in the format '[-c] [&lt;type&gt;] description':
+ * that describes the option. The string is in the format '{@code [-c] [<type>] description}':
  *
  * <ul>
  *   <li>'-c' is an optional single-character short name for the option.
- *   <li>'&lt;type&gt;' is an optional description of the option type more specific than its Java
- *       type (e.g., '&lt;filename&gt;' if the variable's type is String). The less-than and
- *       greater-than symbols are required.
+ *   <li>'{@code <type>}' is an optional description of the option type, to be displayed instead of
+ *       its Java type (e.g., '{@code <filename>}' if the variable's type is String). The less-than
+ *       and greater-than symbols are required.
  *   <li>'description' is a short (one-line) description of the option suitable for a usage message.
- *       By convention, it does not end with a period. The field's Javadoc comment should contain a
- *       longer description appropriate for a manual or manpage. The Javadoc comment often repeats
- *       something similar to the <code>@Option</code> description.
+ *       By convention, it starts with a capital letter but does not end with a period. The field's
+ *       Javadoc comment should contain a longer description appropriate for a manual or manpage.
+ *       The Javadoc comment often repeats something similar to the {@code @Option} description.
  * </ul>
  *
- * <p>The command-line options are processed by the {@link plume.Options} class. For example usage,
- * see the documentation for {@link plume.Options}.
+ * <p>The command-line options are processed by the {@link org.plumelib.options.Options} class. For example usage,
+ * see the documentation for {@link org.plumelib.options.Options}.
  *
- * @see plume.Options
- * @see plume.OptionGroup
- * @see plume.Unpublicized
- * @see plume.OptionsDoclet
+ * @see org.plumelib.options.Options
+ * @see org.plumelib.options.OptionGroup
+ * @see org.plumelib.options.Unpublicized
+ * @see org.plumelib.options.OptionsDoclet
  */
 /*@IgnoreInWholeProgramInference*/
 @Retention(RetentionPolicy.RUNTIME)
@@ -54,7 +54,7 @@ public @interface Option {
 
   /**
    * Aliases for this option. For information about the use of this field, see the section on Option
-   * aliases in {@link plume.Options}. If there is only a single, one-character alias, it can be put
+   * aliases in {@link org.plumelib.options.Options}. If there is only a single, one-character alias, it can be put
    * at the beginning of the value field without the need for an aliases field.
    *
    * @return aliases for this option
@@ -63,7 +63,7 @@ public @interface Option {
 
   /**
    * Whether not to hide default values. For information about this parameter, see the section on
-   * hiding default values in {@link plume.OptionsDoclet}.
+   * hiding default values in {@link org.plumelib.options.OptionsDoclet}.
    *
    * @return whether not to hide default values
    */

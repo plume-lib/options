@@ -14,13 +14,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used in conjunction with the <code>@Option</code> annotation to indicate that the following
- * <code>@Option</code>-annotated fields (including the one the <code>@OptionGroup</code> annotation
- * is applied to) belong to the same option group. Option groups are documented in {@link Options}.
+ * Used in conjunction with the {@code @Option} annotation to indicate that the following
+ * {@code @Option}-annotated fields (including the one the {@code @OptionGroup} annotation is
+ * applied to) belong to the same option group. Option groups are documented in {@link Options}.
  *
- * <p>Note that <code>@OptionGroup</code> must be applied to a field and must appear after that
- * field's Javadoc comment, if any. A Javadoc comment between {@code @OptionGroup} and the field is
- * ignored.
+ * <p>Note that {@code @OptionGroup} must be applied to a field and must appear after that field's
+ * Javadoc comment, if any. A Javadoc comment between {@code @OptionGroup} and the field is ignored.
  *
  * <p>For example, you must write
  *
@@ -39,10 +38,10 @@ import java.lang.annotation.Target;
  * {@literal @}Option("the first option")
  *  public static int first_option = blah;</pre>
  *
- * @see plume.Options
- * @see plume.Option
- * @see plume.Unpublicized
- * @see plume.OptionsDoclet
+ * @see org.plumelib.options.Options
+ * @see org.plumelib.options.Option
+ * @see org.plumelib.options.Unpublicized
+ * @see org.plumelib.options.OptionsDoclet
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

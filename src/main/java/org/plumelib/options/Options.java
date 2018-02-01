@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,8 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 /*>>>
 import org.checkerframework.checker.formatter.qual.*;
@@ -43,7 +43,7 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <ul>
  *   <li>parses command-line options and sets fields in your program accordingly,
- *   <li>creates usage messages (such as printed by a <code>--help</code> option), and
+ *   <li>creates usage messages (such as printed by a {@code --help} option), and
  *   <li>creates documentation suitable for a manual or manpage.
  * </ul>
  *
@@ -52,14 +52,15 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p>The programmer does not have to write any code, only declare and document variables. For each
  * field that you want to set from a command-line argument, you write Javadoc and an @{@link
- * plume.Option} annotation. Then, the field is automatically set from a command-line option of the
- * same name, and usage messages and printed documentation are generated automatically.
+ * org.plumelib.options.Option} annotation. Then, the field is automatically set from a command-line
+ * option of the same name, and usage messages and printed documentation are generated
+ * automatically.
  *
  * <p>The main entry point is {@link #parse_or_usage(String[])}. Typical use is:
  * <!-- Example needs some more words of explanation and example command lines. -->
  *
  * <pre>
- *  import plume.*;
+ *  import org.plumelib.options.*;
  *
  *  public class MyProgram {
  *
@@ -79,10 +80,11 @@ import org.checkerframework.dataflow.qual.*;
  *      String[] remaining_args = options.parse_or_usage(args);
  *      ...
  *    }
- *  }</pre>
+ *  }
+ * </pre>
  *
- * A user may invoke the program using the command-line arguments <code>-o</code>, <code>--outfile
- * </code>, <code>-i</code>, <code>--ignore-case</code>, and <code>--temperature</code>.
+ * A user may invoke the program using the command-line arguments {@code -o}, {@code --outfile},
+ * {@code -i}, {@code --ignore-case}, and {@code --temperature}.
  *
  * <p>The call to {@link #parse_or_usage} sets fields in object myInstance, and sets static fields
  * in class MyUtilityClass. It returns the original command line, with all options removed.
@@ -103,9 +105,8 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p>All arguments that start with '-' are processed as options. To terminate option processing at
  * the first non-option argument, see {@link #parse_options_after_arg(boolean)}. Also, the special
- * option '--' terminates option processing; method <code>parse_or_usage</code> returns all
- * subsequent arguments (along with any preceding non-option arguments) without scanning them for
- * options.
+ * option '--' terminates option processing; method {@code parse_or_usage} returns all subsequent
+ * arguments (along with any preceding non-option arguments) without scanning them for options.
  *
  * <p>A user may provide an option multiple times on the command line. If the field is a list, each
  * entry is added to the list. If the field is not a list, then only the last occurrence is used
@@ -128,8 +129,8 @@ import org.checkerframework.dataflow.qual.*;
  * the same heading in usage texts.
  *
  * <p>The @{@link OptionGroup} annotation must be specified on a field in addition to an @{@link
- * Option} annotation. Note that, due to a deficiency in Javadoc, an <code>@OptionGroup</code>
- * annotation must appear underneath any Javadoc comment for the field it applies to.
+ * Option} annotation. Note that, due to a deficiency in Javadoc, an {@code @OptionGroup} annotation
+ * must appear underneath any Javadoc comment for the field it applies to.
  *
  * <p>The {@code @OptionGroup} annotation acts like a delimiter &mdash; all
  * {@code @Option}-annotated fields up to the next {@code @OptionGroup} annotation belong to the
@@ -154,8 +155,8 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p><b>Option aliases</b>
  *
- * <p>The @{@link Option} annotation has an optional parameter <code>aliases</code>, which accepts
- * an array of strings. Each string in the array is an alias for the option being defined and can be
+ * <p>The @{@link Option} annotation has an optional parameter {@code aliases}, which accepts an
+ * array of strings. Each string in the array is an alias for the option being defined and can be
  * used in place of an option's long name or short name. For example:
  *
  * <pre>
@@ -172,16 +173,16 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p>The class Javadoc for a class that has a main method should generally contain a summary of all
  * command-line options. Such a summary can also be useful in other circumstances. See the {@link
- * plume.OptionsDoclet} class for instructions about generating HTML documentation.
+ * org.plumelib.options.OptionsDoclet} class for instructions about generating HTML documentation.
  *
  * <p><b>Supported field types</b>
  *
  * <p>A field with an @{@link Option} annotation may be of the following types:
  *
  * <ul>
- *   <li>Primitive types: boolean, int, long, float, double. (Primitives can also be represented as
- *       wrappers: Boolean, Integer, Long, Float, Double. Use of a wrapper type allows the argument
- *       to have no default value.)
+ *   <li>Primitive types: boolean, int, long, float, double.
+ *   <li>Primitive type wrappers: Boolean, Integer, Long, Float, Double. Use of a wrapper type
+ *       allows the argument to have no default value.
  *   <li>Reference types that have a constructor with a single string parameter.
  *   <li>java.util.regex.Pattern.
  *   <li>enums.
@@ -190,7 +191,8 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p><b>More examples</b>
  *
- * <p>Example clients of the Options library include {@link plume.Lookup}, <a
+ * <p>Example clients of the Options library include <a
+ * href="https://types.cs.washington.edu/plume-lib/api/plume/Lookup.html">Lookup</a>, <a
  * href="https://randoop.github.io/randoop/manual/#command-line-options">Randoop</a>, and <a
  * href="https://types.cs.washington.edu/javari/javarifier/#command-line-opts">Javarifier</a>, among
  * many others.
@@ -198,26 +200,25 @@ import org.checkerframework.dataflow.qual.*;
  * <p><b>Limitations</b>
  *
  * <ul>
- *   <li> Short options are only supported as separate entries (e.g., "-a -b") and not as a single
+ *   <li>Short options are only supported as separate entries (e.g., "-a -b") and not as a single
  *       group (e.g., "-ab").
- *   <li> Not all primitive types are supported.
- *   <li> Types without a constructor that takes a single <code>String</code> argument are not
- *       supported.
- *   <li> The "--no-long" option to turn off a boolean option named "long" is not supported; use
+ *   <li>Not all primitive types are supported.
+ *   <li>Types without a constructor that takes a single {@code String} argument are not supported.
+ *   <li>The "--no-long" option to turn off a boolean option named "long" is not supported; use
  *       "--long=false" instead.
  * </ul>
  *
  * <p><b>Possible enhancements</b>
  *
  * <ul>
- *   <li> Positional arguments (non-options that must be provided in a given order) could be
+ *   <li>Positional arguments (non-options that must be provided in a given order) could be
  *       supported.
  * </ul>
  *
- * @see plume.Option
- * @see plume.OptionGroup
- * @see plume.Unpublicized
- * @see plume.OptionsDoclet
+ * @see org.plumelib.options.Option
+ * @see org.plumelib.options.OptionGroup
+ * @see org.plumelib.options.Unpublicized
+ * @see org.plumelib.options.OptionsDoclet
  */
 public class Options {
 
@@ -425,8 +426,8 @@ public class Options {
     }
 
     /**
-     * Returns a short synopsis of the option in the form <code>-s --long=&lt;type&gt;</code>
-     * <strong>or</strong> (if use_single_dash is true) <code>-s -long=&lt;type&gt;</code> .
+     * Returns a short synopsis of the option in the form {@code -s --long=<type>}
+     * <strong>or</strong> (if use_single_dash is true) {@code-s -long=<type>} .
      */
     public String synopsis() {
       String prefix = use_single_dash ? "-" : "--";
@@ -580,6 +581,9 @@ public class Options {
    */
   public /*@Nullable*/ String usage_synopsis = null;
 
+  // // Debug loggers
+  // // Does nothing if not enabled.
+  // private final SimpleLog debug_options = new SimpleLog(false);
   private boolean debug_enabled = false;
 
   /**
@@ -631,9 +635,9 @@ public class Options {
       String current_group = null;
 
       @SuppressWarnings({
-        "rawness",
-        "initialization"
-      }) // if is_class is true, obj is a non-null initialized Class
+        "rawness", // if is_class is true, obj is a non-null initialized Class
+        "initialization" // if is_class is true, obj is a non-null initialized Class
+      })
       /*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?> clazz =
           (is_class ? (/*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?>) obj : obj.getClass());
       if (main_class == Void.TYPE) {
@@ -682,7 +686,7 @@ public class Options {
         }
 
         @SuppressWarnings(
-            "initialization") // "new MyClass(underInitialization)" yields @UnderInitialization even when @Initialized would be safe
+            "initialization") // new C(underInit) yields @UnderInitialization; @Initialized is safe
         /*@Initialized*/ OptionInfo oi =
             new OptionInfo(f, option, is_class ? null : obj, unpublicized);
         options.add(oi);
@@ -776,8 +780,6 @@ public class Options {
   /**
    * Like getAnnotation, but returns null (and prints a warning) rather than throwing an exception.
    */
-  @SuppressWarnings(
-      "initialization") // bug; see test case checkers/tests/nullness/generics/OptionsTest.java
   private static <T extends Annotation> /*@Nullable*/ T safeGetAnnotation(
       Field f, Class<T> annotationClass) {
     /*@Nullable*/ T annotation;
@@ -792,7 +794,7 @@ public class Options {
       System.out.printf(
           "Exception in call to f.getAnnotation(%s)%n  for f=%s%n  %s%nClasspath =%n",
           annotationClass, f, e.getMessage());
-      //e.printStackTrace();
+      // e.printStackTrace();
       System.out.println("Classpath:");
       for (URL url : ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()) {
         System.out.println(url.getFile());
@@ -833,6 +835,7 @@ public class Options {
    * @return all non-option arguments
    * @throws ArgException if the command line contains unknown option or misused options
    */
+  @SuppressWarnings("index") // https://github.com/kelloggm/checker-framework/issues/169
   public String[] parse(String[] args) throws ArgException {
 
     List<String> non_options = new ArrayList<String>();
@@ -920,13 +923,14 @@ public class Options {
   }
 
   /**
-   * Parses a command line and sets the options accordingly. This method splits the argument string
-   * into command-line arguments, respecting single and double quotes, then calls {@link
-   * #parse(String[])}.
+   * Parses a command line and sets the options accordingly.
    *
-   * <p>{@link #parse(String[])} is usually a better method to call. This one is appropriate when
-   * the <code>String[]</code> version of the arguments is not available &mdash; for example, for
-   * the <code>premain</code> method of a Java agent.
+   * <p>This method splits the argument string into command-line arguments, respecting single and
+   * double quotes, then calls {@link #parse(String[])}.
+   *
+   * <p>You should usually call {@link #parse(String[])} instead of this method. This method is only
+   * appropriate when the {@code String[]} version of the arguments is not available &mdash; for
+   * example, for the {@code premain} method of a Java agent.
    *
    * @param args the command line to parse
    * @return all non-option arguments
@@ -975,9 +979,80 @@ public class Options {
   }
 
   /**
-   * Parses a command line and sets the options accordingly. If an error occurs, prints the usage
-   * message and terminates the program. The program is terminated rather than throwing an error to
-   * create cleaner output.
+   * Parses a command line and sets the options accordingly. Returns non-option arguments.
+   *
+   * <p>If an error occurs, prints the exception's message, prints the given message, and then
+   * terminates the program. The program is terminated rather than throwing an error to create
+   * cleaner output.
+   *
+   * @param message a message to print, such as "Pass --help for a list of all command-line
+   *     arguments."
+   * @param args the command line to parse
+   * @return all non-option arguments
+   * @see #parse(String[])
+   */
+  public String[] parse_or_message(String message, String[] args) {
+
+    String[] non_options = null;
+
+    try {
+      non_options = parse(args);
+    } catch (ArgException ae) {
+      String exceptionMessage = ae.getMessage();
+      if (exceptionMessage != null) {
+        System.out.println(exceptionMessage);
+      }
+      System.out.println(message);
+      System.exit(-1);
+      // throw new Error ("message error: ", ae);
+    }
+    return (non_options);
+  }
+
+  /**
+   * Parses a command line and sets the options accordingly. Returns non-option arguments.
+   *
+   * <p>If an error occurs, prints the exception's message, prints the given message, and then
+   * terminates the program. The program is terminated rather than throwing an error to create
+   * cleaner output.
+   *
+   * <p>This method splits the argument string into command-line arguments, respecting single and
+   * double quotes, then calls {@link #parse_or_message(String, String[])}.
+   *
+   * <p>You should usually call {@link #parse_or_message(String, String[])} instead of this method.
+   * This method is only appropriate when the {@code String[]} version of the arguments is not
+   * available &mdash; for example, for the {@code premain} method of a Java agent.
+   *
+   * @param message a message to print, such as "Pass --help for a list of all command-line
+   *     arguments."
+   * @param args the command line to parse
+   * @return all non-option arguments
+   * @see #parse_or_message(String, String[])
+   */
+  public String[] parse_or_message(String message, String args) {
+
+    String[] non_options = null;
+
+    try {
+      non_options = parse(args);
+    } catch (ArgException ae) {
+      String exceptionMessage = ae.getMessage();
+      if (exceptionMessage != null) {
+        System.out.println(exceptionMessage);
+      }
+      System.out.println(message);
+      System.exit(-1);
+      // throw new Error ("usage error: ", ae);
+    }
+    return (non_options);
+  }
+
+  /**
+   * Parses a command line and sets the options accordingly. Returns non-option arguments.
+   *
+   * <p>If an error occurs, prints the exception's message, prints usage inoframtion, and then
+   * terminates the program. The program is terminated rather than throwing an error to create
+   * cleaner output.
    *
    * @param args the command line to parse
    * @return all non-option arguments
@@ -1003,16 +1078,17 @@ public class Options {
   }
 
   /**
-   * Parses a command line and sets the options accordingly. If an error occurs, prints the usage
-   * message and terminates the program. The program is terminated rather than throwing an error to
-   * create cleaner output.
+   * Parses a command line and sets the options accordingly. Returns non-option arguments.
+   *
+   * <p>If an error occurs, prints the exception's message, calls print_usage, and then terminates
+   * the program. The program is terminated rather than throwing an error to create cleaner output.
    *
    * <p>This method splits the argument string into command-line arguments, respecting single and
    * double quotes, then calls {@link #parse_or_usage(String[])}.
    *
-   * <p>{@link #parse(String[])} is usually a better method to call. This one is appropriate when
-   * the <code>String[]</code> version of the arguments is not available &mdash; for example, for
-   * the <code>premain</code> method of a Java agent.
+   * <p>You should usually call {@link #parse_or_usage(String[])} instead of this method. This
+   * method is only appropriate when the {@code String[]} version of the arguments is not available
+   * &mdash; for example, for the {@code premain} method of a Java agent.
    *
    * @param args the command line to parse
    * @return all non-option arguments
@@ -1037,8 +1113,7 @@ public class Options {
     return (non_options);
   }
 
-  /// This is a lot of methods, but it does save a tad of typing for the
-  /// programmer.
+  // This is a lot of methods, but it does save a tad of typing for the programmer.
 
   /**
    * Prints usage information. Uses the usage synopsis passed into the constructor, if any.
@@ -1376,7 +1451,7 @@ public class Options {
   private /*@NonNull*/ Object get_ref_arg(OptionInfo oi, String arg_name, String arg_value)
       throws ArgException {
 
-    Object val = null;
+    Object val;
     try {
       if (oi.constructor != null) {
         val = oi.constructor.newInstance(new Object[] {arg_value});
@@ -1388,21 +1463,20 @@ public class Options {
         if (oi.factory == null) {
           throw new Error("No constructor or factory for argument " + arg_name);
         }
-        @SuppressWarnings("nullness") // oi.factory is a static method, so null first argument is OK
-        Object tmpVal = oi.factory.invoke(null, arg_value);
+        @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
+        /*@NonNull*/ Object tmpVal = oi.factory.invoke(null, arg_value);
         val = tmpVal;
       }
     } catch (Exception e) {
       throw new ArgException("Invalid argument (%s) for argument %s", arg_value, arg_name);
     }
 
-    assert val != null : "@AssumeAssertion(nullness)";
     return val;
   }
 
   /**
-   * Behaves like {@link java.lang.Enum#valueOf}, except that <code>name</code> is case-insensitive
-   * and hyphen-insensitive (hyphens can be used in place of underscores). This allows for greater
+   * Behaves like {@link java.lang.Enum#valueOf}, except that {@code name} is case-insensitive and
+   * hyphen-insensitive (hyphens can be used in place of underscores). This allows for greater
    * flexibility when specifying enum types as command-line arguments.
    *
    * @param <T> the enum type
@@ -1515,7 +1589,10 @@ public class Options {
     return out.toString();
   }
 
-  /** Exceptions encountered during argument processing. */
+  /**
+   * Indicates an exception encountered during argument processing. Contains no information other
+   * than the message string.
+   */
   public static class ArgException extends Exception {
     static final long serialVersionUID = 20051223L;
 
@@ -1523,7 +1600,7 @@ public class Options {
       super(s);
     }
 
-    @SuppressWarnings("formatter") // acts as format method wrapper
+    /*@FormatMethod*/
     public ArgException(String format, /*@Nullable*/ Object... args) {
       super(String.format(format, args));
     }
@@ -1617,5 +1694,4 @@ public class Options {
     Collections.sort(theKeys);
     return theKeys;
   }
-
 }
