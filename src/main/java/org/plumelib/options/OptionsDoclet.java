@@ -54,6 +54,9 @@ import org.checkerframework.common.value.qual.*;
  * <pre>javadoc -quiet -doclet org.plumelib.options.OptionsDoclet [doclet options] [java files]
  * </pre>
  *
+ * You must specify a docletpath to Javadoc, and it needs to include the class files for the
+ * documented classes.
+ *
  * <p><b>Doclet Options</b>
  *
  * <p>The following doclet options are supported:
