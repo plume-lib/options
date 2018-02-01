@@ -40,12 +40,14 @@ dependencies {
 
 ///////////////////////////////////////////////////////////////////////////
 /// Maven Central upload
-/// 1. run: ./gradlew uploadArchives
+///
+
+/// 1. run, using a Java 7 JDK: ./gradlew uploadArchives
 /// 2. Manually release the deployment:
 /// 2a.  Browse to https://oss.sonatype.org/#stagingRepositories
 /// 2b.  Search for and select this repository, by group name.
-/// 2c.  Click "close" at the top.
-/// 2d.  Click "release" at the top.
+/// 2c.  At the top, click "close" then "refresh" then "release"
+///      (you might have to wait a little while between the clicks).
 
 
 // From http://central.sonatype.org/pages/gradle.html
