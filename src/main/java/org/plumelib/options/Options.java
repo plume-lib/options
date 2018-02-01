@@ -60,27 +60,27 @@ import org.checkerframework.dataflow.qual.*;
  * <!-- Example needs some more words of explanation and example command lines. -->
  *
  * <pre>
- *  import org.plumelib.options.*;
+ * import org.plumelib.options.*;
  *
- *  public class MyProgram {
+ * public class MyProgram {
  *
- *    &#64;Option("-o &lt;filename&gt; the output file ")
- *    public static File outfile = new File("/tmp/foobar");
+ *   &#64;Option("-o &lt;filename&gt; the output file ")
+ *   public static File outfile = new File("/tmp/foobar");
  *
- *    &#64;Option("-i ignore case")
- *    public static boolean ignore_case;
+ *   &#64;Option("-i ignore case")
+ *   public static boolean ignore_case;
  *
- *    &#64;Option("set the initial temperature")
- *    public static double temperature = 75.0;
+ *   &#64;Option("set the initial temperature")
+ *   public static double temperature = 75.0;
  *
- *    public static void main(String[] args) {
- *      MyProgram myInstance = new MyProgram();
- *      Options options = new Options("MyProgram [options] infile outfile",
- *                                    myInstance, MyUtilityClass.class);
- *      String[] remaining_args = options.parse_or_usage(args);
- *      ...
- *    }
- *  }
+ *   public static void main(String[] args) {
+ *     MyProgram myInstance = new MyProgram();
+ *     Options options = new Options("MyProgram [options] infile outfile",
+ *                                   myInstance, MyUtilityClass.class);
+ *     String[] remaining_args = options.parse_or_usage(args);
+ *     ...
+ *   }
+ * }
  * </pre>
  *
  * A user may invoke the program using the command-line arguments {@code -o}, {@code --outfile},
@@ -795,9 +795,15 @@ public class Options {
           "Exception in call to f.getAnnotation(%s)%n  for f=%s%n  %s%nClasspath =%n",
           annotationClass, f, e.getMessage());
       // e.printStackTrace();
-      System.out.println("Classpath:");
-      for (URL url : ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()) {
-        System.out.println(url.getFile());
+      URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+      if (sysLoader == null) {
+        System.out.println(
+            "No system class loader. (Maybe means bootstrap class loader is being used?)");
+      } else {
+        System.out.println("Classpath:");
+        for (URL url : ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()) {
+          System.out.println(url.getFile());
+        }
       }
       annotation = null;
     }
