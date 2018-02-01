@@ -801,7 +801,7 @@ public class Options {
             "No system class loader. (Maybe means bootstrap class loader is being used?)");
       } else {
         System.out.println("Classpath:");
-        for (URL url : ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs()) {
+        for (URL url : sysLoader.getURLs()) {
           System.out.println(url.getFile());
         }
       }
