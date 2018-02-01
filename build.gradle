@@ -70,8 +70,6 @@ artifacts {
 }
 
 signing {
-// Is this needed?
-//     useGpgCmd()
     sign configurations.archives
 }
 
