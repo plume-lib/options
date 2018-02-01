@@ -40,51 +40,13 @@ dependencies {
 
 ///////////////////////////////////////////////////////////////////////////
 /// Maven Central upload
-/// 1. run: gradle uploadArchives
+/// 1. run: ./gradlew uploadArchives
 /// 2. Manually release the deployment:
 /// 2a.  Browse to https://oss.sonatype.org/#stagingRepositories
-/// 2b.  Search for and select this repository.
+/// 2b.  Search for and select this repository, by group name.
 /// 2c.  Click "close" at the top.
 /// 2d.  Click "release" at the top.
 
-/// I never got this working.
-// bintray {
-//     user = System.getenv('BINTRAY_USER')
-//     key = System.getenv('BINTRAY_API_KEY')
-//     configurations = ['archives']
-//     pkg {
-//         // repo = 'generic'
-//         repo = 'maven'
-//         name = 'plume-gradle-project'
-//         userOrg = 'plumelib'
-//         licenses = ['MIT']
-//         vcsUrl = 'https://github.com/plume-lib/options.git'
-// 	version {
-// 	    name = '0.1'
-// 	    desc = 'Plume-Lib Options 0.1'
-// 	    // released  = new Date()
-// 	    vcsTag = '0.1'
-// 	    // attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
-// 	}
-//     }
-// }
-
-
-/// Older attempt for Maven Central.
-// // run: ./gradlew publish
-// apply plugin: 'maven-publish'
-//
-// publishing {
-//     publications {
-//         mavenJava(MavenPublication) {
-//             groupId 'org.plumelib'
-//             artifactId 'options'
-//             version '0.1'
-//
-//             from components.java
-//         }
-//     }
-// }
 
 // From http://central.sonatype.org/pages/gradle.html
 
@@ -113,7 +75,7 @@ signing {
 
 group = "org.plumelib"
 archivesBaseName = "options"
-version = "0.1"
+version = "0.2"
 
 uploadArchives {
   repositories {
