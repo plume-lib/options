@@ -32,7 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.StringJoiner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -499,7 +498,7 @@ public class OptionsDoclet {
   /** Get the result of inserting the options documentation into the docfile. */
   /*@RequiresNonNull("docFile")*/
   private String newDocFileText() throws Exception {
-    StringJoiner b = new StringJoiner(eol);
+    StringBuilderDelimited b = new StringBuilderDelimited(eol);
     BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);
     String docline;
     boolean replacing = false;
@@ -610,7 +609,7 @@ public class OptionsDoclet {
    * @return the HTML documentation for the underlying options instance
    */
   public String optionsToHtml(int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringBuilderDelimited b = new StringBuilderDelimited(eol);
 
     if (includeClassDoc && root.classes().length > 0) {
       b.add(OptionsDoclet.javadocToHtml(root.classes()[0]));
@@ -660,7 +659,7 @@ public class OptionsDoclet {
    * @return the HTML documentation for the underlying options instance
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringBuilderDelimited b = new StringBuilderDelimited(eol);
     Scanner s = new Scanner(optionsToHtml(refillWidth - padding - 2));
 
     while (s.hasNextLine()) {
@@ -681,7 +680,7 @@ public class OptionsDoclet {
   /** Get the HTML describing many options, formatted as an HTML list. */
   private String optionListToHtml(
       List<Options.OptionInfo> opt_list, int padding, int firstLinePadding, int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringBuilderDelimited b = new StringBuilderDelimited(eol);
     for (Options.OptionInfo oi : opt_list) {
       if (oi.unpublicized) {
         continue;
@@ -724,7 +723,7 @@ public class OptionsDoclet {
       compressedSpaces = compressedSpaces.substring(1);
     }
     String oneLine = StringUtils.repeat(" ", firstLinePadding) + compressedSpaces;
-    StringJoiner multiLine = new StringJoiner(eol);
+    StringBuilderDelimited multiLine = new StringBuilderDelimited(eol);
     while (oneLine.length() > refillWidth) {
       int breakLoc = oneLine.lastIndexOf(' ', refillWidth);
       if (breakLoc == -1) {
@@ -833,7 +832,7 @@ public class OptionsDoclet {
     if (seetags.length > 0) {
       b.append(" See: ");
       {
-        StringJoiner bb = new StringJoiner(", ");
+        StringBuilderDelimited bb = new StringBuilderDelimited(", ");
         for (SeeTag tag : seetags) {
           bb.add("<code>" + tag.text() + "</code>");
         }

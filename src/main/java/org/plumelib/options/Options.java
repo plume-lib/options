@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 /*>>>
@@ -1259,7 +1258,7 @@ public class Options {
     }
     int max_len = Collections.max(lengths);
 
-    StringJoiner buf = new StringJoiner(eol);
+    StringBuilderDelimited buf = new StringBuilderDelimited(eol);
     for (OptionGroupInfo gi : groups) {
       buf.add(String.format("%n%s:", gi.name));
       buf.add(format_options(gi.optionList, max_len, include_unpublicized));
@@ -1271,7 +1270,7 @@ public class Options {
   /** Format a list of options for use in generating usage messages. */
   private String format_options(
       List<OptionInfo> opt_list, int max_len, boolean include_unpublicized) {
-    StringJoiner buf = new StringJoiner(eol);
+    StringBuilderDelimited buf = new StringBuilderDelimited(eol);
     for (OptionInfo oi : opt_list) {
       if (oi.unpublicized && !include_unpublicized) {
         continue;
@@ -1556,7 +1555,7 @@ public class Options {
    * @return options, similarly to supplied on the command line
    */
   public String settings(boolean include_unpublicized) {
-    StringJoiner out = new StringJoiner(eol);
+    StringBuilderDelimited out = new StringBuilderDelimited(eol);
 
     // Determine the length of the longest name
     int max_len = max_opt_len(options, include_unpublicized);
@@ -1586,7 +1585,7 @@ public class Options {
   @SuppressWarnings("purity") // side effect to local state (string creation)
   /*@SideEffectFree*/
   public String toString(/*>>>@GuardSatisfied Options this*/) {
-    StringJoiner out = new StringJoiner(eol);
+    StringBuilderDelimited out = new StringBuilderDelimited(eol);
 
     for (OptionInfo oi : options) {
       out.add(oi.toString());
