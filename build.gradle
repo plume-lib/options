@@ -44,7 +44,10 @@ dependencies {
 /// Maven Central upload
 /// 1. run: gradle uploadArchives
 /// 2. Manually release the deployment:
-/// http://central.sonatype.org/pages/releasing-the-deployment.html
+/// 2a.  Browse to https://oss.sonatype.org/#stagingRepositories
+/// 2b.  Search for and select this repository.
+/// 2c.  Click "close" at the top.
+/// 2d.  Click "release" at the top.
 
 /// I never got this working.
 // bintray {
@@ -131,6 +134,8 @@ uploadArchives {
         name 'Plume-lib Options'
         packaging 'jar'
         // optionally artifactId can be defined here
+        // Is this needed?
+        // artifactId options
         description 'Command-line option processing for Java.'
         url 'https://github.com/plume-lib/options'
 
