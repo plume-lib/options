@@ -15,5 +15,5 @@ argument, you write Javadoc and an `@Option` annotation. Then, the field is
 automatically set from a command-line option of the same name, and usage
 messages and printed documentation are generated automatically.
 
-For more details, see the Javadoc for the [`Options`
-class](https://github.com/plume-lib/options/blob/master/src/main/java/org/plumelib/options/Options.java).
+For more details, see the [Javadoc for the `Options`
+class](http://plumelib.org/options/api/org/plumelib/options/Options.html).

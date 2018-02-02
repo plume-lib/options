@@ -7,19 +7,8 @@
  */
 
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
-}
-
-apply plugin: 'java'
-
-// Apply the java-library plugin to add support for Java Library
-apply plugin: 'java-library'
-
-// In this section you declare where to find the dependencies of your project
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()  // like Maven Central, see https://bintray.com/bintray/jcenter
+  id 'com.github.johnrengelman.shadow' version '2.0.2'   // creates shadowJar task
+  id 'java'
 }
 
 dependencies {
@@ -30,11 +19,22 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 
-    // for tools.jar
+    // for tools.jar, which contains Javadoc
     compile files(org.gradle.internal.jvm.Jvm.current().toolsJar)
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+}
+
+repositories {
+  mavenCentral()
+}
+
+
+task javadocWeb(type: Javadoc) {
+  source = sourceSets.main.allJava
+  destinationDir = file("/cse/web/research/plumelib/options/api")
+  classpath = project.sourceSets.main.compileClasspath
 }
 
 
@@ -75,7 +75,7 @@ signing {
 
 group = "org.plumelib"
 archivesBaseName = "options"
-version = "0.2.2"
+version = "0.2.3"
 
 uploadArchives {
   repositories {
