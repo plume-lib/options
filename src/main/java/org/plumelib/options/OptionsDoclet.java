@@ -98,9 +98,9 @@ import org.checkerframework.common.value.qual.*;
  *       </ul>
  *   <li><b>-classdoc</b> When specified, the output of this doclet includes the class documentation
  *       of the first class specified on the command-line.
- *   <li><b>-singledash</b> When specified, {@code use_single_dash(true)} is called on the
- *       underlying instance of Options used to generate documentation. See {@link
- *       org.plumelib.options.Options#use_single_dash(boolean)}.
+ *   <li><b>-singledash</b> When specified, {@code useSingleDash(true)} is called on the underlying
+ *       instance of Options used to generate documentation. See {@link
+ *       org.plumelib.options.Options#useSingleDash(boolean)}.
  * </ul>
  *
  * <p><b>Examples</b>
@@ -508,7 +508,7 @@ public class OptionsDoclet {
     BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);
     String docline;
     boolean replacing = false;
-    boolean replaced_once = false;
+    boolean replacedOnce = false;
     String prefix = null;
 
     while ((docline = doc.readLine()) != null) {
@@ -522,7 +522,7 @@ public class OptionsDoclet {
 
       b.add(docline);
 
-      if (!replaced_once && docline.trim().equals(startDelim)) {
+      if (!replacedOnce && docline.trim().equals(startDelim)) {
         if (formatJavadoc) {
           int starIndex = docline.indexOf('*');
           b.add(docline.substring(0, starIndex + 1));
@@ -534,7 +534,7 @@ public class OptionsDoclet {
         } else {
           b.add(optionsToHtml(0));
         }
-        replaced_once = true;
+        replacedOnce = true;
         replacing = true;
       }
     }
@@ -548,10 +548,10 @@ public class OptionsDoclet {
   /** Side-effects each option in {@code options.getOptions()}. Adds Javadoc info to it. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
-      ClassDoc opt_doc = root.classNamed(oi.get_declaring_class().getName());
-      if (opt_doc != null) {
-        String nameWithUnderscores = oi.long_name.replace('-', '_');
-        for (FieldDoc fd : opt_doc.fields()) {
+      ClassDoc optDoc = root.classNamed(oi.getDeclaringClass().getName());
+      if (optDoc != null) {
+        String nameWithUnderscores = oi.longName.replace('-', '_');
+        for (FieldDoc fd : optDoc.fields()) {
           if (fd.name().equals(nameWithUnderscores)) {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
@@ -568,39 +568,39 @@ public class OptionsDoclet {
           }
         }
       }
-      if (oi.base_type.isEnum()) {
+      if (oi.baseType.isEnum()) {
         processEnumJavadoc(oi);
       }
     }
   }
 
-  /** Initializes {@link Options.OptionInfo.enum_jdoc} for the given {@code OptionInfo}. */
+  /** Initializes {@link Options.OptionInfo.enumJdoc} for the given {@code OptionInfo}. */
   private void processEnumJavadoc(Options.OptionInfo oi) {
-    Enum<?>[] constants = (Enum<?>[]) oi.base_type.getEnumConstants();
+    Enum<?>[] constants = (Enum<?>[]) oi.baseType.getEnumConstants();
     if (constants == null) {
       return;
     }
 
-    oi.enum_jdoc = new LinkedHashMap<String, String>();
+    oi.enumJdoc = new LinkedHashMap<String, String>();
 
     for (Enum<?> constant : constants) {
-      assert oi.enum_jdoc != null : "@AssumeAssertion(nullness): bug in flow?";
-      oi.enum_jdoc.put(constant.name(), "");
+      assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
+      oi.enumJdoc.put(constant.name(), "");
     }
 
-    ClassDoc enum_doc = root.classNamed(oi.base_type.getName());
-    if (enum_doc == null) {
+    ClassDoc enumDoc = root.classNamed(oi.baseType.getName());
+    if (enumDoc == null) {
       return;
     }
 
-    assert oi.enum_jdoc != null : "@AssumeAssertion(nullness): bug in flow?";
-    for (String name : oi.enum_jdoc.keySet()) {
-      for (FieldDoc fd : enum_doc.fields()) {
+    assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
+    for (String name : oi.enumJdoc.keySet()) {
+      for (FieldDoc fd : enumDoc.fields()) {
         if (fd.name().equals(name)) {
           if (formatJavadoc) {
-            oi.enum_jdoc.put(name, fd.commentText());
+            oi.enumJdoc.put(name, fd.commentText());
           } else {
-            oi.enum_jdoc.put(name, javadocToHtml(fd));
+            oi.enumJdoc.put(name, javadocToHtml(fd));
           }
           break;
         }
@@ -628,7 +628,7 @@ public class OptionsDoclet {
     } else {
       for (Options.OptionGroupInfo gi : options.getOptionGroups()) {
         // Do not include groups without publicized options in output
-        if (!gi.any_publicized()) {
+        if (!gi.anyPublicized()) {
           continue;
         }
 
@@ -685,16 +685,16 @@ public class OptionsDoclet {
 
   /** Get the HTML describing many options, formatted as an HTML list. */
   private String optionListToHtml(
-      List<Options.OptionInfo> opt_list, int padding, int firstLinePadding, int refillWidth) {
+      List<Options.OptionInfo> optList, int padding, int firstLinePadding, int refillWidth) {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
-    for (Options.OptionInfo oi : opt_list) {
+    for (Options.OptionInfo oi : optList) {
       if (oi.unpublicized) {
         continue;
       }
       StringBuilder bb = new StringBuilder();
       String optHtml = optionToHtml(oi, padding);
       bb.append(StringUtils.repeat(" ", padding));
-      bb.append("<li id=\"option:" + oi.long_name + "\">").append(optHtml);
+      bb.append("<li id=\"option:" + oi.longName + "\">").append(optHtml);
       // .append("</li>");
       if (refillWidth <= 0) {
         b.add(bb);
@@ -763,14 +763,14 @@ public class OptionsDoclet {
   public String optionToHtml(Options.OptionInfo oi, int padding) {
     StringBuilder b = new StringBuilder();
     Formatter f = new Formatter(b);
-    if (oi.short_name != null) {
-      f.format("<b>-%s</b> ", oi.short_name);
+    if (oi.shortName != null) {
+      f.format("<b>-%s</b> ", oi.shortName);
     }
     for (String a : oi.aliases) {
       f.format("<b>%s</b> ", a);
     }
     String prefix = getUseSingleDash() ? "-" : "--";
-    f.format("<b>%s%s=</b><i>%s</i>", prefix, oi.long_name, oi.type_name);
+    f.format("<b>%s%s=</b><i>%s</i>", prefix, oi.longName, oi.typeName);
     if (oi.list != null) {
       b.append(" <code>[+]</code>");
     }
@@ -778,10 +778,10 @@ public class OptionsDoclet {
     f.format("%s", StringUtils.repeat(" ", padding));
 
     String jdoc = ((oi.jdoc == null) ? "" : oi.jdoc);
-    if (oi.no_doc_default || oi.default_str == null) {
+    if (oi.noDocDefault || oi.defaultStr == null) {
       f.format("%s", jdoc);
     } else {
-      String default_str = "default " + oi.default_str;
+      String defaultStr = "default " + oi.defaultStr;
       // The default string must be HTML-escaped since it comes from a string
       // rather than a Javadoc comment.
       String suffix = "";
@@ -789,13 +789,13 @@ public class OptionsDoclet {
         suffix = "</p>";
         jdoc = jdoc.substring(0, jdoc.length() - suffix.length());
       }
-      f.format("%s [%s]%s", jdoc, StringEscapeUtils.escapeHtml4(default_str), suffix);
+      f.format("%s [%s]%s", jdoc, StringEscapeUtils.escapeHtml4(defaultStr), suffix);
     }
-    if (oi.base_type.isEnum()) {
+    if (oi.baseType.isEnum()) {
       b.append(eol).append("<ul>").append(eol);
-      assert oi.enum_jdoc != null
-          : "@AssumeAssertion(nullness): dependent: non-null if oi.base_type is an enum";
-      for (Map.Entry<String, String> entry : oi.enum_jdoc.entrySet()) {
+      assert oi.enumJdoc != null
+          : "@AssumeAssertion(nullness): dependent: non-null if oi.baseType is an enum";
+      for (Map.Entry<String, String> entry : oi.enumJdoc.entrySet()) {
         b.append("  <li><b>").append(entry.getKey()).append("</b>");
         if (entry.getValue().length() != 0) {
           b.append(" ").append(entry.getValue());
@@ -871,6 +871,6 @@ public class OptionsDoclet {
   }
 
   public void setUseSingleDash(boolean val) {
-    options.use_single_dash(true);
+    options.useSingleDash(true);
   }
 }

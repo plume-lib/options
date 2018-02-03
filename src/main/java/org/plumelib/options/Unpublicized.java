@@ -14,9 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used in conjunction with the {@code @Option} annotation to signal that the option should not be
- * included in the usage message, unless an optional include_unpublicized argument is supplied to
- * the usage message method and is true.
+ * Used in conjunction with the {@code @Option} annotation. Indicates that by default, the option
+ * should not be included in the usage message.
+ *
+ * <p>If the showUnpublicized argument to the {@link Options#usage(boolean, String[])} method method
+ * is true, the usage method shows all options, even unpublicized ones.
  *
  * @see org.plumelib.options.Option
  * @see org.plumelib.options.Options

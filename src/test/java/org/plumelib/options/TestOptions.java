@@ -3,12 +3,11 @@ package org.plumelib.options;
 import static org.junit.Assert.*;
 import static org.plumelib.options.Options.ArgException;
 
-import org.junit.Test;
-
-import java.util.ArrayList;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.junit.Test;
 
 public class TestOptions {
 
@@ -147,7 +146,7 @@ public class TestOptions {
     assert t.temperature == -12.3;
     assert !t.printVersion;
 
-    options.parse("-d Monday -temp -12.3");
+    options.parse(Options.tokenize("-d Monday -temp -12.3"));
     assert t.day.equals("Monday");
     assert t.temperature == -12.3;
     assert !t.printVersion;
@@ -157,7 +156,7 @@ public class TestOptions {
     assert t.temperature == 21.7;
     assert t.printVersion;
 
-    options.parse("-t 21.7 -version");
+    options.parse(Options.tokenize("-t 21.7 -version"));
     assert t.day.equals("Monday");
     assert t.temperature == 21.7;
     assert t.printVersion;
@@ -169,7 +168,7 @@ public class TestOptions {
     assert t.printVersion;
 
     t.printVersion = false;
-    options.parse("--version -temp=-60.1 --day Tuesday");
+    options.parse(Options.tokenize("--version -temp=-60.1 --day Tuesday"));
     assert t.day.equals("Tuesday");
     assert t.temperature == -60.1;
     assert t.printVersion;
@@ -284,7 +283,7 @@ public class TestOptions {
     assert TestOptionGroups2.color;
     assert TestOptionGroups2.pi == 3.15;
 
-    options.parse("--colour --pi 3.15");
+    options.parse(Options.tokenize("--colour --pi 3.15"));
     assert TestOptionGroups2.color;
     assert TestOptionGroups2.pi == 3.15;
 
@@ -292,7 +291,7 @@ public class TestOptions {
     // included in the usage message.
     Options options2 = new Options("test", TestOptionGroups3.class);
     assert options.usage().indexOf("Internal options") == -1;
-    // ...unless include_unpublicized is true.
+    // ...unless showUnpublicized is true.
     assert options.usage(true).indexOf("Internal options") > -1;
   }
 
