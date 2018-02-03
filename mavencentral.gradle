@@ -5,7 +5,7 @@ apply from: 'build.gradle'
 ///
 
 /// 1. Increment the "version = XXX" line below.
-/// 2. Run, using a Java 7 JDK: ./gradlew -b mavencentral.gradle uploadArchives
+/// 2. Run, using a Java 7 JDK: ./gradle -b mavencentral.gradle uploadArchives
 /// 3. Manually release the deployment:
 /// 3a.  Browse to https://oss.sonatype.org/#stagingRepositories
 /// 3b.  Search for and select this repository, by group name.
