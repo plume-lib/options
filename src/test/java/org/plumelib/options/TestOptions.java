@@ -93,9 +93,9 @@ public class TestOptions {
     assert args[2].equals("-b") : args[2];
     assert !t.bool;
 
-    // Test split_lists
+    // Test spaceSeparatedLists
     t.ld.clear();
-    Options.split_lists = true;
+    Options.spaceSeparatedLists = true;
     args = options.parse(new String[] {"--ld", "42.1 9.3 10.5", "--ld", "2.7"});
     assert args.length == 0;
     assert t.ld.size() == 4;

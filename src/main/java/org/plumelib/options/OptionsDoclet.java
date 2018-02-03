@@ -44,8 +44,8 @@ import org.checkerframework.common.value.qual.*;
 */
 
 /**
- * Generates HTML documentation of command-line options. Works with the {@link
- * org.plumelib.options.Options} class.
+ * Generates HTML documentation of command-line options, for use in a manual or in a Javadoc class
+ * comment. Works with the {@link org.plumelib.options.Options} class.
  *
  * <p><b>Usage</b>
  *
@@ -62,62 +62,53 @@ import org.checkerframework.common.value.qual.*;
  * <p>The following doclet options are supported:
  *
  * <ul>
- *   <li><b>-docfile</b> <i>file</i> When specified, the output of this doclet is the result of
- *       replacing everything between the two lines
+ *   <li><b>-docfile</b> <i>file</i> When specified, this doclet reads <i>file</i> and replaces
+ *       everything between the two lines
  *       <pre>&lt;!-- start options doc (DO NOT EDIT BY HAND) --&gt;</pre>
  *       and
  *       <pre>&lt;!-- end options doc --&gt;</pre>
- *       in <i>file</i> with the options documentation. This can be used for inserting option
- *       documentation into an existing manual. The existing docfile is not modified; output goes to
- *       the {@code -outfile} argument, or to standard out.
+ *       in <i>file</i> with the options documentation. By default, produces output to standard out
+ *       without modifying <i>file</i>; see <span style="white-space: nowrap;">{@code
+ *       -outfile}</span> and <span style="white-space: nowrap;">{@code -i}</span> to output
+ *       elsewhere or to edit <i>file</i> in place.
  *   <li><b>-outfile</b> <i>file</i> The destination for the output (the default is standard out).
- *       If both {@code -outfile} and {@code -docfile} are specified, they must be different. When
- *       {@code -d} is used, the output is written to a file with the given name relative to that
- *       destination directory.
+ *       If both <span style="white-space: nowrap;">{@code -outfile}</span> and <span
+ *       style="white-space: nowrap;">{@code -docfile}</span> are specified, they must be different
+ *       (but see the <span style="white-space: nowrap;">{@code -i}</span> option). When <span
+ *       style="white-space: nowrap;">{@code -d}</span> is used, the output is written to a file
+ *       with the given name relative to that destination directory.
  *   <li><b>-d</b> <i>directory</i> The destination directory for the output file. Only used if
- *       {@code -outfile} is used, in which case, the file is written in this directory. Otherwise,
- *       this option is ignored.
+ *       <span style="white-space: nowrap;">{@code -outfile}</span> is used, in which case, the file
+ *       is written in this directory.
  *   <li><b>-i</b> Specifies that the docfile should be edited in-place. This option can only be
- *       used if the {@code -docfile} option is used, and may not be used at the same time as the
- *       {@code -outfile} option.
+ *       used if the <span style="white-space: nowrap;">{@code -docfile}</span> option is used, and
+ *       may not be used at the same time as the <span style="white-space: nowrap;">{@code
+ *       -outfile}</span> option.
  *   <li><b>-format</b> <i>format</i> This option sets the output format of this doclet. Currently,
  *       the following values for <i>format</i> are supported:
  *       <ul>
  *         <li><b>javadoc</b> When this format is specified, the output of this doclet is formatted
- *             as a Javadoc comment. This is useful for including option documentation inside Java
- *             source code. When this format is used with the {@code -docfile} option, the generated
- *             documentation is inserted between the lines
- *             <pre>* &lt;!-- start options doc (DO NOT EDIT BY HAND) --&gt;</pre>
- *             and
- *             <pre>* &lt;!-- end options doc --&gt;</pre>
- *             using the same indentation. Inline {@code @link} and {@code @see} tags in the Javadoc
- *             input are left untouched.
+ *             as a Javadoc comment, with "*" at the beginning of each line and (when used with the
+ *             <span style="white-space: nowrap;">{@code -docfile}</span> option) using appropriate
+ *             indentation. Inline {@code @link} and {@code @see} tags in the Javadoc input are left
+ *             untouched.
  *         <li><b>html</b> This format outputs HTML for general-purpose use, meaning inline
- *             {@code @link} and {@code @see} tags in the Javadoc input are suitably replaced. This
- *             is the default output format and does not need to be specified explicitly.
+ *             {@code @link} and {@code @see} tags in the Javadoc input are suitably replaced by
+ *             HTML links. This is the default output format and need not be specified explicitly.
  *       </ul>
  *   <li><b>-classdoc</b> When specified, the output of this doclet includes the class documentation
  *       of the first class specified on the command-line.
- *   <li><b>-singledash</b> When specified, {@code useSingleDash(true)} is called on the underlying
- *       instance of Options used to generate documentation. See {@link
- *       org.plumelib.options.Options#useSingleDash(boolean)}.
+ *   <li><b>-singledash</b> When specified, {@link
+ *       org.plumelib.options.Options#setUseSingleDash(boolean) setUseSingleDash(true)} is called on
+ *       the underlying instance of Options used to generate documentation.
  * </ul>
  *
  * <p><b>Examples</b>
  *
- * <p>To update the Javarifier HTML manual with option documentation run:
- *
- * <pre>
- * javadoc -quiet -doclet org.plumelib.options.OptionsDoclet -i -docfile javarifier.html src/javarifier/Main.java
- * </pre>
- *
- * <p>To update the class Javadoc for org.plumelib.options.Lookup with option documentation run:
- *
- * <pre>
- * javadoc -quiet -doclet org.plumelib.options.OptionsDoclet -i -docfile Lookup.java -format javadoc Lookup.java
- * </pre>
- *
- * <p>For a more extensive example, see file {@code java/Makefile} in plume-lib itself.
+ * <p>Search for "OptionsDoclet" in the buildfiles for <a
+ * href="https://types.cs.washington.edu/plume-lib/api/plume/Lookup.html#command-line-options">Lookup</a>,
+ * <a href="https://randoop.github.io/randoop/manual/#command-line-options">Randoop</a>, and <a
+ * href="https://types.cs.washington.edu/javari/javarifier/#command-line-opts">Javarifier</a>.
  *
  * <p><b>Requirements</b>
  *
@@ -131,15 +122,14 @@ import org.checkerframework.common.value.qual.*;
  *
  * <p>By default, the documentation generated by OptionsDoclet includes a default value string for
  * each option in square brackets after the option's description, similar to the usage messages
- * generated by {@link org.plumelib.options.Options#usage(String...)}. The {@link
- * org.plumelib.options.Option#noDocDefault} field in the {@code @Option} annotation can be set to
- * {@code true} to omit the default value string from the generated documentation for that option.
+ * generated by {@link org.plumelib.options.Options#usage(String...)}. You can set the {@link
+ * org.plumelib.options.Option#noDocDefault} field to {@code true} to omit the default value string
+ * from the generated documentation for an option.
  *
  * <p>Omitting the generated default value string is useful for options that have system-dependent
- * defaults. Such options are not an issue for usage messages that are generated at runtime.
- * However, system dependent defaults do pose a problem for static documentation, which is rarely
- * regenerated and meant to apply to all users. Consider the following {@code @Option}-annotated
- * field:
+ * defaults. Reporting the system-dependent default is appropriate for usage messages that are
+ * generated at run time, but are not appropriate for documentation that is meant to apply to all
+ * users. Consider the following {@code @}{@link Option}-annotated field:
  *
  * <pre>
  * &#64;Option(value="&lt;timezone&gt; Set the time zone")
@@ -148,23 +138,22 @@ import org.checkerframework.common.value.qual.*;
  * The default value for {@code timezone} depends on the system's timezone setting. HTML
  * documentation of this option generated in Chicago would not apply to a user in New York. To work
  * around this problem, the default value should be hidden; instead the Javadoc for this field
- * should indicate a special default as follows.
+ * should indicate the default in the main Javadoc comment, and the {@code Option} annotation should
+ * include {@code noDocDefault=true}. For example:
  *
- * <pre>{@code
+ * <pre>
  * &#47;**
- *  * <other stuff...>  This option defaults to the system timezone.
+ *  * &lt;other stuff...&gt;  This option defaults to the system timezone.
  *  *&#47;
- * &#64;Option(value="<timezone> Set the timezone", noDocDefault=true)
- * public static String timezone = TimeZone.getDefault().getID();
- * }</pre>
+ * &#64;Option(value="&lt;timezone&gt; Set the timezone", noDocDefault=true)
+ * public static String timezone = TimeZone.getDefault().getID();</pre>
  *
  * This keeps the documentation system-agnostic.
  *
  * <p><b>Caveats</b>
  *
- * <p>The generated HTML documentation includes unpublicized option groups but not
- * {@code @Unpublicized} options. Option groups that contain only {@code @Unpublicized} options are
- * not included in the output at all.
+ * <p>The generated HTML documentation omits {@code @}{@link Unpublicized} options. It includes
+ * unpublicized option groups if they contain any publicized options.
  *
  * <p><b>Troubleshooting</b>
  *
@@ -406,7 +395,8 @@ public class OptionsDoclet {
   }
 
   /**
-   * Set the options for this class based on command-line arguments given by RootDoc.options().
+   * Set the underlying Options instance for this class based on command-line arguments given by
+   * RootDoc.options().
    *
    * @param options the command-line options to parse: a list of 1- or 2-element arrays
    */
@@ -545,7 +535,7 @@ public class OptionsDoclet {
 
   // HTML and Javadoc processing methods
 
-  /** Side-effects each option in {@code options.getOptions()}. Adds Javadoc info to it. */
+  /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
       ClassDoc optDoc = root.classNamed(oi.getDeclaringClass().getName());
@@ -609,10 +599,10 @@ public class OptionsDoclet {
   }
 
   /**
-   * Get the HTML documentation for the underlying options instance.
+   * Get the HTML documentation for the underlying Options instance.
    *
    * @param refillWidth the number of columns to fit the text into, by breaking lines
-   * @return the HTML documentation for the underlying options instance
+   * @return the HTML documentation for the underlying Options instance
    */
   public String optionsToHtml(int refillWidth) {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
@@ -623,7 +613,7 @@ public class OptionsDoclet {
     }
 
     b.add("<ul>");
-    if (!options.isUsingGroups()) {
+    if (!options.hasGroups()) {
       b.add(optionListToHtml(options.getOptions(), 6, 2, refillWidth));
     } else {
       for (Options.OptionGroupInfo gi : options.getOptionGroups()) {
@@ -658,11 +648,11 @@ public class OptionsDoclet {
   }
 
   /**
-   * Get the HTML documentation for the underlying options instance, formatted as a Javadoc comment.
+   * Get the HTML documentation for the underlying Options instance, formatted as a Javadoc comment.
    *
    * @param padding the number of leading spaces to add in the Javadoc output, before "* "
    * @param refillWidth the number of columns to fit the text into, by breaking lines
-   * @return the HTML documentation for the underlying options instance
+   * @return the HTML documentation for the underlying Options instance
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
@@ -753,7 +743,7 @@ public class OptionsDoclet {
   }
 
   /**
-   * Get the line of HTML describing an Option.
+   * Get the line of HTML describing one Option.
    *
    * @param oi the option to describe
    * @param padding the number of spaces to add at the begginning of the detail line (after the line
@@ -809,11 +799,11 @@ public class OptionsDoclet {
   }
 
   /**
-   * Replace the @link tags and block @see tags in a Javadoc comment with sensible, non-hyperlinked
-   * HTML. This keeps most of the information in the comment while still being presentable.
+   * Replace the @link tags and block @see tags in a Javadoc comment with HTML.
    *
-   * <p>This is only a temporary solution. Ideally, @link/@see tags would be converted to HTML links
-   * that point to actual documentation.
+   * <p>Currently, the output is non-hyperlinked HTML. This keeps most of the information in the
+   * comment while still being presentable. Ideally, @link/@see tags would be converted to HTML
+   * links that point to actual documentation.
    *
    * @param doc a Javadoc comment to convert to HTML
    * @return HTML version of doc
@@ -851,10 +841,12 @@ public class OptionsDoclet {
 
   // Getters and Setters
 
+  /** Returns true if the output format is Javadoc, false if the output format is HTML. */
   public boolean getFormatJavadoc() {
     return formatJavadoc;
   }
 
+  /** Supply true to set the output format to Javadoc, false to set the output format to HTML. */
   public void setFormatJavadoc(boolean val) {
     if (val && !formatJavadoc) {
       startDelim = "* " + startDelim;
@@ -866,11 +858,13 @@ public class OptionsDoclet {
     this.formatJavadoc = val;
   }
 
+  /** See {@link Options#getUseSingleDash()}. */
   public boolean getUseSingleDash() {
-    return options.isUsingSingleDash();
+    return options.getUseSingleDash();
   }
 
+  /** See {@link Options#setUseSingleDash(boolean)}. */
   public void setUseSingleDash(boolean val) {
-    options.useSingleDash(true);
+    options.setUseSingleDash(true);
   }
 }
