@@ -6,10 +6,8 @@
  * user guide available at https://docs.gradle.org/3.4.1/userguide/java_library_plugin.html
  */
 
-plugins {
-  id 'com.github.johnrengelman.shadow' version '2.0.2'   // creates shadowJar task
-  id 'java'
-}
+// Not "plugins { ... }" because this file is included in other build files.
+apply plugin: 'java'
 
 dependencies {
 

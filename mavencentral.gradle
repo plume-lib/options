@@ -4,8 +4,8 @@ apply from: 'build.gradle'
 /// Maven Central upload
 ///
 
-/// 1. Increment the version number below and in README.md.
-/// 2. Run, using a Java 7 JDK: ./gradle -b mavencentral.gradle uploadArchives
+/// 1. Increment the version number in this file and in README.md.
+/// 2. Run, using a Java 7 JDK: gradle -b mavencentral.gradle uploadArchives
 /// 3. Manually release the deployment:
 /// 3a.  Browse to https://oss.sonatype.org/#stagingRepositories
 /// 3b.  Search for and select this repository, by group name.
@@ -17,6 +17,7 @@ apply from: 'build.gradle'
 
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'com.github.johnrengelman.shadow'   // creates shadowJar task
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -38,6 +39,7 @@ signing {
 
 group = "org.plumelib"
 archivesBaseName = "options"
+// When editing this, also increment in README.md .
 version = "0.3"
 
 uploadArchives {
@@ -86,3 +88,13 @@ uploadArchives {
     }
   }
 }
+
+// Do I need to build or publish the shadow jar options-all.jar?
+// What user really needs it?
+// publishing  {
+//   publications {
+//     shadow(MavenPublication) {
+//       from components.shadow
+//       artifactId = 'options-all'
+//   }
+// }
