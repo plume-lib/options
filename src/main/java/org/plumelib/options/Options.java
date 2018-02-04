@@ -258,14 +258,16 @@ public class Options {
   private boolean parseAfterArg = true;
 
   /**
-   * Whether to treat arguments to lists as space-separated. When true, an argument to a option of
-   * list type is split, on whitespace, into multiple arguments each of which is added to the list.
-   * When false, each argument to an option of list type is treated as a single element, no matter
-   * what characters it contains.
+   * Whether to treat arguments to lists as space-separated. Defaults to false.
    *
-   * <p>For example, when this is true, a user supplying {@code --my-option="foo bar"} is equivalent
-   * to {@code --my-option="foo bar"} and has the effect of adding two elements, "foo" and "bar", to
-   * the list {@code my_option}.
+   * <p>When true, an argument to an option of list type is split, on whitespace, into multiple
+   * arguments each of which is added to the list. When false, each argument to an option of list
+   * type is treated as a single element, no matter what characters it contains.
+   *
+   * <p>For example, when this is true, a command line containing <span style="white-space:
+   * nowrap;">{@code --my-option="foo bar"}</span> is equivalent to <span style="white-space:
+   * nowrap;">{@code --my-option="foo" --my-option="bar"}</span>. Both of them have the effect of
+   * adding two elements, "foo" and "bar", to the list {@code my_option}.
    */
   public static boolean spaceSeparatedLists = false;
 
@@ -846,9 +848,10 @@ public class Options {
   }
 
   /**
-   * If true, long options (those derived from field names) will be parsed with a single dash prefix
-   * as in <span style="white-space: nowrap;">{@code -longOption}</span>. The default is false and
-   * long options will be parsed with a double dash prefix as in <span style="white-space:
+   * If true, long options (those derived from field names) are expected with a single dash prefix
+   * as in <span style="white-space: nowrap;">{@code -long-option}</span> rather than <span
+   * style="white-space: nowrap;">{@code --long-option}</span>. The default is false and long
+   * options will be parsed with a double dash prefix as in <span style="white-space:
    * nowrap;">{@code --longOption}</span>.
    *
    * @param val whether to parse long options with a single dash, as in <span style="white-space:
@@ -1463,6 +1466,7 @@ public class Options {
     return optionsString;
   }
 
+  // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
    * Returns a string containing the current setting for each option, in command-line format that
    * can be parsed by Options. Contains every known option even if the option was not specified on
@@ -1475,6 +1479,7 @@ public class Options {
     return settings(false);
   }
 
+  // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
    * Returns a string containing the current setting for each option, in command-line format that
    * can be parsed by Options. Contains every known option even if the option was not specified on
