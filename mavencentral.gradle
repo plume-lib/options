@@ -17,7 +17,7 @@ apply from: 'build.gradle'
 
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: 'com.github.johnrengelman.shadow'   // creates shadowJar task
+// apply plugin: 'com.github.johnrengelman.shadow'   // creates shadowJar task
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -40,7 +40,7 @@ signing {
 group = "org.plumelib"
 archivesBaseName = "options"
 // When editing this, also increment in README.md .
-version = "0.3"
+version = "0.3.1"
 
 uploadArchives {
   repositories {
