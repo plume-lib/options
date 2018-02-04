@@ -50,6 +50,7 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
+  @SuppressWarnings("index") // relies on properties of the command-line interface
   public void testOptions() throws ArgException {
 
     ClassWithOptions t = new ClassWithOptions();
@@ -107,7 +108,8 @@ public class TestOptions {
     // Test list with no default
     args = options.parse(new String[] {"--ls", "hello", "--ls", "world"});
     assert args.length == 0;
-    assert t.ls != null : "@AssumeAssertion(nullness)";
+    assert t.ls != null
+        : "@AssumeAssertion(nullness): application invariant: parsed string with --ls just above";
     assert t.ls.size() == 2;
     assert t.ls.get(0).equals("hello");
     assert t.ls.get(1).equals("world");
