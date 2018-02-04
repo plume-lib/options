@@ -22,7 +22,8 @@ class](http://plumelib.org/options/api/org/plumelib/options/Options.html).
 
 ## Editing your buildfile ##
 
-You can obtain the Options class from [Maven Central](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.plumelib%22%20a%3A%22options%22).
+You can obtain the Options class from [Maven
+Central](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.plumelib%22%20a%3A%22options%22).
 
 In a gradle buildfile, write
 
