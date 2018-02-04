@@ -9,8 +9,9 @@ apply from: 'build.gradle'
 /// 3. Manually release the deployment:
 /// 3a.  Browse to https://oss.sonatype.org/#stagingRepositories
 /// 3b.  Search for and select this repository, by group name.
-/// 3c.  At the top, click "close" then "refresh" then "release"
-///      (you might have to wait a little while between the clicks).
+/// 3c.  At the top, click "close" then "refresh" then "release".
+///      You might have to wait a little while between the clicks.
+///      Use the release message "Plume-lib Options X.Y.Z" (w/version number).
 
 
 // From http://central.sonatype.org/pages/gradle.html
