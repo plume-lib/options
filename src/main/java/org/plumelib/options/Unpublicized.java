@@ -14,11 +14,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used in conjunction with the {@code @Option} annotation. Indicates that by default, the option
- * should not be included in the usage message.
+ * Indicates a field that can be set by a command-line option, but that command-line option is
+ * unpublicized: it is not included in the usage message. Should only be written on a field that
+ * also has a {@code @Option} annotation.
  *
- * <p>If the showUnpublicized argument to the {@link Options#usage(boolean, String[])} method method
- * is true, the usage method shows all options, even unpublicized ones.
+ * <p>If the {@code showUnpublicized} argument to the {@link Options#usage(boolean, String[])}
+ * method is true, the usage message shows all options, even unpublicized ones.
  *
  * @see org.plumelib.options.Option
  * @see org.plumelib.options.Options

@@ -14,14 +14,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used in conjunction with the {@code @Option} annotation to indicate that the following
- * {@code @Option}-annotated fields (including the one the {@code @OptionGroup} annotation is
- * applied to) belong to the same option group. Option groups are documented in {@link Options}.
+ * Indicates which {@code @Option}-annotated fields are part of an option group &mdash; a related
+ * set of user-visible features. Option groups are documented in {@link Options}.
  *
- * <p>Note that {@code @OptionGroup} must be applied to a field and must appear after that field's
- * Javadoc comment, if any. A Javadoc comment between {@code @OptionGroup} and the field is ignored.
+ * <p>Write {@code OptionGroup} on the first field in every group. Every {@code @Option}-annotated
+ * field must be part of a group if any of them are.
  *
- * <p>For example, you must write
+ * <p>{@code @OptionGroup} must appear after a field's Javadoc comment, if any. A Javadoc comment
+ * between {@code @OptionGroup} and the field is ignored. For example, you must write
  *
  * <pre>
  *  /** comment for first option{@literal *}/
@@ -47,7 +47,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface OptionGroup {
   /**
-   * Name of this option group.
+   * Name of this option group. Must be unique across all objects that are passed to the {@link
+   * Options} constructor.
    *
    * @return the name of this option group
    */

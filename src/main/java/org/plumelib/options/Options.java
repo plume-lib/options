@@ -165,7 +165,13 @@ import org.checkerframework.dataflow.qual.*;
  *
  * <p>The @{@link Option} annotation has an optional parameter {@code aliases}, which accepts an
  * array of strings. Each string in the array is an alias for the option being defined and can be
- * used in place of an option's long name or short name. For example:
+ * used in place of an option's long name or short name.
+ *
+ * <p>One example is that a program might support <span style="white-space:
+ * nowrap;">"--optimize"</span> and <span style="white-space: nowrap;">"--optimise"</span> which are
+ * interchangeable. Another example is that a program might support <span style="white-space:
+ * nowrap;">"--help"</span> and <span style="white-space: nowrap;">"-help"</span> with the same
+ * meaning:
  *
  * <pre>
  *     // The user may supply --help, -h, or -help, all of which mean the same thing and set this variable
