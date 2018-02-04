@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.Test;
 
+/*>>>
+import org.checkerframework.checker.nullness.qual.*;
+*/
+
 public class TestOptions {
 
   /** Test class for Options testing. */

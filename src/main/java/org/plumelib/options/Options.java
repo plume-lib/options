@@ -1517,7 +1517,10 @@ public class Options {
    * @return a description of all of the known options
    */
   @Override
-  @SuppressWarnings("purity") // side effect to local state (string creation)
+  @SuppressWarnings({
+    "purity",
+    "method.guarantee.violated"
+  }) // side effect to local state (string creation)
   /*@SideEffectFree*/
   public String toString(/*>>>@GuardSatisfied Options this*/) {
     StringBuilderDelimited out = new StringBuilderDelimited(lineSeparator);
