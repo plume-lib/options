@@ -4,7 +4,7 @@ apply from: 'build.gradle'
 /// Maven Central upload
 ///
 
-/// 1. Increment the "version = XXX" line below.
+/// 1. Increment the version number below and in README.md.
 /// 2. Run, using a Java 7 JDK: ./gradle -b mavencentral.gradle uploadArchives
 /// 3. Manually release the deployment:
 /// 3a.  Browse to https://oss.sonatype.org/#stagingRepositories
@@ -38,7 +38,7 @@ signing {
 
 group = "org.plumelib"
 archivesBaseName = "options"
-version = "0.2.3"
+version = "0.3"
 
 uploadArchives {
   repositories {
