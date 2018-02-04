@@ -1457,12 +1457,13 @@ public class Options {
 
   /**
    * Returns a string containing all of the options that were set and their arguments. This is
-   * essentially the contents of args[] with all non-options removed. It is used for debugging.
+   * essentially the contents of args[] with all non-options removed. It can be used for calling a
+   * subprocess or for debugging.
    *
    * @return options, similarly to supplied on the command line
    * @see #settings()
    */
-  private String getOptionsString() {
+  public String getOptionsString() {
     return optionsString;
   }
 
