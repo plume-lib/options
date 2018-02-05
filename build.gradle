@@ -70,6 +70,7 @@ task javadocWeb(type: Javadoc) {
 
 allprojects {
   tasks.withType(JavaCompile).all { JavaCompile compile ->
+      // This if statement can be removed if checker.jar is added as a testCompileOnly (in addition to the compileOnly dependency).
       if (!name.toLowerCase().contains('test')) { // https://stackoverflow.com/questions/46227703/configuring-all-gradle-javacompile-tasks-that-are-not-for-test-code
           compile.doFirst {
               compile.options.compilerArgs = [
