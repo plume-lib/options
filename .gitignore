@@ -9,7 +9,7 @@ build
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar # Need to commit gradle-wrapper.jar file
 *.war
 *.ear
 

@@ -1,24 +1,20 @@
 apply from: '../build.gradle'
 
+// To use this, your ~/.gradle/gradle.properties file must contain:
+//   ossrhUsername=YOUR_USER_NAME_HERE
+//   ossrhPassword=YOUR_PASSWORD_HREE
+
+
 ///////////////////////////////////////////////////////////////////////////
-/// Maven Central upload
+/// Maven Central publishing
 ///
-
-/// 1. Increment the version number in this file and in README.md.
-/// 2. Run, using a Java 7 JDK: gradle -b mavencentral.gradle uploadArchives
-/// 3. Manually release the deployment:
-/// 3a.  Browse to https://oss.sonatype.org/#stagingRepositories
-/// 3b.  Search for and select this repository, by group name.
-/// 3c.  At the top, click "close" then "refresh" then "release".
-///      You might have to wait a little while between the clicks.
-///      Use the release message "Plume-lib Options X.Y.Z" (w/version number).
-
-
-// From http://central.sonatype.org/pages/gradle.html
 
 apply plugin: 'maven'
 apply plugin: 'signing'
-// apply plugin: 'com.github.johnrengelman.shadow'   // creates shadowJar task
+
+group = "org.plumelib"
+archivesBaseName = "options"
+version = "0.3.1"
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -38,11 +34,6 @@ signing {
     sign configurations.archives
 }
 
-group = "org.plumelib"
-archivesBaseName = "options"
-// When editing this, also increment in README.md .
-version = "0.3.1"
-
 uploadArchives {
   repositories {
     mavenDeployer {
@@ -59,9 +50,6 @@ uploadArchives {
       pom.project {
         name 'Plume-lib Options'
         packaging 'jar'
-        // optionally artifactId can be defined here
-        // Is this needed?
-        // artifactId options
         description 'Command-line option processing for Java.'
         url 'https://github.com/plume-lib/options'
 
@@ -90,8 +78,8 @@ uploadArchives {
   }
 }
 
-// Do I need to build or publish the shadow jar options-all.jar?
-// What user really needs it?
+// The *-all.jar file isn't used by Maven/Gradle users.  The point of publishing
+// it is to host all artifacts on Maven Central, for people who want *-all.jar.
 // publishing  {
 //   publications {
 //     shadow(MavenPublication) {
