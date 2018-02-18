@@ -9,7 +9,7 @@ apply plugin: 'java'
 apply from: 'gradle/checkerframework.gradle'
 
 // Code formatting with Google Java Format
-apply from: 'gradle/codeformatting.gradle'
+// apply from: 'gradle/codeformatting.gradle'
 
 dependencies {
   implementation 'org.apache.commons:commons-text:1.2'
@@ -34,4 +34,24 @@ task javadocWeb(type: Javadoc) {
   source = sourceSets.main.allJava
   destinationDir = file("/cse/web/research/plumelib/options/api")
   classpath = project.sourceSets.main.compileClasspath
+}
+
+// Work around https://github.com/johnrengelman/shadow/issues/324
+shadowJar.doLast {
+  exec {
+    workingDir 'build/libs'
+    commandLine 'jar', 'xf', shadowJar.archiveName, 'META-INF/MANIFEST.MF'
+  }
+  exec {
+    workingDir 'build/libs'
+    commandLine 'sed', '-i', '/^Class-Path:.*/d', 'META-INF/MANIFEST.MF'
+  }
+  exec {
+    workingDir 'build/libs'
+    commandLine 'zip', '-q', '-u', shadowJar.archiveName, 'META-INF/MANIFEST.MF'
+    ignoreExitValue true  // Exit value 12 means "nothing to do"
+  }
+  delete {
+    delete 'build/libs/META-INF'
+  }
 }
