@@ -16,9 +16,6 @@ dependencies {
 
   testImplementation 'junit:junit:4.12'
 
-  // for tools.jar, which contains the Javadoc tool
-  shadow files(org.gradle.internal.jvm.Jvm.current().toolsJar)
-
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 }
@@ -37,21 +34,10 @@ task javadocWeb(type: Javadoc) {
 }
 
 // Work around https://github.com/johnrengelman/shadow/issues/324
-shadowJar.doLast {
-  exec {
-    workingDir 'build/libs'
-    commandLine 'jar', 'xf', shadowJar.archiveName, 'META-INF/MANIFEST.MF'
-  }
-  exec {
-    workingDir 'build/libs'
-    commandLine 'sed', '-i', '/^Class-Path:.*/d', 'META-INF/MANIFEST.MF'
-  }
-  exec {
-    workingDir 'build/libs'
-    commandLine 'zip', '-q', '-u', shadowJar.archiveName, 'META-INF/MANIFEST.MF'
-    ignoreExitValue true  // Exit value 12 means "nothing to do"
-  }
-  delete {
-    delete 'build/libs/META-INF'
-  }
+configurations {
+  toolsJar  // tools.jar contains the Javadoc tool
 }
+dependencies {
+  toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+}
+configurations.compileClasspath.extendsFrom configurations.toolsJar
