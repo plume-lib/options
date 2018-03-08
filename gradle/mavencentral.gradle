@@ -77,13 +77,3 @@ uploadArchives {
     }
   }
 }
-
-// The *-all.jar file isn't used by Maven/Gradle users.  The point of publishing
-// it is to host all artifacts on Maven Central, for people who want *-all.jar.
-// publishing  {
-//   publications {
-//     shadow(MavenPublication) {
-//       from components.shadow
-//       artifactId = 'options-all'
-//   }
-// }
