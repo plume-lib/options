@@ -96,6 +96,7 @@ import org.checkerframework.common.value.qual.*;
  *             {@code @link} and {@code @see} tags in the Javadoc input are suitably replaced by
  *             HTML links. This is the default output format and need not be specified explicitly.
  *       </ul>
+ *
  *   <li><b>-classdoc</b> When specified, the output of this doclet includes the class documentation
  *       of the first class specified on the command-line.
  *   <li><b>-singledash</b> When specified, {@link
