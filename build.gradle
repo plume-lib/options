@@ -9,7 +9,7 @@ apply plugin: 'java-library'
 
 // Checker Framework pluggable type-checking
 apply from: 'gradle/checkerframework.gradle'
-// To upload to Maven Central, run:  ./gradlew uploadArchives
+// To upload to Maven Central.  See file README-developers.txt .
 apply from: 'gradle/mavencentral.gradle'
 
 dependencies {
