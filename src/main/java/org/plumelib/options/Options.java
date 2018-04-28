@@ -19,6 +19,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -400,6 +402,9 @@ public class Options {
      */
     /*@Nullable*/ Method factory = null;
 
+    /** The second argument to the factory; non-null if needed. */
+    /*@Nullable*/ Object factoryArg2 = null;
+
     /**
      * If true, this OptionInfo is not output when printing documentation.
      *
@@ -512,7 +517,10 @@ public class Options {
       // Get a constructor for non-primitive base types
       if (!baseType.isPrimitive() && !baseType.isEnum()) {
         try {
-          if (baseType == Pattern.class) {
+          if (baseType == Path.class) {
+            factory = Paths.class.getMethod("get", String.class, String[].class);
+            factoryArg2 = new String[0];
+          } else if (baseType == Pattern.class) {
             factory = Pattern.class.getMethod("compile", String.class);
           } else { // look for a string constructor
             constructor = baseType.getConstructor(String.class);
@@ -1393,6 +1401,7 @@ public class Options {
    * Create an instance of the correct type by passing the argument value string to the constructor.
    * The only expected error is some sort of parse error from the constructor.
    */
+  @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
   private /*@NonNull*/ Object getRefArg(OptionInfo oi, String argName, String argValue)
       throws ArgException {
 
@@ -1408,9 +1417,11 @@ public class Options {
         if (oi.factory == null) {
           throw new Error("No constructor or factory for argument " + argName);
         }
-        @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
-        /*@NonNull*/ Object tmpVal = oi.factory.invoke(null, argValue);
-        val = tmpVal;
+        if (oi.factoryArg2 == null) {
+          val = oi.factory.invoke(null, argValue);
+        } else {
+          val = oi.factory.invoke(null, argValue, oi.factoryArg2);
+        }
       }
     } catch (Exception e) {
       throw new ArgException("Invalid argument (%s) for argument %s", argValue, argName);
@@ -1450,7 +1461,7 @@ public class Options {
 
     if (type.isPrimitive()) {
       return type.getName();
-    } else if (type == File.class) {
+    } else if (type == File.class || type == Path.class) {
       return "filename";
     } else if (type == Pattern.class) {
       return "regex";

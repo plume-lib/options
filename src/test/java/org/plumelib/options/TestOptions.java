@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.plumelib.options.Options.ArgException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,6 +37,9 @@ public class TestOptions {
     @Option("-f the input file")
     public /*@Nullable*/ File input_file;
 
+    @Option("-g the input file")
+    public /*@Nullable*/ Path input_path;
+
     @Option("-b boolean")
     public boolean bool;
 
@@ -55,25 +60,38 @@ public class TestOptions {
    */
   @Test
   @SuppressWarnings("index") // relies on properties of the command-line interface
-  public void testOptions() throws ArgException {
+  public void testOptions() throws ArgException, IOException {
+
+    new File("/tmp/TestOptions1.txt").createNewFile();
+    new File("/tmp/TestOptions2.txt").createNewFile();
 
     ClassWithOptions t = new ClassWithOptions();
     Options options = new Options("test", t);
-    options.parse(
-        new String[] {
-          "--lp=foo",
-          "--lp",
-          "bar",
-          "-i",
-          "24",
-          "-d=37.8",
-          "-b",
-          "-b=false",
-          "--ld",
-          "34.6",
-          "--ld",
-          "17.8",
-        });
+    try {
+      options.parse(
+          new String[] {
+            "--lp=foo",
+            "--lp",
+            "bar",
+            "-i",
+            "24",
+            "-d=37.8",
+            "-b",
+            "-b=false",
+            "--ld",
+            "34.6",
+            "--ld",
+            "17.8",
+            "--input-file",
+            "/tmp/TestOptions1.txt",
+            "--input-path",
+            "/tmp/TestOptions2.txt",
+          });
+    } catch (ArgException e) {
+      System.out.println(e);
+      throw e;
+    }
+
     assert t.lp.get(0).toString().equals("foo");
     assert t.lp.get(1).toString().equals("bar");
     assert t.integer_reference != null && t.integer_reference.intValue() == 24;
@@ -117,6 +135,13 @@ public class TestOptions {
     assert t.ls.size() == 2;
     assert t.ls.get(0).equals("hello");
     assert t.ls.get(1).equals("world");
+
+    // Test files and paths
+    assert t.input_file.exists();
+    assert t.input_file.getName().equals("TestOptions1.txt");
+    assert t.input_path.toFile().exists();
+    assert t.input_path.toString().equals("/tmp/TestOptions2.txt");
+    ;
   }
 
   /** Test class for option alias testing. */
