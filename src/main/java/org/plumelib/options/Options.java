@@ -347,9 +347,7 @@ public class Options {
     //    Option option;
 
     /** Object containing the field. Null if the field is static. */
-    /*@UnknownInitialization*/
-    /*@Raw*/
-    /*@Nullable*/ Object obj;
+    /*@UnknownInitialization*/ /*@Raw*/ /*@Nullable*/ Object obj;
 
     /** Short (one-character) argument name. */
     /*@Nullable*/ String shortName;
@@ -425,9 +423,7 @@ public class Options {
     OptionInfo(
         Field field,
         Option option,
-        /*@UnknownInitialization*/
-        /*@Raw*/
-        /*@Nullable*/ Object obj,
+        /*@UnknownInitialization*/ /*@Raw*/ /*@Nullable*/ Object obj,
         boolean unpublicized) {
       this.field = field;
       //      this.option = option;
@@ -571,7 +567,7 @@ public class Options {
      */
     @Override
     /*@SideEffectFree*/
-    public String toString(/*>>>@GuardSatisfied OptionInfo this*/ ) {
+    public String toString(/*>>>@GuardSatisfied OptionInfo this*/) {
       String prefix = useSingleDash ? "-" : "--";
       String shortNameStr = "";
       if (shortName != null) {
@@ -640,7 +636,7 @@ public class Options {
    *
    * @param args the classes whose options to process
    */
-  public Options(/*@UnknownInitialization*//*@Raw*/ Object... args) {
+  public Options(/*@UnknownInitialization*/ /*@Raw*/ Object... args) {
     this("", args);
   }
 
@@ -675,10 +671,8 @@ public class Options {
         "rawness", // if isClass is true, obj is a non-null initialized Class
         "initialization" // if isClass is true, obj is a non-null initialized Class
       })
-      /*@Initialized*/
-      /*@NonRaw*/
-      /*@NonNull*/ Class<?> clazz =
-          (isClass ? (/*@Initialized*//*@NonRaw*//*@NonNull*/ Class<?>) obj : obj.getClass());
+      /*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?> clazz =
+          (isClass ? (/*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?>) obj : obj.getClass());
       if (mainClass == Void.TYPE) {
         mainClass = clazz;
       }
@@ -688,7 +682,7 @@ public class Options {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
           @SuppressWarnings("cast")
-          Object objNonraw = (/*@Initialized*//*@NonRaw*/ Object) obj;
+          Object objNonraw = (/*@Initialized*/ /*@NonRaw*/ Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
           }
@@ -776,7 +770,6 @@ public class Options {
           groupMap.put(name, gi);
           currentGroup = name;
         } // currentGroup is non-null at this point
-        @SuppressWarnings("nullness") // map key
         /*@NonNull*/ OptionGroupInfo ogi = groupMap.get(currentGroup);
         ogi.optionList.add(oi);
       } // loop through fields
@@ -882,7 +875,6 @@ public class Options {
    * @return all non-option arguments
    * @throws ArgException if the command line contains unknown option or misused options
    */
-  @SuppressWarnings("index") // https://github.com/kelloggm/checker-framework/issues/169
   public String[] parse(String[] args) throws ArgException {
 
     List<String> nonOptions = new ArrayList<String>();
@@ -1540,7 +1532,7 @@ public class Options {
     "method.guarantee.violated"
   }) // side effect to local state (string creation)
   /*@SideEffectFree*/
-  public String toString(/*>>>@GuardSatisfied Options this*/ ) {
+  public String toString(/*>>>@GuardSatisfied Options this*/) {
     StringBuilderDelimited out = new StringBuilderDelimited(lineSeparator);
 
     for (OptionInfo oi : options) {
