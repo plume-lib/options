@@ -96,7 +96,6 @@ import org.checkerframework.common.value.qual.*;
  *             {@code @link} and {@code @see} tags in the Javadoc input are suitably replaced by
  *             HTML links. This is the default output format and need not be specified explicitly.
  *       </ul>
- *
  *   <li><b>-classdoc</b> When specified, the output of this doclet includes the class documentation
  *       of the first class specified on the command-line.
  *   <li><b>-singledash</b> When specified, {@link
@@ -842,12 +841,20 @@ public class OptionsDoclet {
 
   // Getters and Setters
 
-  /** Returns true if the output format is Javadoc, false if the output format is HTML. */
+  /**
+   * Returns true if the output format is Javadoc, false if the output format is HTML.
+   *
+   * @return true if the output format is Javadoc, false if the output format is HTML
+   */
   public boolean getFormatJavadoc() {
     return formatJavadoc;
   }
 
-  /** Supply true to set the output format to Javadoc, false to set the output format to HTML. */
+  /**
+   * Supply true to set the output format to Javadoc, false to set the output format to HTML.
+   *
+   * @param val true to set the output format to Javadoc, false to set the output format to HTML
+   */
   public void setFormatJavadoc(boolean val) {
     if (val && !formatJavadoc) {
       startDelim = "* " + startDelim;
@@ -859,12 +866,20 @@ public class OptionsDoclet {
     this.formatJavadoc = val;
   }
 
-  /** See {@link Options#getUseSingleDash()}. */
+  /**
+   * See {@link Options#getUseSingleDash()}.
+   *
+   * @return whether to use a single dash (as opposed to a double dash) for command-line options
+   */
   public boolean getUseSingleDash() {
     return options.getUseSingleDash();
   }
 
-  /** See {@link Options#setUseSingleDash(boolean)}. */
+  /**
+   * See {@link Options#setUseSingleDash(boolean)}.
+   *
+   * @param val whether to use a single dash (as opposed to a double dash) for command-line options
+   */
   public void setUseSingleDash(boolean val) {
     options.setUseSingleDash(true);
   }

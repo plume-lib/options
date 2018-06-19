@@ -1,8 +1,10 @@
 plugins {
   // To make build/libs/options-all.jar, run: gradle shadowJar
   id 'com.github.johnrengelman.shadow' version '2.0.2'
-  // Code formatting with Google Java Format.  Run: ./gradlew googleJavaFormat
-  id "com.github.sherter.google-java-format" version "0.7.1"
+  // Disabled due to poor handling of type annotations; wait until
+  // this issue is fixed: https://github.com/google/google-java-format/issues/5
+  // // Code formatting with Google Java Format.  Run: ./gradlew googleJavaFormat
+  // id "com.github.sherter.google-java-format" version "0.7.1"
 }
 
 apply plugin: 'java-library'
@@ -27,6 +29,12 @@ repositories {
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
+
+// Turn Javadoc warnings into errors.
+javadoc {
+  options.addStringOption('Xmaxwarns', '10000')
+  options.addStringOption('Xwerror', '-quiet')
+}
 
 task javadocWeb(type: Javadoc) {
   source = sourceSets.main.allJava
