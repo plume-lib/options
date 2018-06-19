@@ -14,7 +14,9 @@ cache:
 jdk:
   - oraclejdk8
 
-script: ./gradlew build javadoc verGJF
+# Add "verGJF" task when google-java-format handles type annotations better;
+# see https://github.com/google/google-java-format/issues/5
+script: ./gradlew build javadoc
 
 git:
   depth: 9
