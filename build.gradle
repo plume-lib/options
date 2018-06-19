@@ -2,7 +2,7 @@ plugins {
   // To make build/libs/options-all.jar, run: gradle shadowJar
   id 'com.github.johnrengelman.shadow' version '2.0.2'
   // Code formatting with Google Java Format.  Run: ./gradlew googleJavaFormat
-  id "com.github.sherter.google-java-format" version "0.6"
+  id "com.github.sherter.google-java-format" version "0.7.1"
 }
 
 apply plugin: 'java-library'
