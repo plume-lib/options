@@ -665,7 +665,9 @@ public class Options {
     // Loop through each specified object or class
     for (Object obj : args) {
       boolean isClass = obj instanceof Class<?>;
-      String currentGroup = null;
+      // null or a key in groupMap
+      @SuppressWarnings("keyfor")
+      @KeyFor("groupMap") String currentGroup = null;
 
       @SuppressWarnings({
         "rawness", // if isClass is true, obj is a non-null initialized Class

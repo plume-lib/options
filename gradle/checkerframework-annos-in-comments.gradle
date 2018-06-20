@@ -67,10 +67,11 @@ compileJava {
         '-processor', 'org.checkerframework.checker.formatter.FormatterChecker,org.checkerframework.checker.index.IndexChecker,org.checkerframework.checker.lock.LockChecker,org.checkerframework.checker.nullness.NullnessChecker,org.checkerframework.checker.signature.SignatureChecker',
         '-Xmaxerrs', '10000',
         '-Xmaxwarns', '10000',
-        // '-Awarns',      // turn Checker Framework errors into warnings
+        '-Awarns',      // turn Checker Framework errors into warnings
         '-source', '7', '-target', '7', // include if Java 7 compatibility is needed
         '-AcheckPurityAnnotations',
-        "-Xbootclasspath/p:${configurations.checkerFrameworkAnnotatedJDK.asPath}"
+        "-Xbootclasspath/p:${configurations.checkerFrameworkAnnotatedJDK.asPath}",
+        "-Astubs=$System.env.CHECKERFRAMEWORK/checker/resources/javadoc.astub" // TODO: does not work when downloading from Maven Central
     ]
     options.fork = true
     options.forkOptions.jvmArgs += ["-Xbootclasspath/p:${configurations.checkerFrameworkJavac.asPath}"]
