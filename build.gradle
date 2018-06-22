@@ -3,7 +3,7 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '2.0.2'
   // Disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
-  // // Code formatting with Google Java Format.  Run: ./gradlew googleJavaFormat
+  // // Code formatting with Google Java Format; defines targets "goJF" and "verJF".
   // id "com.github.sherter.google-java-format" version "0.7.1"
 }
 
