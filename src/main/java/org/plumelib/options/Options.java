@@ -406,7 +406,7 @@ public class Options {
     /**
      * If true, this OptionInfo is not output when printing documentation.
      *
-     * @see #usage()
+     * @see #printUsage()
      */
     boolean unpublicized;
 
@@ -546,6 +546,8 @@ public class Options {
     /**
      * Returns a short synopsis of the option in the form <span style="white-space: nowrap;">{@code
      * -s --long=<type>}</span>.
+     *
+     * @return a synopsis of how the option can be provided on the command line
      */
     public String synopsis() {
       String prefix = useSingleDash ? "-" : "--";
@@ -595,7 +597,7 @@ public class Options {
     /**
      * If true, this group of options will not be printed in usage output by default. However, the
      * usage information for this option group can be printed by specifying the group explicitly in
-     * the call to {@link #usage}.
+     * the call to {@link #printUsage}.
      */
     boolean unpublicized;
 
@@ -617,6 +619,8 @@ public class Options {
     /**
      * If false, this group of options does not contain any publicized options, so it will not be
      * included in the default usage message.
+     *
+     * @return true if this group of options contains at least one publicized option
      */
     boolean anyPublicized() {
       for (OptionInfo oi : optionList) {
@@ -806,7 +810,14 @@ public class Options {
   }
 
   /**
-   * Like getAnnotation, but returns null (and prints a warning) rather than throwing an exception.
+   * Like {@link Field#getAnnotation}, but returns null (and prints a warning) rather than throwing
+   * an exception.
+   *
+   * @param <T> the type of the annotation to query for and return if present
+   * @param f the Field that may contain the annotation
+   * @param annotationClass the Class object corresponding to the annotation type, or null
+   * @return this element's annotation for the specified annotation type if present on this element,
+   *     else null
    */
   private static <T extends Annotation> /*@Nullable*/ T safeGetAnnotation(
       Field f, Class<T> annotationClass) {
@@ -1180,6 +1191,11 @@ public class Options {
   /**
    * Format a list of options for use in generating usage messages. Also sets {@link #hasListOption}
    * if any option has list type.
+   *
+   * @param optList the options to format
+   * @param maxLength the maximum number of characters in the output
+   * @param showUnpublicized if true, include unpublicized options in the output
+   * @return the formatted options
    */
   private String formatOptions(List<OptionInfo> optList, int maxLength, boolean showUnpublicized) {
     StringBuilderDelimited buf = new StringBuilderDelimited(lineSeparator);
@@ -1208,6 +1224,8 @@ public class Options {
    * Return the length of the longest synopsis message in a list of options. Useful for aligning
    * options in usage strings.
    *
+   * @param optList the options whose synopsis messages to measure
+   * @param showUnpublicized if true, include unpublicized options in the computation
    * @return the length of the longest synopsis message in a list of options
    */
   private int maxOptionLength(List<OptionInfo> optList, boolean showUnpublicized) {
@@ -1392,8 +1410,14 @@ public class Options {
   }
 
   /**
-   * Create an instance of the correct type by passing the argument value string to the constructor.
-   * The only expected error is some sort of parse error from the constructor.
+   * Given a value string supplied on the command line, create an object. The only expected error is
+   * some sort of parse error from the constructor.
+   *
+   * @param oi the option corresponding to {@code argName} and {@code argValue}
+   * @param argName the argument name -- used only for diagnostics
+   * @param argValue the value supplied on the command line, which this method parses
+   * @return a value, whose printed representation is {@code argValue}
+   * @throws ArgException if the user supplied an incorrect string (contained in {@code argValue})
    */
   @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
   private /*@NonNull*/ Object getRefArg(OptionInfo oi, String argName, String argValue)
@@ -1429,7 +1453,10 @@ public class Options {
    * hyphen-insensitive (hyphens can be used in place of underscores). This allows for greater
    * flexibility when specifying enum types as command-line arguments.
    *
-   * @param <T> the enum type
+   * @param <T> the enum type whose constant is to be returned
+   * @param enumType the Class object of the enum type from which to return a constant
+   * @param name the name of the constant to return
+   * @return the enum constant of the specified enum type with the specified name
    */
   private <T extends Enum<T>> T getEnumValue(Class<T> enumType, String name) {
     T[] constants = enumType.getEnumConstants();
@@ -1447,8 +1474,11 @@ public class Options {
   }
 
   /**
-   * Return a short name for the specified type for use in messages.
+   * Return a short name for the specified type for use in messages. This is usually the lowercase
+   * simple name of the type, but there are special cases (for files, regular expressions, enums,
+   * ...).
    *
+   * @param type the type whoso short name to return
    * @return a short name for the specified type for use in messages
    */
   private static String typeShortName(Class<?> type) {
@@ -1574,8 +1604,12 @@ public class Options {
   }
 
   /**
-   * Parse an option value and return its three components (shortName, typeName, and description).
-   * The shortName and typeName are null if they are not specified in the string.
+   * Parse an option value (the argument to {@code @Option}) and return its three components
+   * (shortName, typeName, and description). The shortName and typeName are null if they are not
+   * specified in the string.
+   *
+   * @param val the string to parse, which is an argument to {@code @Option}
+   * @return a description of the option
    */
   private static ParseResult parseOption(String val) {
 

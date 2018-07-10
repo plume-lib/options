@@ -167,7 +167,8 @@ import org.checkerframework.common.value.qual.*;
  * @see org.plumelib.options.Unpublicized
  */
 
-// This doesn't itself use org.plumelib.options.Options for its command-line option processing because a Doclet is
+// This doesn't itself use org.plumelib.options.Options for its command-line option processing
+// because a Doclet is
 // required to implement the optionLength() and validOptions() methods.
 @SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
 public class OptionsDoclet {
@@ -436,6 +437,9 @@ public class OptionsDoclet {
 
   /**
    * Determine if a class needs to be instantiated in order to work properly with {@link Options}.
+   *
+   * @param clazz the class whose values will be created by command-line arguments
+   * @return true if the class needs to be instantiated before command-line arguments are parsed
    */
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
@@ -491,7 +495,12 @@ public class OptionsDoclet {
     return newDocFileText();
   }
 
-  /** Get the result of inserting the options documentation into the docfile. */
+  /**
+   * Get the result of inserting the options documentation into the docfile.
+   *
+   * @return the docfile, but with the command-line argument documentation updated
+   * @throws Exception if there is trouble reading files
+   */
   /*@RequiresNonNull("docFile")*/
   private String newDocFileText() throws Exception {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
@@ -564,7 +573,12 @@ public class OptionsDoclet {
     }
   }
 
-  /** Initializes {@link Options.OptionInfo.enumJdoc} for the given {@code OptionInfo}. */
+  /**
+   * Initializes {@link Options.OptionInfo#enumJdoc} for the given {@code OptionInfo}: creates a
+   * mapping from enum constants to their Javadoc
+   *
+   * @param oi the enum option whose Javadoc to read
+   */
   private void processEnumJavadoc(Options.OptionInfo oi) {
     Enum<?>[] constants = (Enum<?>[]) oi.baseType.getEnumConstants();
     if (constants == null) {
@@ -673,7 +687,17 @@ public class OptionsDoclet {
     return b.toString();
   }
 
-  /** Get the HTML describing many options, formatted as an HTML list. */
+  /**
+   * Get the HTML describing many options, formatted as an HTML list.
+   *
+   * @param optList the options to document
+   * @param padding the number of leading spaces to add before each line of HTML output, except the
+   *     first one
+   * @param firstLinePadding the number of leading spaces to add before the first line of HTML
+   *     output
+   * @param refillWidth the number of columns to fit the text into, by breaking lines
+   * @return the options documented in HTML format
+   */
   private String optionListToHtml(
       List<Options.OptionInfo> optList, int padding, int firstLinePadding, int refillWidth) {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
@@ -695,7 +719,16 @@ public class OptionsDoclet {
     return b.toString();
   }
 
-  /** refillWidth includes the padding. */
+  /**
+   * Refill the string so that each line is {@code refillWidth} characters long.
+   *
+   * @param in the string to refill
+   * @param padding each line, other than the first, starts with this many spaces
+   * @param firstLinePadding the first line starts with this many spaces
+   * @param refillWidth the maximum width of each line in the output, including the padding
+   * @return a string in which no more than {@code refillWidth} characters appear between any two
+   *     end-of-line character sequences
+   */
   private String refill(String in, int padding, int firstLinePadding, int refillWidth) {
     if (refillWidth <= 0) {
       return in;
@@ -706,8 +739,8 @@ public class OptionsDoclet {
     int ulPos = in.indexOf(eol + "<ul>" + eol);
     if (ulPos != -1) {
       @SuppressWarnings("index") // https://github.com/panacekcz/checker-framework/issues/23
-      String suffix_temp = in.substring(ulPos + eol.length());
-      suffix = suffix_temp;
+      String suffixTemp = in.substring(ulPos + eol.length());
+      suffix = suffixTemp;
       in = in.substring(0, ulPos);
     }
 
