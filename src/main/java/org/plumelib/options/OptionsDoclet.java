@@ -312,6 +312,8 @@ public class OptionsDoclet {
    * Tests the validity of command-line arguments passed to this doclet. Returns true if the option
    * usage is valid, and false otherwise. This method is automatically invoked by Javadoc.
    *
+   * <p>Also sets fields from the command-line arguments.
+   *
    * @param options the command-line options to be checked: an array of 1- or 2-element arrays,
    *     where the length depends on {@link #optionLength} applied to the first element
    * @param reporter where to report errors
