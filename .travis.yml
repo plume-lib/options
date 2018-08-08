@@ -16,7 +16,7 @@ jdk:
 
 # Add "verGJF" task when google-java-format handles type annotations better;
 # see https://github.com/google/google-java-format/issues/5
-script: ./gradlew build javadoc && ./gradlew requireJavadoc
+script: export CHECKERFRAMEWORK=`pwd` && mkdir -p $CHECKERFRAMEWORK/checker/resources && (cd $CHECKERFRAMEWORK/checker/resources && wget -q https://raw.githubusercontent.com/typetools/checker-framework/master/checker/resources/javadoc.astub ) && ./gradlew build javadoc && ./gradlew requireJavadoc
 
 git:
   depth: 9
