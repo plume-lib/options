@@ -1,3 +1,8 @@
+// To make a release:
+//  * Update the version number in ../README.md and in this file.
+//  * Run in the top-level directory:  ./gradlew uploadArchives
+//  * Browse to https://oss.sonatype.org/#stagingRepositories
+
 // To use this, your ~/.gradle/gradle.properties file must contain:
 //   ossrhUsername=YOUR_USER_NAME_HERE
 //   ossrhPassword=YOUR_PASSWORD_HREE
@@ -12,7 +17,7 @@ apply plugin: 'signing'
 
 group = "org.plumelib"
 archivesBaseName = "options"
-version = "0.3.3"
+version = "1.0.0"
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'

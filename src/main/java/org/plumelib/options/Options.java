@@ -30,14 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-/*>>>
-import org.checkerframework.checker.formatter.qual.*;
-import org.checkerframework.checker.initialization.qual.*;
-import org.checkerframework.checker.lock.qual.*;
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.dataflow.qual.*;
-*/
+import org.checkerframework.checker.formatter.qual.FormatMethod;
+import org.checkerframework.checker.initialization.qual.Initialized;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.nullness.qual.KeyFor;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.NonRaw;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Raw;
+import org.checkerframework.dataflow.qual.Pure;
+import org.checkerframework.dataflow.qual.SideEffectFree;
 
 /**
  * The Options class:
@@ -279,7 +283,7 @@ public class Options {
    * <p>This field is public so that clients can reset it. Setting it enables one program to
    * masquerade as another program, based on parsed options.
    */
-  public /*@Nullable*/ String usageSynopsis = null;
+  public @Nullable String usageSynopsis = null;
 
   /**
    * In usage messages, use dashes (hyphens) to split words in option names. This only applies to
@@ -347,10 +351,10 @@ public class Options {
     //    Option option;
 
     /** Object containing the field. Null if the field is static. */
-    /*@UnknownInitialization*/ /*@Raw*/ /*@Nullable*/ Object obj;
+    @UnknownInitialization @Raw @Nullable Object obj;
 
     /** Short (one-character) argument name. */
-    /*@Nullable*/ String shortName;
+    @Nullable String shortName;
 
     /** Long argument name. */
     String longName;
@@ -362,13 +366,13 @@ public class Options {
     String description;
 
     /** Full Javadoc description. */
-    /*@Nullable*/ String jdoc;
+    @Nullable String jdoc;
 
     /**
      * Maps names of enum constants to their corresponding Javadoc. This is used by OptionsDoclet to
      * generate documentation for enum-type options. Null if the baseType is not an Enum.
      */
-    /*@MonotonicNonNull*/ Map<String, String> enumJdoc;
+    @MonotonicNonNull Map<String, String> enumJdoc;
 
     /**
      * Name of the argument type. Defaults to the type of the field, but user can override this in
@@ -380,7 +384,7 @@ public class Options {
     Class<?> baseType;
 
     /** Default value of the option as a string. */
-    /*@Nullable*/ String defaultStr = null;
+    @Nullable String defaultStr = null;
 
     /**
      * If true, the default value string for this option will be excluded from OptionsDoclet
@@ -389,19 +393,19 @@ public class Options {
     boolean noDocDefault = false;
 
     /** If the option is a list, this references that list. */
-    /*@MonotonicNonNull*/ List<Object> list = null;
+    @MonotonicNonNull List<Object> list = null;
 
     /** Constructor that takes one String for the type. */
-    /*@Nullable*/ Constructor<?> constructor = null;
+    @Nullable Constructor<?> constructor = null;
 
     /**
      * Factory that takes a string (some classes don't have a string constructor) and always returns
      * non-null.
      */
-    /*@Nullable*/ Method factory = null;
+    @Nullable Method factory = null;
 
     /** The second argument to the factory; non-null if needed. */
-    /*@Nullable*/ Object factoryArg2 = null;
+    @Nullable Object factoryArg2 = null;
 
     /**
      * If true, this OptionInfo is not output when printing documentation.
@@ -423,7 +427,7 @@ public class Options {
     OptionInfo(
         Field field,
         Option option,
-        /*@UnknownInitialization*/ /*@Raw*/ /*@Nullable*/ Object obj,
+        @UnknownInitialization @Raw @Nullable Object obj,
         boolean unpublicized) {
       this.field = field;
       //      this.option = option;
@@ -568,8 +572,8 @@ public class Options {
      * @return a one-line description of the option
      */
     @Override
-    /*@SideEffectFree*/
-    public String toString(/*>>>@GuardSatisfied OptionInfo this*/) {
+    @SideEffectFree
+    public String toString(@GuardSatisfied OptionInfo this) {
       String prefix = useSingleDash ? "-" : "--";
       String shortNameStr = "";
       if (shortName != null) {
@@ -640,7 +644,7 @@ public class Options {
    *
    * @param args the classes whose options to process
    */
-  public Options(/*@UnknownInitialization*/ /*@Raw*/ Object... args) {
+  public Options(@UnknownInitialization @Raw Object... args) {
     this("", args);
   }
 
@@ -653,7 +657,7 @@ public class Options {
    * @param usageSynopsis a synopsis of how to call your program
    * @param args the classes whose options to process
    */
-  public Options(String usageSynopsis, /*@UnknownInitialization*/ /*@Raw*/ Object... args) {
+  public Options(String usageSynopsis, @UnknownInitialization @Raw Object... args) {
 
     if (args.length == 0) {
       throw new Error("Must pass at least one object to Options constructor");
@@ -677,8 +681,7 @@ public class Options {
         "rawness", // if isClass is true, obj is a non-null initialized Class
         "initialization" // if isClass is true, obj is a non-null initialized Class
       })
-      /*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?> clazz =
-          (isClass ? (/*@Initialized*/ /*@NonRaw*/ /*@NonNull*/ Class<?>) obj : obj.getClass());
+      @Initialized @NonRaw @NonNull Class<?> clazz = (isClass ? (@Initialized @NonRaw @NonNull Class<?>) obj : obj.getClass());
       if (mainClass == Void.TYPE) {
         mainClass = clazz;
       }
@@ -688,7 +691,7 @@ public class Options {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
           @SuppressWarnings("cast")
-          Object objNonraw = (/*@Initialized*/ /*@NonRaw*/ Object) obj;
+          Object objNonraw = (@Initialized @NonRaw Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
           }
@@ -726,8 +729,7 @@ public class Options {
 
         @SuppressWarnings(
             "initialization") // new C(underInit) yields @UnderInitialization; @Initialized is safe
-        /*@Initialized*/ OptionInfo oi =
-            new OptionInfo(f, option, isClass ? null : obj, unpublicized);
+        @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
 
         OptionGroup optionGroup = safeGetAnnotation(f, OptionGroup.class);
@@ -776,7 +778,7 @@ public class Options {
           groupMap.put(name, gi);
           currentGroup = name;
         } // currentGroup is non-null at this point
-        /*@NonNull*/ OptionGroupInfo ogi = groupMap.get(currentGroup);
+        @NonNull OptionGroupInfo ogi = groupMap.get(currentGroup);
         ogi.optionList.add(oi);
       } // loop through fields
     } // loop through args
@@ -819,12 +821,12 @@ public class Options {
    * @return this element's annotation for the specified annotation type if present on this element,
    *     else null
    */
-  private static <T extends Annotation> /*@Nullable*/ T safeGetAnnotation(
+  private static <T extends Annotation> @Nullable T safeGetAnnotation(
       Field f, Class<T> annotationClass) {
-    /*@Nullable*/ T annotation;
+    @Nullable T annotation;
     try {
       @SuppressWarnings("cast") // cast is redundant (except for type annotations)
-      /*@Nullable*/ T cast = f.getAnnotation((Class</*@NonNull*/ T>) annotationClass);
+      @Nullable T cast = f.getAnnotation((Class<@NonNull T>) annotationClass);
       annotation = cast;
     } catch (Exception e) {
       // Can get
@@ -1245,12 +1247,12 @@ public class Options {
   // Package-private accessors/utility methods that are needed by the OptionsDoclet class to
   // generate HTML documentation.
 
-  /*@Pure*/
+  @Pure
   boolean hasGroups() {
     return hasGroups;
   }
 
-  /*@Pure*/
+  @Pure
   boolean getUseSingleDash() {
     return useSingleDash;
   }
@@ -1271,7 +1273,7 @@ public class Options {
    * @param argValue a string representation of the value
    * @throws ArgException if there are any errors
    */
-  private void setArg(OptionInfo oi, String argName, /*@Nullable*/ String argValue)
+  private void setArg(OptionInfo oi, String argName, @Nullable String argValue)
       throws ArgException {
 
     Field f = oi.field;
@@ -1420,7 +1422,7 @@ public class Options {
    * @throws ArgException if the user supplied an incorrect string (contained in {@code argValue})
    */
   @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
-  private /*@NonNull*/ Object getRefArg(OptionInfo oi, String argName, String argValue)
+  private @NonNull Object getRefArg(OptionInfo oi, String argName, String argValue)
       throws ArgException {
 
     Object val;
@@ -1563,8 +1565,8 @@ public class Options {
     "purity",
     "method.guarantee.violated"
   }) // side effect to local state (string creation)
-  /*@SideEffectFree*/
-  public String toString(/*>>>@GuardSatisfied Options this*/) {
+  @SideEffectFree
+  public String toString(@GuardSatisfied Options this) {
     StringBuilderDelimited out = new StringBuilderDelimited(lineSeparator);
 
     for (OptionInfo oi : options) {
@@ -1585,18 +1587,18 @@ public class Options {
       super(s);
     }
 
-    /*@FormatMethod*/
-    public ArgException(String format, /*@Nullable*/ Object... args) {
+    @FormatMethod
+    public ArgException(String format, @Nullable Object... args) {
       super(String.format(format, args));
     }
   }
 
   private static class ParseResult {
-    /*@Nullable*/ String shortName;
-    /*@Nullable*/ String typeName;
+    @Nullable String shortName;
+    @Nullable String typeName;
     String description;
 
-    ParseResult(/*@Nullable*/ String shortName, /*@Nullable*/ String typeName, String description) {
+    ParseResult(@Nullable String shortName, @Nullable String typeName, String description) {
       this.shortName = shortName;
       this.typeName = typeName;
       this.description = description;
@@ -1616,7 +1618,7 @@ public class Options {
     // Get the short name, long name, and description
     String shortName;
     String typeName;
-    /*@NonNull*/ String description;
+    @NonNull String description;
 
     // Get the short name (if any)
     if (val.startsWith("-")) {
@@ -1676,9 +1678,9 @@ public class Options {
    * @param m a map whose keyset will be sorted
    * @return a sorted version of m.keySet()
    */
-  private static <K extends Comparable<? super K>, V> Collection</*@KeyFor("#1")*/ K> sortedKeySet(
+  private static <K extends Comparable<? super K>, V> Collection<@KeyFor("#1") K> sortedKeySet(
       Map<K, V> m) {
-    ArrayList</*@KeyFor("#1")*/ K> theKeys = new ArrayList</*@KeyFor("#1")*/ K>(m.keySet());
+    ArrayList<@KeyFor("#1") K> theKeys = new ArrayList<@KeyFor("#1") K>(m.keySet());
     Collections.sort(theKeys);
     return theKeys;
   }

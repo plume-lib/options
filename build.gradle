@@ -12,8 +12,8 @@ plugins {
 apply plugin: 'java-library'
 
 // Checker Framework pluggable type-checking
-apply from: 'gradle/checkerframework-annos-in-comments.gradle'
-// To upload to Maven Central.  See file README-developers.txt .
+apply from: 'gradle/checkerframework.gradle'
+// To upload to Maven Central.  See instructions in the file.
 apply from: 'gradle/mavencentral.gradle'
 
 dependencies {
@@ -31,8 +31,8 @@ repositories {
   mavenCentral()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 // Turn Javadoc warnings into errors.
 javadoc {

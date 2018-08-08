@@ -9,11 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Test;
-
-/*>>>
-import org.checkerframework.checker.nullness.qual.*;
-*/
 
 public class TestOptions {
 
@@ -29,28 +26,28 @@ public class TestOptions {
     public String arg1 = "/tmp/foobar";
 
     @Option("argument 2")
-    public /*@Nullable*/ String arg2;
+    public @Nullable String arg2;
 
     @Option("-d double value")
     public double temperature;
 
     @Option("-f the input file")
-    public /*@Nullable*/ File input_file;
+    public @Nullable File input_file;
 
     @Option("-g the input file")
-    public /*@Nullable*/ Path input_path;
+    public @Nullable Path input_path;
 
     @Option("-b boolean")
     public boolean bool;
 
     @Option("-i Integer")
-    public /*@Nullable*/ Integer integer_reference;
+    public @Nullable Integer integer_reference;
 
     @Option("list of doubles")
     public List<Double> ld = new ArrayList<Double>();
 
     @Option("list with no default")
-    public /*@Nullable*/ List<String> ls;
+    public @Nullable List<String> ls;
   }
 
   /**
@@ -150,15 +147,13 @@ public class TestOptions {
     public String day = "Friday";
 
     @Option(
-      value = "-t Set the temperature",
-      aliases = {"-temp"}
-    )
+        value = "-t Set the temperature",
+        aliases = {"-temp"})
     public double temperature = 42.0;
 
     @Option(
-      value = "Print the program version",
-      aliases = {"-v", "-version", "--version"}
-    )
+        value = "Print the program version",
+        aliases = {"-v", "-version", "--version"})
     public boolean printVersion = false;
   }
 
@@ -225,9 +220,8 @@ public class TestOptions {
   public static class TestOptionGroups2 {
     @OptionGroup("General options")
     @Option(
-      value = "-h Display help message",
-      aliases = {"-help"}
-    )
+        value = "-h Display help message",
+        aliases = {"-help"})
     public static boolean help = false;
 
     @OptionGroup(value = "Internal options", unpublicized = true)
@@ -240,9 +234,8 @@ public class TestOptions {
 
     @OptionGroup("Display options")
     @Option(
-      value = "Use colors",
-      aliases = {"--colour"}
-    )
+        value = "Use colors",
+        aliases = {"--colour"})
     public static boolean color = false;
   }
 
@@ -250,9 +243,8 @@ public class TestOptions {
   public static class TestOptionGroups3 {
     @OptionGroup("General options")
     @Option(
-      value = "-h Display help message",
-      aliases = {"-help"}
-    )
+        value = "-h Display help message",
+        aliases = {"-help"})
     public static boolean help = false;
 
     @OptionGroup("Internal options")
@@ -266,9 +258,8 @@ public class TestOptions {
 
     @OptionGroup("Display options")
     @Option(
-      value = "Use colors",
-      aliases = {"--colour"}
-    )
+        value = "Use colors",
+        aliases = {"--colour"})
     public static boolean color = false;
   }
 
@@ -334,10 +325,10 @@ public class TestOptions {
     }
 
     @Option("Set the first compression pass")
-    public static /*@Nullable*/ Compressor firstPass;
+    public static @Nullable Compressor firstPass;
 
     @Option("Set the second compression pass")
-    public static /*@Nullable*/ Compressor secondPass;
+    public static @Nullable Compressor secondPass;
   }
 
   @Test

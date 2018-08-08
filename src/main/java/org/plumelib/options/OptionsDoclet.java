@@ -34,14 +34,11 @@ import java.util.Map;
 import java.util.Scanner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-
-/*>>>
-import org.checkerframework.checker.formatter.qual.*;
-import org.checkerframework.checker.index.qual.*;
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.checker.signature.qual.*;
-import org.checkerframework.common.value.qual.*;
-*/
+import org.checkerframework.checker.formatter.qual.Format;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.signature.qual.BinaryNameForNonArray;
+import org.checkerframework.common.value.qual.MinLen;
 
 /**
  * Generates HTML documentation of command-line options, for use in a manual or in a Javadoc class
@@ -175,7 +172,7 @@ public class OptionsDoclet {
 
   private static String eol = System.getProperty("line.separator");
 
-  private static final /*@Format({})*/ String USAGE =
+  private static final @Format({}) String USAGE =
       "Provided by Options doclet:%n"
           + "-docfile <file>        Specify file into which options documentation is inserted%n"
           + "-outfile <file>        Specify destination for resulting output%n"
@@ -192,8 +189,8 @@ public class OptionsDoclet {
   private String startDelim = "<!-- start options doc (DO NOT EDIT BY HAND) -->";
   private String endDelim = "<!-- end options doc -->";
 
-  private /*@Nullable*/ File docFile = null;
-  private /*@Nullable*/ File outFile = null;
+  private @Nullable File docFile = null;
+  private @Nullable File outFile = null;
 
   /** If true, then edit docFile in place (and docFile is non-null). */
   private boolean inPlace = false;
@@ -233,7 +230,7 @@ public class OptionsDoclet {
       Class<?> clazz;
       try {
         @SuppressWarnings("signature") // Javadoc source code is not yet annotated
-        /*@BinaryNameForNonArray*/ String className = doc.qualifiedName();
+        @BinaryNameForNonArray String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
@@ -323,7 +320,7 @@ public class OptionsDoclet {
    *     overview</a>
    */
   @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
-  public static boolean validOptions(String[] /*@MinLen(1)*/[] options, DocErrorReporter reporter) {
+  public static boolean validOptions(String[] @MinLen(1) [] options, DocErrorReporter reporter) {
     boolean hasDocFile = false;
     boolean hasOutFile = false;
     boolean hasDestDir = false;
@@ -404,7 +401,7 @@ public class OptionsDoclet {
    * @param options the command-line options to parse: a list of 1- or 2-element arrays
    */
   @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
-  public void setOptions(String[] /*@MinLen(1)*/[] options) {
+  public void setOptions(String[] @MinLen(1) [] options) {
     String outFilename = null;
     File destDir = null;
     for (int oi = 0; oi < options.length; oi++) {
@@ -503,7 +500,7 @@ public class OptionsDoclet {
    * @return the docfile, but with the command-line argument documentation updated
    * @throws Exception if there is trouble reading files
    */
-  /*@RequiresNonNull("docFile")*/
+  @RequiresNonNull("docFile")
   private String newDocFileText() throws Exception {
     StringBuilderDelimited b = new StringBuilderDelimited(eol);
     BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);

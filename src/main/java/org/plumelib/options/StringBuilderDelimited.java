@@ -4,13 +4,6 @@ package org.plumelib.options;
 /// to avoid adding a dependency or a new tiny project.
 /// This class is replaced by StringJoiner.java in Java 8.x
 
-/*>>>
-import org.checkerframework.checker.index.qual.*;
-import org.checkerframework.checker.lock.qual.*;
-import org.checkerframework.checker.nullness.qual.*;
-import org.checkerframework.dataflow.qual.*;
-*/
-
 // NEEDS DOCUMENTATION!
 // (Probably mostly Javadoc "see" directives, possibly with first line of relevant method doc.)
 
@@ -26,6 +19,14 @@ import org.checkerframework.dataflow.qual.*;
  * Java 7.
  */
 // Not public, but package-visible, to keep it out of public Javadoc
+import org.checkerframework.checker.index.qual.IndexFor;
+import org.checkerframework.checker.index.qual.IndexOrHigh;
+import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.dataflow.qual.Pure;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+
 class StringBuilderDelimited implements Appendable, CharSequence {
 
   /** The StringBuilder to which this delegates work. */
@@ -44,7 +45,7 @@ class StringBuilderDelimited implements Appendable, CharSequence {
     this.delimiter = delimiter;
   }
 
-  private void appendDelimiter(/*>>>@GuardSatisfied StringBuilderDelimited this*/ ) {
+  private void appendDelimiter(@GuardSatisfied StringBuilderDelimited this) {
     if (empty) {
       empty = false;
     } else {
@@ -66,7 +67,7 @@ class StringBuilderDelimited implements Appendable, CharSequence {
    * @deprecated Use #add(CharSequence)
    */
   @Deprecated
-  public StringBuilderDelimited append(/*@Nullable*/ String str) {
+  public StringBuilderDelimited append(@Nullable String str) {
     appendDelimiter();
     delegate.append(str);
     return this;
@@ -80,7 +81,7 @@ class StringBuilderDelimited implements Appendable, CharSequence {
    * @deprecated Use #add(CharSequence)
    */
   @Deprecated
-  public StringBuilderDelimited append(/*@Nullable*/ Object o) {
+  public StringBuilderDelimited append(@Nullable Object o) {
     appendDelimiter();
     delegate.append(o);
     return this;
@@ -110,7 +111,7 @@ class StringBuilderDelimited implements Appendable, CharSequence {
    */
   @Deprecated
   @Override
-  public StringBuilderDelimited append(/*@Nullable*/ CharSequence csq) {
+  public StringBuilderDelimited append(@Nullable CharSequence csq) {
     appendDelimiter();
     delegate.append(csq);
     return this;
@@ -120,9 +121,7 @@ class StringBuilderDelimited implements Appendable, CharSequence {
   @Deprecated
   @Override
   public StringBuilderDelimited append(
-      /*@Nullable*/ CharSequence csq,
-      /*@IndexOrHigh("#1")*/ int start,
-      /*@IndexOrHigh("#1")*/ int end) {
+      @Nullable CharSequence csq, @IndexOrHigh("#1") int start, @IndexOrHigh("#1") int end) {
     appendDelimiter();
     delegate.append(csq, start, end);
     return this;
@@ -131,29 +130,28 @@ class StringBuilderDelimited implements Appendable, CharSequence {
   /** @deprecated Not supported by StringJoiner which will supersede this */
   @Deprecated
   @Override
-  public char charAt(/*>>>@IndexFor("this")*/ int index) {
+  public char charAt(@IndexFor("this") int index) {
     return delegate.charAt(index);
   }
 
-  /*@Pure*/
+  @Pure
   @Override
   @SuppressWarnings("upperbound:override.return.invalid") // mutable-length subclass of CharSequence
-  public /*@NonNegative*/ int length(/*>>>@GuardSatisfied StringBuilderDelimited this*/ ) {
+  public @NonNegative int length(@GuardSatisfied StringBuilderDelimited this) {
     return delegate.length();
   }
 
   /** @deprecated Not supported by StringJoiner which will supersede this */
   @Deprecated
   @Override
-  public CharSequence subSequence(
-      /*>>>@IndexOrHigh("this")*/ int start, /*@IndexOrHigh("this")*/ int end) {
+  public CharSequence subSequence(@IndexOrHigh("this") int start, @IndexOrHigh("this") int end) {
     return delegate.subSequence(start, end);
   }
 
-  /*@SideEffectFree*/
+  @SideEffectFree
   @Override
   @SuppressWarnings("samelen:override.return.invalid") // mutable-length subclass of CharSequence
-  public String toString(/*>>>@GuardSatisfied StringBuilderDelimited this*/ ) {
+  public String toString(@GuardSatisfied StringBuilderDelimited this) {
     return delegate.toString();
   }
 }
