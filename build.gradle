@@ -1,5 +1,5 @@
 plugins {
-  // To create a fat jar build/libs/bcel-util-all.jar, run: ./gradlew shadowJar
+  // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
   id "com.github.johnrengelman.shadow" version "2.0.4"
   // Run the Error Prone linter.
   id "net.ltgt.errorprone-base" version "0.0.16"
