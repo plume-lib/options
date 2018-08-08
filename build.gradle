@@ -1,6 +1,6 @@
 plugins {
-  // To make build/libs/options-all.jar, run: gradle shadowJar
-  id 'com.github.johnrengelman.shadow' version '2.0.4'
+  // To create a fat jar build/libs/bcel-util-all.jar, run: ./gradlew shadowJar
+  id "com.github.johnrengelman.shadow" version "2.0.4"
   // Run the Error Prone linter.
   id "net.ltgt.errorprone-base" version "0.0.16"
   // Formating is disabled due to poor handling of type annotations; wait until
@@ -12,19 +12,15 @@ plugins {
 apply plugin: 'java-library'
 
 // Checker Framework pluggable type-checking
-apply from: 'gradle/checkerframework.gradle'
-// To upload to Maven Central.  See instructions in the file.
-apply from: 'gradle/mavencentral.gradle'
+apply from: "${buildscript.sourceFile.parent}/gradle/checkerframework.gradle"
+// To upload to Maven Central, see instructions in the file.
+apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
 
 dependencies {
   implementation 'org.apache.commons:commons-text:1.2'
-
-  testImplementation 'junit:junit:4.12'
-
-  errorprone 'com.google.errorprone:error_prone_core:2.3.1'
-
-  // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+  testImplementation 'junit:junit:4.12'
+  errorprone 'com.google.errorprone:error_prone_core:2.3.1'
 }
 
 repositories {
@@ -54,3 +50,21 @@ dependencies {
   toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
+
+// `requireJavadoc` target ensures that all Java elements have Javadoc documentation.
+configurations {
+  requireJavadoc
+}
+dependencies {
+  compile group: 'org.plumelib', name: 'require-javadoc', version: '0.0.6'
+}
+task requireJavadoc(type: Javadoc) {
+  destinationDir.deleteDir()
+  source = sourceSets.main.allJava
+  classpath = project.sourceSets.main.compileClasspath
+  // TODO: uncomment.  "requireJavadoc" has no effect over "javadoc" while this line is commented.
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.compileClasspath as List
+  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
+  options.addStringOption('skip', 'WeakIdentityHashMap|WeakHasherMap')
+}
