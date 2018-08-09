@@ -50,21 +50,3 @@ dependencies {
   toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
-
-// `requireJavadoc` target ensures that all Java elements have Javadoc documentation.
-configurations {
-  requireJavadoc
-}
-dependencies {
-  compile group: 'org.plumelib', name: 'require-javadoc', version: '0.0.6'
-}
-task requireJavadoc(type: Javadoc) {
-  destinationDir.deleteDir()
-  source = sourceSets.main.allJava
-  classpath = project.sourceSets.main.compileClasspath
-  // TODO: uncomment.  "requireJavadoc" has no effect over "javadoc" while this line is commented.
-  options.memberLevel = JavadocMemberLevel.PRIVATE
-  options.docletpath = project.sourceSets.main.compileClasspath as List
-  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
-  options.addStringOption('skip', 'WeakIdentityHashMap|WeakHasherMap')
-}
