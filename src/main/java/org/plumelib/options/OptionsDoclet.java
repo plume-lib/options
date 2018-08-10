@@ -37,7 +37,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.formatter.qual.Format;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
-import org.checkerframework.checker.signature.qual.BinaryNameForNonArray;
 import org.checkerframework.common.value.qual.MinLen;
 
 /**
@@ -230,7 +229,7 @@ public class OptionsDoclet {
       Class<?> clazz;
       try {
         @SuppressWarnings("signature") // Javadoc source code is not yet annotated
-        @BinaryNameForNonArray String className = doc.qualifiedName();
+        @BinaryName String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
