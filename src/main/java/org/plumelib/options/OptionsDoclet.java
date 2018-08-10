@@ -37,6 +37,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.formatter.qual.Format;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.common.value.qual.MinLen;
 
 /**
