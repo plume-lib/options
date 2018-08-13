@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.formatter.qual.FormatMethod;
 import org.checkerframework.checker.initialization.qual.Initialized;
@@ -1181,7 +1182,7 @@ public class Options {
     }
     int maxLength = Collections.max(lengths);
 
-    StringBuilderDelimited buf = new StringBuilderDelimited(lineSeparator);
+    StringJoiner buf = new StringJoiner(lineSeparator);
     for (OptionGroupInfo gi : groups) {
       buf.add(String.format("%n%s:", gi.name));
       buf.add(formatOptions(gi.optionList, maxLength, showUnpublicized));
@@ -1200,7 +1201,7 @@ public class Options {
    * @return the formatted options
    */
   private String formatOptions(List<OptionInfo> optList, int maxLength, boolean showUnpublicized) {
-    StringBuilderDelimited buf = new StringBuilderDelimited(lineSeparator);
+    StringJoiner buf = new StringJoiner(lineSeparator);
     for (OptionInfo oi : optList) {
       if (oi.unpublicized && !showUnpublicized) {
         continue;
@@ -1534,7 +1535,7 @@ public class Options {
    *     setting for each option
    */
   public String settings(boolean showUnpublicized) {
-    StringBuilderDelimited out = new StringBuilderDelimited(lineSeparator);
+    StringJoiner out = new StringJoiner(lineSeparator);
 
     // Determine the length of the longest name
     int maxLength = maxOptionLength(options, showUnpublicized);
@@ -1567,7 +1568,7 @@ public class Options {
   }) // side effect to local state (string creation)
   @SideEffectFree
   public String toString(@GuardSatisfied Options this) {
-    StringBuilderDelimited out = new StringBuilderDelimited(lineSeparator);
+    StringJoiner out = new StringJoiner(lineSeparator);
 
     for (OptionInfo oi : options) {
       out.add(oi.toString());
