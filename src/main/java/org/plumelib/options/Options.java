@@ -322,9 +322,6 @@ public class Options {
   /** String describing "[+]" (copied from Mercurial). */
   private static final String LIST_HELP = "[+] marked option can be specified multiple times";
 
-  // // Debug loggers
-  // // Does nothing if not enabled.
-  // private final SimpleLog debugOptions = new SimpleLog(false);
   private boolean debugEnabled = false;
 
   /**
@@ -1584,10 +1581,22 @@ public class Options {
   public static class ArgException extends Exception {
     static final long serialVersionUID = 20051223L;
 
-    public ArgException(String s) {
-      super(s);
+    /**
+     * Create an ArgException with the specified detail message.
+     *
+     * @param message the detail message for the exception
+     */
+    public ArgException(String message) {
+      super(message);
     }
 
+    /**
+     * Create an ArgException whose detail message is formed by formatting the given format string
+     * and arguments.
+     *
+     * @param format the format string
+     * @param args the arguments to be formatted by the format string
+     */
     @FormatMethod
     public ArgException(String format, @Nullable Object... args) {
       super(String.format(format, args));

@@ -203,6 +203,12 @@ public class OptionsDoclet {
   private RootDoc root;
   private Options options;
 
+  /**
+   * Create an OptionsDoclet that documents the given options.
+   *
+   * @param root the document root
+   * @param options the command-line options
+   */
   public OptionsDoclet(RootDoc root, Options options) {
     this.root = root;
     this.options = options;

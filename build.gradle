@@ -30,6 +30,15 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+// Work around https://github.com/johnrengelman/shadow/issues/324
+configurations {
+  toolsJar  // tools.jar contains the Javadoc tool
+}
+dependencies {
+  toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+}
+configurations.compileClasspath.extendsFrom configurations.toolsJar
+
 // Turn Javadoc warnings into errors.
 javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
@@ -42,11 +51,18 @@ task javadocWeb(type: Javadoc) {
   classpath = project.sourceSets.main.compileClasspath
 }
 
-// Work around https://github.com/johnrengelman/shadow/issues/324
 configurations {
-  toolsJar  // tools.jar contains the Javadoc tool
+  requireJavadoc
 }
 dependencies {
-  toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+  implementation group: 'org.plumelib', name: 'require-javadoc', version: '0.1.0'
 }
-configurations.compileClasspath.extendsFrom configurations.toolsJar
+task requireJavadoc(type: Javadoc) {
+  description = 'Ensures that Javadoc documentation exists.'
+  destinationDir.deleteDir()
+  source = sourceSets.main.allJava
+  classpath = project.sourceSets.main.compileClasspath
+  // options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.compileClasspath as List
+  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
+}
