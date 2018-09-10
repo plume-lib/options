@@ -906,7 +906,7 @@ public class OptionsDoclet {
   }
 
   /**
-   * See {@link Options#getUseSingleDash()}.
+   * Return true if using a single dash (as opposed to a double dash) for command-line options.
    *
    * @return whether to use a single dash (as opposed to a double dash) for command-line options
    */
