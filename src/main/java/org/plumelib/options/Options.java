@@ -300,14 +300,13 @@ public class Options {
   private Class<?> mainClass = Void.TYPE;
 
   /** List of all of the defined options. */
-  private final List<OptionInfo> options = new ArrayList<OptionInfo>();
+  private final List<OptionInfo> options = new ArrayList<>();
 
   /** Map from short or long option names (with leading dashes) to option information. */
-  private final Map<String, OptionInfo> nameMap = new LinkedHashMap<String, OptionInfo>();
+  private final Map<String, OptionInfo> nameMap = new LinkedHashMap<>();
 
   /** Map from option group name to option group information. */
-  private final Map<String, OptionGroupInfo> groupMap =
-      new LinkedHashMap<String, OptionGroupInfo>();
+  private final Map<String, OptionGroupInfo> groupMap = new LinkedHashMap<>();
 
   /**
    * If true, then the user is using {@code @OptionGroup} annotations correctly (as per the
@@ -473,7 +472,7 @@ public class Options {
                   + field);
         }
         if (defaultObj == null) {
-          List<Object> newList = new ArrayList<Object>();
+          List<Object> newList = new ArrayList<>();
           try {
             field.set(obj, newList);
           } catch (Exception e) {
@@ -890,7 +889,7 @@ public class Options {
    */
   public String[] parse(String[] args) throws ArgException {
 
-    List<String> nonOptions = new ArrayList<String>();
+    List<String> nonOptions = new ArrayList<>();
     // If true, then "--" has been seen and any argument starting with "-"
     // is processed as an ordinary argument, not as an option.
     boolean ignoreOptions = false;
@@ -990,7 +989,7 @@ public class Options {
     // Split the args string on whitespace boundaries accounting for quoted
     // strings.
     args = args.trim();
-    List<String> argList = new ArrayList<String>();
+    List<String> argList = new ArrayList<>();
     String arg = "";
     char activeQuote = 0;
     for (int ii = 0; ii < args.length(); ii++) {
@@ -1150,7 +1149,7 @@ public class Options {
       return formatOptions(options, maxOptionLength(options, showUnpublicized), showUnpublicized);
     }
 
-    List<OptionGroupInfo> groups = new ArrayList<OptionGroupInfo>();
+    List<OptionGroupInfo> groups = new ArrayList<>();
     if (groupNames.length > 0) {
       for (String groupName : groupNames) {
         if (!groupMap.containsKey(groupName)) {
@@ -1173,7 +1172,7 @@ public class Options {
       }
     }
 
-    List<Integer> lengths = new ArrayList<Integer>();
+    List<Integer> lengths = new ArrayList<>();
     for (OptionGroupInfo gi : groups) {
       lengths.add(maxOptionLength(gi.optionList, showUnpublicized));
     }
@@ -1662,7 +1661,7 @@ public class Options {
   //    */
   //   private static class Test {
   //
-  //     @Option("generic") List<Pattern> lp = new ArrayList<Pattern>();
+  //     @Option("generic") List<Pattern> lp = new ArrayList<>();
   //     @Option("-a <filename> argument 1") String arg1 = "/tmp/foobar";
   //     @Option("argument 2") String arg2;
   //     @Option("-d double value") double temperature;
@@ -1690,7 +1689,7 @@ public class Options {
    */
   private static <K extends Comparable<? super K>, V> Collection<@KeyFor("#1") K> sortedKeySet(
       Map<K, V> m) {
-    ArrayList<@KeyFor("#1") K> theKeys = new ArrayList<@KeyFor("#1") K>(m.keySet());
+    ArrayList<@KeyFor("#1") K> theKeys = new ArrayList<>(m.keySet());
     Collections.sort(theKeys);
     return theKeys;
   }

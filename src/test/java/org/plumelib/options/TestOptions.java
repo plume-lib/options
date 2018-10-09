@@ -20,7 +20,7 @@ public class TestOptions {
     // TODO: test the @Unpublicized annotation and the usage() message.
 
     @Option("list of patterns")
-    public List<Pattern> lp = new ArrayList<Pattern>();
+    public List<Pattern> lp = new ArrayList<>();
 
     @Option("-a <filename> argument 1")
     public String arg1 = "/tmp/foobar";
@@ -44,7 +44,7 @@ public class TestOptions {
     public @Nullable Integer integer_reference;
 
     @Option("list of doubles")
-    public List<Double> ld = new ArrayList<Double>();
+    public List<Double> ld = new ArrayList<>();
 
     @Option("list with no default")
     public @Nullable List<String> ls;

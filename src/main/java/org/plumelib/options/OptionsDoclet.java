@@ -223,7 +223,7 @@ public class OptionsDoclet {
    * @return true if processing completed without an error
    */
   public static boolean start(RootDoc root) {
-    List<Object> objs = new ArrayList<Object>();
+    List<Object> objs = new ArrayList<>();
     for (ClassDoc doc : root.specifiedClasses()) {
       // TODO: Class.forName() expects a binary name but doc.qualifiedName()
       // returns a fully qualified name.  I do not know a good way to convert
@@ -591,7 +591,7 @@ public class OptionsDoclet {
       return;
     }
 
-    oi.enumJdoc = new LinkedHashMap<String, String>();
+    oi.enumJdoc = new LinkedHashMap<>();
 
     for (Enum<?> constant : constants) {
       assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
