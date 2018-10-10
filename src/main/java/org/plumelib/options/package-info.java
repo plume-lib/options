@@ -1,5 +1,5 @@
 /**
- * Command-line option processing for Java
+ * Command-line option processing for Java.
  *
  * <p>The Options class:
  *
