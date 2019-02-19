@@ -336,7 +336,7 @@ public class Options {
   private String optionsString = "";
 
   /** The system-dependent line separator. */
-  private static String lineSeparator = System.getProperty("line.separator");
+  private static String lineSeparator = System.lineSeparator();
 
   /** Information about an option. */
   class OptionInfo {

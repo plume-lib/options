@@ -171,7 +171,7 @@ import org.checkerframework.common.value.qual.MinLen;
 @SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
 public class OptionsDoclet {
 
-  private static String eol = System.getProperty("line.separator");
+  private static String lineSep = System.lineSeparator();
 
   private static final @Format({}) String USAGE =
       "Provided by Options doclet:%n"
@@ -509,7 +509,7 @@ public class OptionsDoclet {
    */
   @RequiresNonNull("docFile")
   private String newDocFileText() throws Exception {
-    StringJoiner b = new StringJoiner(eol);
+    StringJoiner b = new StringJoiner(lineSep);
     BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);
     String docline;
     boolean replacing = false;
@@ -625,7 +625,7 @@ public class OptionsDoclet {
    * @return the HTML documentation for the underlying Options instance
    */
   public String optionsToHtml(int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringJoiner b = new StringJoiner(lineSep);
 
     if (includeClassDoc && root.classes().length > 0) {
       b.add(OptionsDoclet.javadocToHtml(root.classes()[0]));
@@ -675,7 +675,7 @@ public class OptionsDoclet {
    * @return the HTML documentation for the underlying Options instance
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringJoiner b = new StringJoiner(lineSep);
     Scanner s = new Scanner(optionsToHtml(refillWidth - padding - 2));
 
     while (s.hasNextLine()) {
@@ -706,7 +706,7 @@ public class OptionsDoclet {
    */
   private String optionListToHtml(
       List<Options.OptionInfo> optList, int padding, int firstLinePadding, int refillWidth) {
-    StringJoiner b = new StringJoiner(eol);
+    StringJoiner b = new StringJoiner(lineSep);
     for (Options.OptionInfo oi : optList) {
       if (oi.unpublicized) {
         continue;
@@ -742,10 +742,10 @@ public class OptionsDoclet {
 
     // suffix is text *not* to refill.
     String suffix = null;
-    int ulPos = in.indexOf(eol + "<ul>" + eol);
+    int ulPos = in.indexOf(lineSep + "<ul>" + lineSep);
     if (ulPos != -1) {
       @SuppressWarnings("index") // https://github.com/panacekcz/checker-framework/issues/23
-      String suffixTemp = in.substring(ulPos + eol.length());
+      String suffixTemp = in.substring(ulPos + lineSep.length());
       suffix = suffixTemp;
       in = in.substring(0, ulPos);
     }
@@ -758,7 +758,7 @@ public class OptionsDoclet {
       compressedSpaces = compressedSpaces.substring(1);
     }
     String oneLine = StringUtils.repeat(" ", firstLinePadding) + compressedSpaces;
-    StringJoiner multiLine = new StringJoiner(eol);
+    StringJoiner multiLine = new StringJoiner(lineSep);
     while (oneLine.length() > refillWidth) {
       int breakLoc = oneLine.lastIndexOf(' ', refillWidth);
       if (breakLoc == -1) {
@@ -821,7 +821,7 @@ public class OptionsDoclet {
       f.format("%s [%s]%s", jdoc, StringEscapeUtils.escapeHtml4(defaultStr), suffix);
     }
     if (oi.baseType.isEnum()) {
-      b.append(eol).append("<ul>").append(eol);
+      b.append(lineSep).append("<ul>").append(lineSep);
       assert oi.enumJdoc != null
           : "@AssumeAssertion(nullness): dependent: non-null if oi.baseType is an enum";
       for (Map.Entry<String, String> entry : oi.enumJdoc.entrySet()) {
@@ -830,9 +830,9 @@ public class OptionsDoclet {
           b.append(" ").append(entry.getValue());
         }
         // b.append("</li>");
-        b.append(eol);
+        b.append(lineSep);
       }
-      b.append("</ul>").append(eol);
+      b.append("</ul>").append(lineSep);
     }
     return b.toString();
   }
