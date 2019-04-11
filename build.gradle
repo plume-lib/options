@@ -67,7 +67,7 @@ checkerFramework {
   extraJavacArgs = [
     '-AcheckPurityAnnotations',
     // TODO: does not work when downloading from Maven Central
-    '-Astubs=$System.env.CHECKERFRAMEWORK/checker/resources/javadoc.astub'
+    "-Astubs=$System.env.CHECKERFRAMEWORK/checker/resources/javadoc.astub"
   ]
 }
 
