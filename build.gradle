@@ -54,9 +54,6 @@ task javadocWeb(type: Javadoc) {
   classpath = project.sourceSets.main.compileClasspath
 }
 
-configurations {
-  requireJavadoc
-}
 dependencies {
   implementation group: 'org.plumelib', name: 'require-javadoc', version: '0.1.0'
 }
