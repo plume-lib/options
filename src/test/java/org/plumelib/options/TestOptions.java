@@ -134,8 +134,12 @@ public class TestOptions {
     assert t.ls.get(1).equals("world");
 
     // Test files and paths
+    assert t.input_file != null
+        : "@AssumeAssertion(nullness): application invariant: parsed string with --input-file just above";
     assert t.input_file.exists();
     assert t.input_file.getName().equals("TestOptions1.txt");
+    assert t.input_path != null
+        : "@AssumeAssertion(nullness): application invariant: parsed string with --input-path just above";
     assert t.input_path.toFile().exists();
     assert t.input_path.toString().equals("/tmp/TestOptions2.txt");
     ;
