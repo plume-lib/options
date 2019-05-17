@@ -141,6 +141,8 @@ public class TestOptions {
     assert t.input_path != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-path just above";
     assert t.input_path.toFile().exists();
+    assert t.input_path != null
+        : "@AssumeAssertion(nullness): annotated JDK doesn't contain toFile() yet";
     assert t.input_path.toString().equals("/tmp/TestOptions2.txt");
     ;
   }
