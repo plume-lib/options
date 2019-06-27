@@ -56,7 +56,6 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
-  @SuppressWarnings("index") // relies on properties of the command-line interface
   public void testOptions() throws ArgException, IOException {
 
     new File("/tmp/TestOptions1.txt").createNewFile();
@@ -100,6 +99,7 @@ public class TestOptions {
     // Test non-options
     t.bool = false;
     String[] args = options.parse(new String[] {"one", "two", "three", "-b"});
+    assert args.length == 3 : "@AssumeAssertion(value)";
     assert args[0].equals("one") : args[0];
     assert args[1].equals("two") : args[1];
     assert args[2].equals("three") : args[2];
@@ -108,6 +108,7 @@ public class TestOptions {
     // Test --
     t.bool = false;
     args = options.parse(new String[] {"--", "one", "two", "-b"});
+    assert args.length == 3 : "@AssumeAssertion(value)";
     assert args[0].equals("one") : args[0];
     assert args[1].equals("two") : args[1];
     assert args[2].equals("-b") : args[2];
@@ -117,7 +118,7 @@ public class TestOptions {
     t.ld.clear();
     Options.spaceSeparatedLists = true;
     args = options.parse(new String[] {"--ld", "42.1 9.3 10.5", "--ld", "2.7"});
-    assert args.length == 0;
+    assert args.length == 0 : "@AssumeAssertion(value)";
     assert t.ld.size() == 4;
     assert t.ld.get(0).doubleValue() == 42.1;
     assert t.ld.get(1).doubleValue() == 9.3;
@@ -126,7 +127,7 @@ public class TestOptions {
 
     // Test list with no default
     args = options.parse(new String[] {"--ls", "hello", "--ls", "world"});
-    assert args.length == 0;
+    assert args.length == 0 : "@AssumeAssertion(value)";
     assert t.ls != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --ls just above";
     assert t.ls.size() == 2;

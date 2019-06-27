@@ -272,7 +272,8 @@ public class OptionsDoclet {
     }
 
     OptionsDoclet o = new OptionsDoclet(root, options);
-    o.setOptions(root.options());
+    String[] @MinLen(1) [] rootOptions = root.options();
+    o.setOptions(rootOptions);
     o.processJavadoc();
     try {
       o.write();
@@ -326,7 +327,7 @@ public class OptionsDoclet {
    *     href="https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
    *     overview</a>
    */
-  @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
+  // @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
   public static boolean validOptions(String[] @MinLen(1) [] options, DocErrorReporter reporter) {
     boolean hasDocFile = false;
     boolean hasOutFile = false;
@@ -343,6 +344,7 @@ public class OptionsDoclet {
           reporter.printError("-docfile option specified twice");
           return false;
         }
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"docfile\")==2";
         docFile = os[1];
         File f = new File(docFile);
         if (!f.exists()) {
@@ -360,6 +362,7 @@ public class OptionsDoclet {
           reporter.printError("-i and -outfile can not be used at the same time");
           return false;
         }
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"outfile\")==2";
         outFile = os[1];
         hasOutFile = true;
       }
@@ -375,6 +378,7 @@ public class OptionsDoclet {
           reporter.printError("-format option specified twice");
           return false;
         }
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"format\")==2";
         String format = os[1];
         if (!format.equals("javadoc") && !format.equals("html")) {
           reporter.printError("unrecognized output format: " + format);
@@ -407,7 +411,7 @@ public class OptionsDoclet {
    *
    * @param options the command-line options to parse: a list of 1- or 2-element arrays
    */
-  @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
+  // @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
   public void setOptions(String[] @MinLen(1) [] options) {
     String outFilename = null;
     File destDir = null;
@@ -415,14 +419,18 @@ public class OptionsDoclet {
       String[] os = options[oi];
       String opt = os[0].toLowerCase();
       if (opt.equals("-docfile")) {
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"docfile\")==2";
         this.docFile = new File(os[1]);
       } else if (opt.equals("-d")) {
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"d\")==2";
         destDir = new File(os[1]);
       } else if (opt.equals("-outfile")) {
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"outfile\")==2";
         outFilename = os[1];
       } else if (opt.equals("-i")) {
         this.inPlace = true;
       } else if (opt.equals("-format")) {
+        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"format\")==2";
         if (os[1].equals("javadoc")) {
           setFormatJavadoc(true);
         }
@@ -744,7 +752,8 @@ public class OptionsDoclet {
     String suffix = null;
     int ulPos = in.indexOf(lineSep + "<ul>" + lineSep);
     if (ulPos != -1) {
-      @SuppressWarnings("index") // https://github.com/panacekcz/checker-framework/issues/23
+      @SuppressWarnings(
+          "index:argument.type.incompatible") // https://github.com/panacekcz/checker-framework/issues/23
       String suffixTemp = in.substring(ulPos + lineSep.length());
       suffix = suffixTemp;
       in = in.substring(0, ulPos);
