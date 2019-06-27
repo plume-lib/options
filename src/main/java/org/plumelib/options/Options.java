@@ -687,7 +687,7 @@ public class Options {
       for (Field f : fields) {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
-          @SuppressWarnings("cast")
+          @SuppressWarnings("nullness:initialization.invalid.cast")
           Object objNonraw = (@Initialized @NonRaw Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
@@ -724,8 +724,8 @@ public class Options {
           throw new Error("non-static option " + f + " in class " + obj);
         }
 
-        @SuppressWarnings(
-            "initialization") // new C(underInit) yields @UnderInitialization; @Initialized is safe
+        @SuppressWarnings("initialization:assignment.type.incompatible") // new C(underInit) yields
+        // @UnderInitialization; @Initialized is safe
         @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
 
@@ -822,7 +822,7 @@ public class Options {
       Field f, Class<T> annotationClass) {
     @Nullable T annotation;
     try {
-      @SuppressWarnings("cast") // cast is redundant (except for type annotations)
+      // @SuppressWarnings("nullness:initialization.invalid.cast")
       @Nullable T cast = f.getAnnotation((Class<@NonNull T>) annotationClass);
       annotation = cast;
     } catch (Exception e) {
@@ -1559,9 +1559,9 @@ public class Options {
    */
   @Override
   @SuppressWarnings({
-    "purity",
-    "method.guarantee.violated"
-  }) // side effect to local state (string creation)
+    "all:purity",
+    "lock:method.guarantee.violated" // side effect to local state (string creation)
+  })
   @SideEffectFree
   public String toString(@GuardSatisfied Options this) {
     StringJoiner out = new StringJoiner(lineSeparator);
