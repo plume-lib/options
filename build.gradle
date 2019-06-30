@@ -64,6 +64,7 @@ checkerFramework {
     'org.checkerframework.checker.signature.SignatureChecker'
   ]
   extraJavacArgs = [
+    '-Werror',
     "-Astubs=checker.jar/javadoc.astub",
     '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
