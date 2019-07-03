@@ -40,7 +40,6 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.NonRaw;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.nullness.qual.Raw;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -348,7 +347,7 @@ public class Options {
     //    Option option;
 
     /** Object containing the field. Null if the field is static. */
-    @UnknownInitialization @Raw @Nullable Object obj;
+    @UnknownInitialization @Nullable Object obj;
 
     /** Short (one-character) argument name. */
     @Nullable String shortName;
@@ -424,7 +423,7 @@ public class Options {
     OptionInfo(
         Field field,
         Option option,
-        @UnknownInitialization @Raw @Nullable Object obj,
+        @UnknownInitialization @Nullable Object obj,
         boolean unpublicized) {
       this.field = field;
       //      this.option = option;
@@ -641,7 +640,7 @@ public class Options {
    *
    * @param args the classes whose options to process
    */
-  public Options(@UnknownInitialization @Raw Object... args) {
+  public Options(@UnknownInitialization Object... args) {
     this("", args);
   }
 
@@ -654,7 +653,7 @@ public class Options {
    * @param usageSynopsis a synopsis of how to call your program
    * @param args the classes whose options to process
    */
-  public Options(String usageSynopsis, @UnknownInitialization @Raw Object... args) {
+  public Options(String usageSynopsis, Object... args) {
 
     if (args.length == 0) {
       throw new Error("Must pass at least one object to Options constructor");
@@ -675,7 +674,6 @@ public class Options {
       @KeyFor("groupMap") String currentGroup = null;
 
       @SuppressWarnings({
-        "rawness", // if isClass is true, obj is a non-null initialized Class
         "initialization" // if isClass is true, obj is a non-null initialized Class
       })
       @Initialized @NonRaw @NonNull Class<?> clazz = (isClass ? (@Initialized @NonRaw @NonNull Class<?>) obj : obj.getClass());
