@@ -2,7 +2,7 @@
 
 ## 1.0.2
 
-- Minor improvemets
+- Minor improvements
 
 ## 1.0.0
 
