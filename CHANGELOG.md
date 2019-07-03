@@ -1,5 +1,9 @@
 # Plume-lib Options change log
 
+## 1.0.2
+
+- Minor improvemets
+
 ## 1.0.0
 
 - Require Java 8
@@ -10,11 +14,11 @@
 
 ## 0.3.2
 
-- Build file improvements, such as work around bug in shadowJar task
 - Make getOptionsString public
+- Build file improvements, such as work around bug in shadowJar task
 
 ## 0.3.1
 
+- Document the need to set `docletpath`
 - Prefer camelCase to underscore-separated method and field names.
 - Introduce `tokenize` method, reduce number of `parse*` methods
-- Document the need to set `docletpath`
