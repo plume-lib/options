@@ -653,7 +653,7 @@ public class Options {
    * @param usageSynopsis a synopsis of how to call your program
    * @param args the classes whose options to process
    */
-  public Options(String usageSynopsis, Object... args) {
+  public Options(String usageSynopsis, @UnknownInitialization Object... args) {
 
     if (args.length == 0) {
       throw new Error("Must pass at least one object to Options constructor");
