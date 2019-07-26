@@ -20,7 +20,7 @@ apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
 
 dependencies {
   // https://mvnrepository.com/artifact/org.apache.commons/commons-text
-  implementation 'org.apache.commons:commons-text:1.6'
+  implementation 'org.apache.commons:commons-text:1.7'
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
   // https://mvnrepository.com/artifact/junit/junit
