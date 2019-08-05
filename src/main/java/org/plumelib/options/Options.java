@@ -38,7 +38,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.NonRaw;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -676,7 +675,7 @@ public class Options {
       @SuppressWarnings({
         "initialization" // if isClass is true, obj is a non-null initialized Class
       })
-      @Initialized @NonRaw @NonNull Class<?> clazz = (isClass ? (@Initialized @NonRaw @NonNull Class<?>) obj : obj.getClass());
+      @Initialized @NonNull Class<?> clazz = (isClass ? (@Initialized @NonNull Class<?>) obj : obj.getClass());
       if (mainClass == Void.TYPE) {
         mainClass = clazz;
       }
@@ -686,7 +685,7 @@ public class Options {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
           @SuppressWarnings("nullness:initialization.invalid.cast")
-          Object objNonraw = (@Initialized @NonRaw Object) obj;
+          Object objNonraw = (@Initialized Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
           }
