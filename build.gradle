@@ -5,7 +5,7 @@ plugins {
   // Run the Error Prone linter.
   id "net.ltgt.errorprone-base" version "0.0.16"
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.3.22'
+  id 'org.checkerframework' version '0.3.22' apply false
 
   // Formatting is disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
@@ -65,6 +65,16 @@ checkerFramework {
   ]
 }
 
+// To use a local-built Checker Framework, run gradle with "-PcfLocal".
+if (project.hasProperty("cfLocal")) {
+  def cfHome = String.valueOf(System.getenv("CHECKERFRAMEWORK"))
+  dependencies {
+    compileOnly files(cfHome + "/checker/dist/checker-qual.jar")
+    testCompileOnly files(cfHome + "/checker/dist/checker-qual.jar")
+    checkerFramework files(cfHome + "/checker/dist/checker.jar")
+    checkerFrameworkAnnotatedJDK files(cfHome + "/checker/dist/jdk8.jar")
+  }
+}
 
 /// Javadoc
 
