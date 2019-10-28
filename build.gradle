@@ -63,7 +63,10 @@ checkerFramework {
     "-Astubs=checker.jar/javadoc.astub",
     '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
-    '-AwarnUnneededSuppressions'
+    '-AwarnUnneededSuppressions',
+    // com.sun.javadoc had been marked for removal.
+    // Classes are imported by OptionsDoclet and therefor this warning can't be suppressed there.
+    '-Xlint:-removal'
   ]
 }
 
