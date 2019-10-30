@@ -29,7 +29,7 @@ In a gradle buildfile, write
 
 ```
 dependencies {
-  implementation 'org.plumelib:options:1.0.2'
+  implementation 'org.plumelib:options:1.0.3'
 }
 ```
 

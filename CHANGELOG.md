@@ -2,6 +2,10 @@
 
 ## 1.0.2
 
+- Bug fixes
+
+## 1.0.2
+
 - Minor improvements
 
 ## 1.0.0
