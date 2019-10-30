@@ -40,7 +40,9 @@ configurations {
   toolsJar  // tools.jar contains the Javadoc tool
 }
 dependencies {
-  toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+  if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
+    toolsJar files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+  }
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
 
