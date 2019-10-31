@@ -1,22 +1,24 @@
 plugins {
-  // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
-  id "com.github.johnrengelman.shadow" version "5.1.0"
+  id 'java-library'
 
-  // Run the Error Prone linter.
-  id "net.ltgt.errorprone-base" version "0.0.16"
-  // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.4.8' apply false
+  // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
+  id 'com.github.johnrengelman.shadow' version '5.1.0'
 
   // Formatting is disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
   // // Code formatting with Google Java Format; defines targets "goJF" and "verJF".
-  // id "com.github.sherter.google-java-format" version "0.7.1"
+  // id 'com.github.sherter.google-java-format' version '0.7.1'
+
+  // Run the Error Prone linter.
+  id 'net.ltgt.errorprone-base' version '0.0.16'
+
+  // Checker Framework pluggable type-checking
+  id 'org.checkerframework' version '0.4.8' apply false
 }
 
-apply plugin: 'java-library'
-
-// To upload to Maven Central, see instructions in the file.
-apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
+repositories {
+  mavenCentral()
+}
 
 dependencies {
   // https://mvnrepository.com/artifact/org.apache.commons/commons-text
@@ -28,12 +30,11 @@ dependencies {
   errorprone 'com.google.errorprone:error_prone_core:2.3.3'
 }
 
-repositories {
-  mavenCentral()
-}
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+// To upload to Maven Central, see instructions in the file.
+apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
 
 // Work around https://github.com/johnrengelman/shadow/issues/324
 configurations {
@@ -46,8 +47,10 @@ dependencies {
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
 
-// Checker Framework pluggable type-checking
+/// Checker Framework pluggable type-checking
+
 apply plugin: 'org.checkerframework'
+
 checkerFramework {
   checkers = [
     'org.checkerframework.checker.formatter.FormatterChecker',
@@ -95,6 +98,7 @@ task javadocWeb(type: Javadoc) {
   classpath = project.sourceSets.main.compileClasspath
 }
 
+// `requireJavadoc` target ensures that all Java elements have Javadoc documentation.
 dependencies {
   compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
 }
