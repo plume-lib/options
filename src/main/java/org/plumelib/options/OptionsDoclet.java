@@ -539,6 +539,9 @@ public class OptionsDoclet {
         replacing = true;
       }
     }
+    if (!replacedOnce) {
+      System.err.println("Did not find start delimiter: " + startDelim);
+    }
 
     doc.close();
     return b.toString();
