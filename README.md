@@ -22,14 +22,31 @@ class](http://plumelib.org/options/api/org/plumelib/options/Options.html).
 
 ## Editing your buildfile ##
 
-You can obtain the Options class from [Maven
-Central](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.plumelib%22%20a%3A%22options%22).
-
 In a gradle buildfile, write
 
 ```
 dependencies {
   implementation 'org.plumelib:options:1.0.3'
+}
+```
+
+```
+/*
+ * Applies OptionsDoclet to src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java
+ * (in place) to add command-line arguments extracted from the @Option-annotated classes.
+ */
+task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
+  description "Runs OptionsDoclet on MultiVersionControl.html"
+
+  title = ""
+  source = sourceSets.main.allJava
+  classpath = project.sourceSets.main.compileClasspath
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.docletpath = project.sourceSets.main.runtimeClasspath as List
+  options.doclet = "org.plumelib.options.OptionsDoclet"
+  options.addStringOption("docfile", "${projectDir}/src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java")
+  options.addStringOption("format", "javadoc")
+  options.addStringOption("i", "-quiet")
 }
 ```
 
