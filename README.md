@@ -31,14 +31,9 @@ dependencies {
 ```
 
 ```
-/*
- * Applies OptionsDoclet to src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java
- * (in place) to add command-line arguments extracted from the @Option-annotated classes.
- */
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
-  description "Runs OptionsDoclet on MultiVersionControl.html"
+  description "Updates printed documentation of command-line arguments."
 
-  title = ""
   source = sourceSets.main.allJava
   classpath = project.sourceSets.main.compileClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
@@ -47,6 +42,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
+  title = ""
 }
 ```
 
