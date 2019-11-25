@@ -56,17 +56,18 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * is automatically generated and never gets out of sync with the rest of the program.
  *
  * <p>The programmer does not have to write any code, only declare and document variables. For each
- * field that you want to set from a command-line argument, you write Javadoc and an @{@link
- * org.plumelib.options.Option} annotation. Then, the field is automatically set from a command-line
- * option of the same name, and usage messages and printed documentation are generated
+ * field that you want to set from a command-line argument, you write Javadoc and an {@code @Option}
+ * annotation. Then, at run time, the field is automatically set from a command-line option of the
+ * same name. Also, at build time, usage messages and printed documentation are generated
  * automatically.
  *
- * <p>The following code enables a user to invoke theprogram using the command-line arguments <span
- * style="white-space: nowrap;">{@code --outfile}</span>, <span style="white-space: nowrap;">{@code
- * -o}</span> (shorthand for <span style="white-space: nowrap;">{@code --outfile}</span>), <span
+ * <p>Suppose your program should support the command-line arguments <span style="white-space:
+ * nowrap;">{@code --outfile}</span>, <span style="white-space: nowrap;">{@code -o}</span>
+ * (shorthand for <span style="white-space: nowrap;">{@code --outfile}</span>), <span
  * style="white-space: nowrap;">{@code --ignore-case}</span>, <span style="white-space:
  * nowrap;">{@code -i}</span>, (shorthand for <span style="white-space: nowrap;">{@code
- * --ignore-case}</span>), and <span style="white-space: nowrap;">{@code --temperature}</span>:
+ * --ignore-case}</span>), and <span style="white-space: nowrap;">{@code --temperature}</span>. This
+ * code does so:
  *
  * <pre>
  * import org.plumelib.options.*;
@@ -95,26 +96,27 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * In the code above, the call to {@link #parse(boolean, String[])} sets fields in object {@code
  * myInstance} and sets static fields in class {@code MyUtilityClass}. It returns the original
  * command line, with all options removed. If a command-line argument is incorrect, it prints a
- * usage message and terminates the program.
+ * usage message and terminates the program. The program can also explicitly create or print a usage
+ * message; see {@link #usage(String...)} and {@link #printUsage()}.
  *
- * <p>For examples of usage, see the documentation for <a
+ * <p>For examples of generated HTML documentation, see the documentation for <a
  * href="https://types.cs.washington.edu/plume-lib/api/plume/Lookup.html#command-line-options">Lookup</a>,
  * <a href="https://randoop.github.io/randoop/manual/#command-line-options">Randoop</a>, and <a
  * href="https://types.cs.washington.edu/javari/javarifier/#command-line-opts">Javarifier</a>.
  *
  * <p><b>@Option indicates a command-line option</b>
  *
- * <p>The @{@link Option} annotation on a field specifies brief user documentation and, optionally,
- * a one-character short name that a user may supply on the command line. The long name is taken
- * from the name of the variable. When the name contains an underscore, the user may substitute a
- * hyphen on the command line instead; for example, the <span style="white-space: nowrap;">{@code
- * --multi-word-variable}</span> command-line option would set the variable {@code
+ * <p>The {@code @}{@link Option} annotation on a field specifies brief user documentation and,
+ * optionally, a one-character short name that a user may supply on the command line. The long name
+ * is taken from the name of the variable. When the name contains an underscore, the user may
+ * substitute a hyphen on the command line instead; for example, the <span style="white-space:
+ * nowrap;">{@code --multi-word-variable}</span> command-line option would set the variable {@code
  * multi_word_variable}.
  *
- * <p>On the command line, the values for options are specified in the form <span
- * style="white-space: nowrap;">"--name=value"</span> or <span style="white-space: nowrap;">"-name
- * value"</span>. The value (after the "=" or " ") is mandatory for all options except booleans.
- * Booleans are set to true if no value is specified. Booleans support <span style="white-space:
+ * <p>A user of your program supplies command-line options in the form <span style="white-space:
+ * nowrap;">"--name=value"</span> or <span style="white-space: nowrap;">"-name value"</span>. The
+ * value (after the "=" or " ") is mandatory for all options except booleans. Booleans are set to
+ * true if no value is specified. Booleans support <span style="white-space:
  * nowrap;">"--no-<em>optionname</em>"</span> which is equivalent to <span style="white-space:
  * nowrap;">"--optionname=false"</span>.
  *
@@ -131,10 +133,10 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *
  * <p><b>Unpublicized options</b>
  *
- * <p>The @{@link Unpublicized} annotation causes an option not to be displayed in the usage
+ * <p>The {@code @}{@link Unpublicized} annotation causes an option not to be displayed in the usage
  * message. This can be useful for options that are preliminary, experimental, or for internal
- * purposes only. The @{@link Unpublicized} annotation must be specified in addition to the @{@link
- * Option} annotation.
+ * purposes only. The {@code @}{@link Unpublicized} annotation must be specified in addition to the
+ * {@code @}{@link Option} annotation.
  *
  * <p>The usage message can optionally include unpublicized options; see {@link
  * #usage(boolean,String...)}.
@@ -147,10 +149,9 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * <a href="https://randoop.github.io/randoop/manual/#command-line-options">Randoop</a>, and <a
  * href="https://types.cs.washington.edu/javari/javarifier/#command-line-opts">Javarifier</a>.
  *
- * <p>To specify option groups, declare related fields together in your {@code .java} file, then
- * write @{@link OptionGroup} on the first field in each group (including the first
- * {@code @Option}-annotated field of every class and object passed to the {@link #Options(String,
- * Object...)} constructor).
+ * <p>If you wish to use option groups, then every option must be in some group. Declare related
+ * fields adjacent to one another in your {@code .java} file. Write {@code @}{@link OptionGroup} on
+ * the first field in each group.
  *
  * <p>The group name (the first argument of an {@code @OptionGroup} annotation) must be unique among
  * all classes and objects passed to the {@link #Options(String, Object...)} constructor.
@@ -168,9 +169,9 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *
  * <p><b>Option aliases</b>
  *
- * <p>The @{@link Option} annotation has an optional parameter {@code aliases}, which accepts an
- * array of strings. Each string in the array is an alias for the option being defined and can be
- * used in place of an option's long name or short name.
+ * <p>The {@code @}{@link Option} annotation has an optional parameter {@code aliases}, which
+ * accepts an array of strings. Each string in the array is an alias for the option being defined
+ * and can be used in place of an option's long name or short name.
  *
  * <p>One example is that a program might support <span style="white-space:
  * nowrap;">"--optimize"</span> and <span style="white-space: nowrap;">"--optimise"</span> which are
@@ -179,7 +180,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * meaning:
  *
  * <pre>
- *     // The user may supply --help, -h, or -help, all of which mean the same thing and set this variable
+ *     // The user may supply --help, -h, or -help, all of which mean the same thing and set this variable.
  *     &#64;Option(value="-h Print a help message", aliases={"-help"})
  *     public static boolean help;</pre>
  *
@@ -195,7 +196,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *
  * <p><b>Supported field types</b>
  *
- * <p>A field with an @{@link Option} annotation may be of the following types:
+ * <p>A field with an {@code @}{@link Option} annotation may be of the following types:
  *
  * <ul>
  *   <li>Primitive types: boolean, byte, char, short, int, long, float, double.
