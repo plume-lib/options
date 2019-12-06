@@ -510,7 +510,6 @@ public class OptionsDoclet {
     String docline;
     boolean replacing = false;
     boolean replacedOnce = false;
-    String prefix = null;
 
     while ((docline = doc.readLine()) != null) {
       if (replacing) {

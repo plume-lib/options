@@ -989,7 +989,6 @@ public class Options {
     args = args.trim();
     List<String> argList = new ArrayList<>();
     String arg = "";
-    char activeQuote = 0;
     for (int ii = 0; ii < args.length(); ii++) {
       char ch = args.charAt(ii);
       if ((ch == '\'') || (ch == '"')) {
@@ -1304,7 +1303,7 @@ public class Options {
         if (type == Boolean.TYPE) {
           boolean val;
           String argValueLowercase = argValue.toLowerCase();
-          if (argValueLowercase.equals("true") || (argValueLowercase.equals("t"))) {
+          if (argValueLowercase.equals("true") || argValueLowercase.equals("t")) {
             val = true;
           } else if (argValueLowercase.equals("false") || argValueLowercase.equals("f")) {
             val = false;
@@ -1312,7 +1311,7 @@ public class Options {
             throw new ArgException(
                 "Value \"%s\" for argument %s is not a boolean", argValue, argName);
           }
-          argValue = (val) ? "true" : "false";
+          argValue = val ? "true" : "false";
           // System.out.printf ("Setting %s to %s%n", argName, val);
           f.setBoolean(oi.obj, val);
         } else if (type == Byte.TYPE) {
@@ -1385,7 +1384,7 @@ public class Options {
         // argument value.
         if (oi.list != null) {
           if (spaceSeparatedLists) {
-            String[] aarr = argValue.split("  *");
+            String[] aarr = argValue.split(" +");
             for (String aval : aarr) {
               Object val = getRefArg(oi, argName, aval);
               oi.list.add(val); // uncheck cast

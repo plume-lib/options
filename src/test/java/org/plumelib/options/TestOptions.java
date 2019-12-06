@@ -280,7 +280,7 @@ public class TestOptions {
     // TODO: The following two exception tests are not adequate.  There must be
     // a better way to do these.
     try {
-      Options options = new Options("test", TestOptionGroups1.class);
+      new Options("test", TestOptionGroups1.class);
     } catch (Error e) {
       assert e.getMessage() != null
           && e.getMessage()
@@ -289,7 +289,7 @@ public class TestOptions {
     }
 
     try {
-      Options options = new Options("test", TestOptionGroups2.class, TestOptionGroups1.class);
+      new Options("test", TestOptionGroups2.class, TestOptionGroups1.class);
     } catch (Error e) {
       assert e.getMessage() != null
           && e.getMessage().indexOf("missing @OptionGroup annotation in field") > -1;
@@ -319,9 +319,9 @@ public class TestOptions {
     // Test that an option group that contains only unpublicized options is not
     // included in the usage message.
     Options options2 = new Options("test", TestOptionGroups3.class);
-    assert options.usage().indexOf("Internal options") == -1;
+    assert options2.usage().indexOf("Internal options") == -1;
     // ...unless showUnpublicized is true.
-    assert options.usage(true).indexOf("Internal options") > -1;
+    assert options2.usage(true).indexOf("Internal options") > -1;
   }
 
   public static class ClassWithOptionsEnums {
