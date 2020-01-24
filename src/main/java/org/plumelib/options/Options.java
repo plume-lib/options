@@ -669,7 +669,7 @@ public class Options {
     // Loop through each specified object or class
     for (Object obj : args) {
       boolean isClass = obj instanceof Class<?>;
-      // null or a key in groupMap
+      // null or a key in groupMap (that is, an option group name)
       @SuppressWarnings("keyfor")
       @KeyFor("groupMap") String currentGroup = null;
 
@@ -727,6 +727,7 @@ public class Options {
         @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
 
+        // The @OptionGroup annotation on this field, or null
         OptionGroup optionGroup = safeGetAnnotation(f, OptionGroup.class);
 
         if (!seenFirstOpt) {
@@ -755,16 +756,9 @@ public class Options {
             continue;
           }
         }
+        // hasGroups is true at this point.
 
-        // hasGroups is true at this point.  The variable currentGroup is set
-        // to null at the start of every iteration through 'args'.  This is so
-        // we can check that the first @Option-annotated field of every
-        // class/object in 'args' has an @OptionGroup annotation when hasGroups
-        // is true, as required.
-        if (currentGroup == null && optionGroup == null) {
-          // NOTE: changing this error string requires changes to TestPlume
-          throw new Error("missing @OptionGroup annotation in field " + f + " of class " + obj);
-        } else if (optionGroup != null) {
+        if (optionGroup != null) {
           String name = optionGroup.value();
           if (groupMap.containsKey(name)) {
             throw new Error("option group " + name + " declared twice");
@@ -772,7 +766,15 @@ public class Options {
           OptionGroupInfo gi = new OptionGroupInfo(optionGroup);
           groupMap.put(name, gi);
           currentGroup = name;
-        } // currentGroup is non-null at this point
+        }
+        // The variable currentGroup is set to null at the start of every iteration through 'args'.
+        // This is so we can check that the first @Option-annotated field of every class/object in
+        // 'args' has an @OptionGroup annotation when hasGroups is true, as required.
+        if (currentGroup == null) {
+          // NOTE: changing this error string requires changes to TestPlume
+          throw new Error("missing @OptionGroup annotation in field " + f + " of class " + obj);
+        }
+
         @NonNull OptionGroupInfo ogi = groupMap.get(currentGroup);
         ogi.optionList.add(oi);
       } // loop through fields
