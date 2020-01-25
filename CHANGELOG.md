@@ -1,6 +1,10 @@
 # Plume-lib Options change log
 
-## 1.0.2
+## 1.0.4
+
+- Documentation and annotation improvements
+
+## 1.0.3
 
 - Bug fixes
 
