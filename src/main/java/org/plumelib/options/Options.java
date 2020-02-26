@@ -674,7 +674,7 @@ public class Options {
       @KeyFor("groupMap") String currentGroup = null;
 
       @SuppressWarnings({
-        "initialization" // if isClass is true, obj is a non-null initialized Class
+        "nullness" // if isClass is true, obj is a non-null initialized Class
       })
       @Initialized @NonNull Class<?> clazz = (isClass ? (@Initialized @NonNull Class<?>) obj : obj.getClass());
       if (mainClass == Void.TYPE) {
@@ -722,7 +722,7 @@ public class Options {
           throw new Error("non-static option " + f + " in class " + obj);
         }
 
-        @SuppressWarnings("initialization:assignment.type.incompatible") // new C(underInit) yields
+        @SuppressWarnings("nullness:assignment.type.incompatible") // new C(underInit) yields
         // @UnderInitialization; @Initialized is safe
         @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
