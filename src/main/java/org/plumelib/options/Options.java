@@ -439,18 +439,14 @@ public class Options {
         longName = longName.replace('_', '-');
       }
 
-      // Get the default value (if any)
-      Object defaultObj = null;
       if (!Modifier.isPublic(field.getModifiers())) {
         throw new Error("option field is not public: " + field);
       }
-      try {
-        defaultObj = field.get(obj);
-        if (defaultObj != null) {
-          defaultStr = defaultObj.toString();
-        }
-      } catch (Exception e) {
-        throw new Error("Unexpected error getting default for " + field, e);
+
+      // Get the default value (if any)
+      Object defaultObj = fieldGet(field, obj);
+      if (defaultObj != null) {
+        defaultStr = defaultObj.toString();
       }
 
       if (field.getType().isArray()) {
@@ -1538,12 +1534,8 @@ public class Options {
     // Create the settings string
     for (OptionInfo oi : options) {
       @SuppressWarnings("formatter") // format string computed from maxLength
-      String use = String.format("%-" + maxLength + "s = ", oi.longName);
-      try {
-        use += oi.field.get(oi.obj);
-      } catch (Exception e) {
-        throw new Error("unexpected exception reading field " + oi.field, e);
-      }
+      String use =
+          String.format("%-" + maxLength + "s = %s", oi.longName, fieldGet(oi.field, oi.obj));
       out.add(use);
     }
 
@@ -1691,5 +1683,27 @@ public class Options {
     ArrayList<@KeyFor("#1") K> theKeys = new ArrayList<>(m.keySet());
     Collections.sort(theKeys);
     return theKeys;
+  }
+
+  /**
+   * Returns the value of the field represented by this Field, on the specified object. Wraps {@code
+   * Field.get}, but throws no exceptions other than an informative Error.
+   *
+   * @param field the field to extract
+   * @param obj object from which the field's value is to be extracted; may be null if the field is
+   *     static
+   * @return the value of the represented field in object obj; primitive values are wrapped in an
+   *     appropriate object before being returned
+   */
+  @SuppressWarnings(
+      "nullness" // should not be called with non-static field and null obj, but if so, the
+  // exception is caught and handled
+  )
+  private static Object fieldGet(Field field, @UnknownInitialization @Nullable Object obj) {
+    try {
+      return field.get(obj);
+    } catch (Exception e) {
+      throw new Error("Unexpected error reading " + field + " in " + obj, e);
+    }
   }
 }
