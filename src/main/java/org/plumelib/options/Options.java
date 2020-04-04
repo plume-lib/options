@@ -420,6 +420,7 @@ public class Options {
      * @param obj the object whose field will be set; if obj is null, the field must be static
      * @param unpublicized whether the option is unpublicized
      */
+    @SuppressWarnings("nullness:argument.type.incompatible") // field is static when object is null
     OptionInfo(
         Field field,
         Option option,
@@ -432,6 +433,10 @@ public class Options {
       this.unpublicized = unpublicized;
       this.aliases = option.aliases();
       this.noDocDefault = option.noDocDefault();
+
+      if (obj == null && !Modifier.isStatic(field.getModifiers())) {
+        throw new Error("obj is null for non-static field " + field);
+      }
 
       // The long name is the name of the field
       longName = field.getName();
@@ -1265,6 +1270,7 @@ public class Options {
    * @param argValue a string representation of the value
    * @throws ArgException if there are any errors
    */
+  @SuppressWarnings("nullness:argument.type.incompatible") // object can be null if field is static
   private void setArg(OptionInfo oi, String argName, @Nullable String argValue)
       throws ArgException {
 
