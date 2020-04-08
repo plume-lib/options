@@ -420,7 +420,10 @@ public class Options {
      * @param obj the object whose field will be set; if obj is null, the field must be static
      * @param unpublicized whether the option is unpublicized
      */
-    @SuppressWarnings("nullness:argument.type.incompatible") // field is static when object is null
+    @SuppressWarnings({
+      "nullness:argument.type.incompatible", // field is static when object is null
+      "interning:argument.type.incompatible" // interning is not relevant to the call
+    })
     OptionInfo(
         Field field,
         Option option,
@@ -1270,7 +1273,10 @@ public class Options {
    * @param argValue a string representation of the value
    * @throws ArgException if there are any errors
    */
-  @SuppressWarnings("nullness:argument.type.incompatible") // object can be null if field is static
+  @SuppressWarnings({
+    "nullness:argument.type.incompatible", // object can be null if field is static
+    "interning:argument.type.incompatible" // interning is not relevant to the call
+  })
   private void setArg(OptionInfo oi, String argName, @Nullable String argValue)
       throws ArgException {
 
