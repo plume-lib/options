@@ -25,7 +25,11 @@ jobs:
             - gradle-v1-{{ .Branch }}-
             - gradle-v1-
 
-      - run: ./gradlew build javadoc
+      - run: cd .. && git clone --depth 1 https://github.com/typetools/checker-framework.git
+      - run: cd ../checker-framework && checker/bin-devel/build.sh
+
+      # "-PcfLocal" is needed for both `build` and `javadoc` tasks
+      - run: export CHECKERFRAMEWORK=$(cd ../checker-framework && pwd) && ./gradlew build javadoc -PcfLocal
       - run: ./gradlew requireJavadoc
 
       - save_cache:
