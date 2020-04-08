@@ -28,8 +28,8 @@ jobs:
       - run: cd .. && git clone --depth 1 https://github.com/typetools/checker-framework.git
       - run: cd ../checker-framework && checker/bin-devel/build.sh
 
-      - run: export CHECKERFRAMEWORK=$(cd ../checker-framework && pwd) && ./gradlew build -PcfLocal
-      - run: ./gradlew javadoc
+      # "-PcfLocal" is needed for both `build` and `javadoc` tasks
+      - run: export CHECKERFRAMEWORK=$(cd ../checker-framework && pwd) && ./gradlew build javadoc -PcfLocal
       - run: ./gradlew requireJavadoc
 
       - save_cache:
