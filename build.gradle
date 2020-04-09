@@ -109,6 +109,7 @@ javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.addStringOption('private', '-quiet')
 }
+check.dependsOn javadoc
 
 task javadocWeb(type: Javadoc) {
   source = sourceSets.main.allJava
@@ -116,19 +117,19 @@ task javadocWeb(type: Javadoc) {
   classpath = project.sourceSets.main.compileClasspath
 }
 
-// `requireJavadoc` target ensures that all Java elements have Javadoc documentation.
+configurations {
+  requireJavadoc
+}
 dependencies {
-  compileOnly group: 'org.plumelib', name: 'require-javadoc', version: '0.1.2'
+  requireJavadoc "org.plumelib:require-javadoc:0.3.0"
 }
-task requireJavadoc(type: Javadoc) {
+task requireJavadoc(type: JavaExec) {
   description = 'Ensures that Javadoc documentation exists.'
-  destinationDir.deleteDir()
-  source = sourceSets.main.allJava
-  classpath = project.sourceSets.main.compileClasspath
-  // options.memberLevel = JavadocMemberLevel.PRIVATE
-  options.docletpath = project.sourceSets.main.compileClasspath as List
-  options.doclet = "org.plumelib.javadoc.RequireJavadoc"
+  main = "org.plumelib.javadoc.RequireJavadoc"
+  classpath = configurations.requireJavadoc
+  args "src/main/java"
 }
+check.dependsOn requireJavadoc
 
 
 /// Emacs support
