@@ -159,8 +159,10 @@ import org.checkerframework.common.value.qual.MinLen;
 @SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
 public class OptionsDoclet {
 
+  /** The system-specific line separator. */
   private static String lineSep = System.lineSeparator();
 
+  /** How to use the Options doclet. */
   private static final @Format({}) String USAGE =
       "Provided by Options doclet:%n"
           + "-docfile <file>        Specify file into which options documentation is inserted%n"
@@ -172,13 +174,18 @@ public class OptionsDoclet {
           + "-singledash            Use single dashes for long options (see org.plumelib.options.Options)%n"
           + "See the OptionsDoclet documentation for more details.%n";
 
+  /** Help message about options that can be specified multiple times. */
   private static final String LIST_HELP =
       "<code>[+]</code> marked option can be specified multiple times";
 
+  /** Marker for start of options documentation. */
   private String startDelim = "<!-- start options doc (DO NOT EDIT BY HAND) -->";
+  /** Marker for end of options documentation. */
   private String endDelim = "<!-- end options doc -->";
 
+  /** The file into which options documentation is inserted. */
   private @Nullable File docFile = null;
+  /** Destination for output. */
   private @Nullable File outFile = null;
 
   /** If true, then edit docFile in place (and docFile is non-null). */
@@ -188,7 +195,9 @@ public class OptionsDoclet {
   /** If true, then include the class's main Javadoc comment. */
   private boolean includeClassDoc = false;
 
+  /** The document root. */
   private RootDoc root;
+  /** The command-line options. */
   private Options options;
 
   /**

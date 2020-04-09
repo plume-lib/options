@@ -320,6 +320,7 @@ public class Options {
   /** String describing "[+]" (copied from Mercurial). */
   private static final String LIST_HELP = "[+] marked option can be specified multiple times";
 
+  /** If true, print diagnostic messages. */
   private boolean debugEnabled = false;
 
   /**
@@ -608,12 +609,23 @@ public class Options {
     /** List of options that belong to this group. */
     List<OptionInfo> optionList;
 
+    /**
+     * Create a new option group.
+     *
+     * @param name the name of this option group
+     * @param unpublicized if true, this option group is unpublicized
+     */
     OptionGroupInfo(String name, boolean unpublicized) {
       optionList = new ArrayList<OptionInfo>();
       this.name = name;
       this.unpublicized = unpublicized;
     }
 
+    /**
+     * Create a copy of an option group.
+     *
+     * @param optionGroup the option group to copy
+     */
     OptionGroupInfo(OptionGroup optionGroup) {
       optionList = new ArrayList<OptionInfo>();
       this.name = optionGroup.value();
@@ -1247,20 +1259,40 @@ public class Options {
   // Package-private accessors/utility methods that are needed by the OptionsDoclet class to
   // generate HTML documentation.
 
+  /**
+   * Return whether option groups are being used.
+   *
+   * @return true if option groups are being used
+   */
   @Pure
   boolean hasGroups() {
     return hasGroups;
   }
 
+  /**
+   * Return whether single dashes are being used.
+   *
+   * @return true if single dashes are being used
+   */
   @Pure
   boolean getUseSingleDash() {
     return useSingleDash;
   }
 
+  /**
+   * Return all the defined options
+   *
+   * @return all the defined options
+   */
   List<OptionInfo> getOptions() {
     return options;
   }
 
+  /**
+   * Return all the option groups
+   *
+   * @return all the option groups
+   */
   Collection<OptionGroupInfo> getOptionGroups() {
     return groupMap.values();
   }
@@ -1605,11 +1637,22 @@ public class Options {
     }
   }
 
+  /** The result of parsing the argument to {@code @Option}. */
   private static class ParseResult {
+    /** The short name of an option, or null if none. */
     @Nullable String shortName;
+    /** The type name of an option, or null if none. */
     @Nullable String typeName;
+    /** The description of an option. */
     String description;
 
+    /**
+     * Create a new ParseResult.
+     *
+     * @param shortName the short name of an option, or null if none
+     * @param typeName the type name of an option, or null if none
+     * @param description the description of an option
+     */
     ParseResult(@Nullable String shortName, @Nullable String typeName, String description) {
       this.shortName = shortName;
       this.typeName = typeName;
