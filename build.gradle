@@ -27,7 +27,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
   // https://mvnrepository.com/artifact/junit/junit
   testImplementation 'junit:junit:4.13'
-  errorprone 'com.google.errorprone:error_prone_core:2.3.4'
+  errorprone 'com.google.errorprone:error_prone_core:2.4.0'
 }
 
 sourceCompatibility = 1.8
