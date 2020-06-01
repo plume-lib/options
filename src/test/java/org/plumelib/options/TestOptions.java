@@ -88,63 +88,64 @@ public class TestOptions {
       throw e;
     }
 
-    assert t.lp.get(0).toString().equals("foo");
-    assert t.lp.get(1).toString().equals("bar");
-    assert t.integer_reference != null && t.integer_reference.intValue() == 24;
-    assert t.temperature == 37.8;
-    assert t.bool == false;
-    assert t.ld.get(0).doubleValue() == 34.6;
-    assert t.ld.get(1).doubleValue() == 17.8;
+    assertEquals("foo", t.lp.get(0).toString());
+    assertEquals("bar", t.lp.get(1).toString());
+    assertNotNull(t.integer_reference);
+    assertEquals(24, t.integer_reference.intValue());
+    assertEquals(37.8, t.temperature, 0);
+    assertFalse(t.bool);
+    assertEquals(34.6, t.ld.get(0).doubleValue(), 0);
+    assertEquals(17.8, t.ld.get(1).doubleValue(), 0);
 
     // Test non-options
     t.bool = false;
     String[] args = options.parse(new String[] {"one", "two", "three", "-b"});
     assert args.length == 3 : "@AssumeAssertion(value)";
-    assert args[0].equals("one") : args[0];
-    assert args[1].equals("two") : args[1];
-    assert args[2].equals("three") : args[2];
-    assert t.bool;
+    assertEquals("one", args[0]);
+    assertEquals("two", args[1]);
+    assertEquals("three", args[2]);
+    assertTrue(t.bool);
 
     // Test --
     t.bool = false;
     args = options.parse(new String[] {"--", "one", "two", "-b"});
     assert args.length == 3 : "@AssumeAssertion(value)";
-    assert args[0].equals("one") : args[0];
-    assert args[1].equals("two") : args[1];
-    assert args[2].equals("-b") : args[2];
-    assert !t.bool;
+    assertEquals("one", args[0]);
+    assertEquals("two", args[1]);
+    assertEquals("-b", args[2]);
+    assertFalse(t.bool);
 
     // Test spaceSeparatedLists
     t.ld.clear();
     Options.spaceSeparatedLists = true;
     args = options.parse(new String[] {"--ld", "42.1 9.3 10.5", "--ld", "2.7"});
     assert args.length == 0 : "@AssumeAssertion(value)";
-    assert t.ld.size() == 4;
-    assert t.ld.get(0).doubleValue() == 42.1;
-    assert t.ld.get(1).doubleValue() == 9.3;
-    assert t.ld.get(2).doubleValue() == 10.5;
-    assert t.ld.get(3).doubleValue() == 2.7;
+    assertEquals(4, t.ld.size());
+    assertEquals(42.1, t.ld.get(0).doubleValue(), 0);
+    assertEquals(9.3, t.ld.get(1).doubleValue(), 0);
+    assertEquals(10.5, t.ld.get(2).doubleValue(), 0);
+    assertEquals(2.7, t.ld.get(3).doubleValue(), 0);
 
     // Test list with no default
     args = options.parse(new String[] {"--ls", "hello", "--ls", "world"});
     assert args.length == 0 : "@AssumeAssertion(value)";
     assert t.ls != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --ls just above";
-    assert t.ls.size() == 2;
-    assert t.ls.get(0).equals("hello");
-    assert t.ls.get(1).equals("world");
+    assertEquals(2, t.ls.size());
+    assertEquals("hello", t.ls.get(0));
+    assertEquals("world", t.ls.get(1));
 
     // Test files and paths
     assert t.input_file != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-file just above";
-    assert t.input_file.exists();
-    assert t.input_file.getName().equals("TestOptions1.txt");
+    assertTrue(t.input_file.exists());
+    assertEquals("TestOptions1.txt", t.input_file.getName());
     assert t.input_path != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-path just above";
-    assert t.input_path.toFile().exists();
+    assertTrue(t.input_path.toFile().exists());
     assert t.input_path != null
         : "@AssumeAssertion(nullness): annotated JDK doesn't contain toFile() yet";
-    assert t.input_path.toString().equals("/tmp/TestOptions2.txt");
+    assertEquals("/tmp/TestOptions2.txt", t.input_path.toString());
     ;
   }
 
@@ -175,36 +176,36 @@ public class TestOptions {
     Options options = new Options("test", t);
 
     options.parse(new String[] {"-d", "Monday", "-temp", "-12.3"});
-    assert t.day.equals("Monday");
-    assert t.temperature == -12.3;
-    assert !t.printVersion;
+    assertEquals("Monday", t.day);
+    assertEquals(-12.3, t.temperature, 0);
+    assertFalse(t.printVersion);
 
     options.parse(Options.tokenize("-d Monday -temp -12.3"));
-    assert t.day.equals("Monday");
-    assert t.temperature == -12.3;
-    assert !t.printVersion;
+    assertEquals("Monday", t.day);
+    assertEquals(-12.3, t.temperature, 0);
+    assertFalse(t.printVersion);
 
     options.parse(new String[] {"-t", "21.7", "-version"});
-    assert t.day.equals("Monday");
-    assert t.temperature == 21.7;
-    assert t.printVersion;
+    assertEquals("Monday", t.day);
+    assertEquals(21.7, t.temperature, 0);
+    assertTrue(t.printVersion);
 
     options.parse(Options.tokenize("-t 21.7 -version"));
-    assert t.day.equals("Monday");
-    assert t.temperature == 21.7;
-    assert t.printVersion;
+    assertEquals("Monday", t.day);
+    assertEquals(21.7, t.temperature, 0);
+    assertTrue(t.printVersion);
 
     t.printVersion = false;
     options.parse(new String[] {"--version", "-temp=-60.1", "--day", "Tuesday"});
-    assert t.day.equals("Tuesday");
-    assert t.temperature == -60.1;
-    assert t.printVersion;
+    assertEquals("Tuesday", t.day);
+    assertEquals(-60.1, t.temperature, 0);
+    assertTrue(t.printVersion);
 
     t.printVersion = false;
     options.parse(Options.tokenize("--version -temp=-60.1 --day Tuesday"));
-    assert t.day.equals("Tuesday");
-    assert t.temperature == -60.1;
-    assert t.printVersion;
+    assertEquals("Tuesday", t.day);
+    assertEquals(-60.1, t.temperature, 0);
+    assertTrue(t.printVersion);
   }
 
   /** Test class for testing option groups. */
@@ -281,47 +282,49 @@ public class TestOptions {
     // a better way to do these.
     try {
       new Options("test", TestOptionGroups1.class);
+      fail();
     } catch (Error e) {
-      assert e.getMessage() != null
-          && e.getMessage()
-                  .indexOf("missing @OptionGroup annotation on the first @Option-annotated field")
-              > -1;
+      assertNotNull(e.getMessage());
+      assertTrue(
+          e.getMessage()
+              .contains("missing @OptionGroup annotation on the first @Option-annotated field"));
     }
 
     try {
       new Options("test", TestOptionGroups2.class, TestOptionGroups1.class);
+      fail();
     } catch (Error e) {
-      assert e.getMessage() != null
-          && e.getMessage().indexOf("missing @OptionGroup annotation in field") > -1;
+      assertNotNull(e.getMessage());
+      assertTrue(e.getMessage().contains("missing @OptionGroup annotation in field"));
     }
 
     Options options = new Options("test", TestOptionGroups2.class);
 
-    assert options.usage().indexOf("General options") > -1;
-    assert options.usage().indexOf("Display options") > -1;
+    assertNotEquals(-1, options.usage().indexOf("General options"));
+    assertNotEquals(-1, options.usage().indexOf("Display options"));
     // "Internal options" is unpublicized so it should not occur in the default
     // usage message.
-    assert options.usage().indexOf("Internal options") == -1;
+    assertEquals(-1, options.usage().indexOf("Internal options"));
 
-    assert options.usage("Internal options").indexOf("Set mu") > -1;
+    assertNotEquals(-1, options.usage("Internal options").indexOf("Set mu"));
     // "Set pi" should not appear in the usage message for "Internal options"
     // because it is marked with @Unpublicized.
-    assert options.usage("Internal options").indexOf("Set pi") == -1;
+    assertEquals(-1, options.usage("Internal options").indexOf("Set pi"));
 
     options.parse(new String[] {"--colour", "--pi", "3.15"});
-    assert TestOptionGroups2.color;
-    assert TestOptionGroups2.pi == 3.15;
+    assertTrue(TestOptionGroups2.color);
+    assertEquals(3.15, TestOptionGroups2.pi, 0);
 
     options.parse(Options.tokenize("--colour --pi 3.15"));
-    assert TestOptionGroups2.color;
-    assert TestOptionGroups2.pi == 3.15;
+    assertTrue(TestOptionGroups2.color);
+    assertEquals(3.15, TestOptionGroups2.pi, 0);
 
     // Test that an option group that contains only unpublicized options is not
     // included in the usage message.
     Options options2 = new Options("test", TestOptionGroups3.class);
-    assert options2.usage().indexOf("Internal options") == -1;
+    assertEquals(-1, options2.usage().indexOf("Internal options"));
     // ...unless showUnpublicized is true.
-    assert options2.usage(true).indexOf("Internal options") > -1;
+    assertNotEquals(-1, options2.usage(true).indexOf("Internal options"));
   }
 
   public static class ClassWithOptionsEnums {
@@ -343,23 +346,23 @@ public class TestOptions {
     Options options = new Options("test", ClassWithOptionsEnums.class);
 
     options.parse(new String[] {"--firstPass", "SMART_RLE"});
-    assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
+    assertEquals(ClassWithOptionsEnums.Compressor.SMART_RLE, ClassWithOptionsEnums.firstPass);
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
     options.parse(new String[] {"--firstPass", "smart_rle"});
-    assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
+    assertEquals(ClassWithOptionsEnums.Compressor.SMART_RLE, ClassWithOptionsEnums.firstPass);
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
     options.parse(new String[] {"--firstPass", "smart-rle"});
-    assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
+    assertEquals(ClassWithOptionsEnums.Compressor.SMART_RLE, ClassWithOptionsEnums.firstPass);
 
     options.parse(new String[] {"--firstPass", "rle", "--secondPass", "SMART-RLE"});
-    assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
-    assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
+    assertEquals(ClassWithOptionsEnums.Compressor.RLE, ClassWithOptionsEnums.firstPass);
+    assertEquals(ClassWithOptionsEnums.Compressor.SMART_RLE, ClassWithOptionsEnums.secondPass);
 
     options.parse(new String[] {"--secondPass", "Huffman"});
-    assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
-    assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.HUFFMAN;
+    assertEquals(ClassWithOptionsEnums.Compressor.RLE, ClassWithOptionsEnums.firstPass);
+    assertEquals(ClassWithOptionsEnums.Compressor.HUFFMAN, ClassWithOptionsEnums.secondPass);
   }
 
   @Test
