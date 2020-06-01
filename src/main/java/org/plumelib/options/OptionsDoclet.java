@@ -154,8 +154,7 @@ import org.checkerframework.common.value.qual.MinLen;
  */
 
 // This doesn't itself use org.plumelib.options.Options for its command-line option processing
-// because a Doclet is
-// required to implement the optionLength() and validOptions() methods.
+// because a Doclet is required to implement the optionLength() and validOptions() methods.
 @SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
 public class OptionsDoclet {
 
@@ -163,7 +162,6 @@ public class OptionsDoclet {
   private static String lineSep = System.lineSeparator();
 
   /** How to use the Options doclet. */
-  @SuppressWarnings("InlineFormatString")
   private static final @Format({}) String USAGE =
       "Provided by Options doclet:%n"
           + "-docfile <file>        Specify file into which options documentation is inserted%n"
@@ -593,6 +591,7 @@ public class OptionsDoclet {
    *
    * @param oi the enum option whose Javadoc to read
    */
+  @SuppressWarnings("ModifyCollectionInEnhancedForLoop")
   private void processEnumJavadoc(Options.OptionInfo oi) {
     Enum<?>[] constants = (Enum<?>[]) oi.baseType.getEnumConstants();
     if (constants == null) {
