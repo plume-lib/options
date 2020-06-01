@@ -163,6 +163,7 @@ public class OptionsDoclet {
   private static String lineSep = System.lineSeparator();
 
   /** How to use the Options doclet. */
+  @SuppressWarnings("InlineFormatString")
   private static final @Format({}) String USAGE =
       "Provided by Options doclet:%n"
           + "-docfile <file>        Specify file into which options documentation is inserted%n"
