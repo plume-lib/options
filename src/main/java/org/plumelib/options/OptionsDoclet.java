@@ -35,7 +35,6 @@ import java.util.Scanner;
 import java.util.StringJoiner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.checkerframework.checker.formatter.qual.Format;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.signature.qual.BinaryName;
@@ -162,7 +161,7 @@ public class OptionsDoclet {
   private static String lineSep = System.lineSeparator();
 
   /** How to use the Options doclet. */
-  private static final @Format({}) String USAGE =
+  private static final String USAGE =
       String.format(
           "Provided by Options doclet:%n"
               + "-docfile <file>        Specify file into which options documentation is inserted%n"
