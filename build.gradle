@@ -61,7 +61,6 @@ tasks.withType(JavaCompile).configureEach {
     disable("StringSplitter") // obscure case isn't likely
     disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
     disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
-    disable("InlineFormatString") // Format String Checker guarantees correct usage
   }
 }
 

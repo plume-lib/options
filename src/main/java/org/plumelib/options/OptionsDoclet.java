@@ -163,15 +163,16 @@ public class OptionsDoclet {
 
   /** How to use the Options doclet. */
   private static final @Format({}) String USAGE =
-      "Provided by Options doclet:%n"
-          + "-docfile <file>        Specify file into which options documentation is inserted%n"
-          + "-outfile <file>        Specify destination for resulting output%n"
-          + "-d <directory>         Destination directory for -outfile%n"
-          + "-i                     Edit the docfile in-place%n"
-          + "-format javadoc        Format output as a Javadoc comment%n"
-          + "-classdoc              Include 'main' class documentation in output%n"
-          + "-singledash            Use single dashes for long options (see org.plumelib.options.Options)%n"
-          + "See the OptionsDoclet documentation for more details.%n";
+      String.format(
+          "Provided by Options doclet:%n"
+              + "-docfile <file>        Specify file into which options documentation is inserted%n"
+              + "-outfile <file>        Specify destination for resulting output%n"
+              + "-d <directory>         Destination directory for -outfile%n"
+              + "-i                     Edit the docfile in-place%n"
+              + "-format javadoc        Format output as a Javadoc comment%n"
+              + "-classdoc              Include 'main' class documentation in output%n"
+              + "-singledash            Use single dashes for long options (see org.plumelib.options.Options)%n"
+              + "See the OptionsDoclet documentation for more details.%n");
 
   /** Help message about options that can be specified multiple times. */
   private static final String LIST_HELP =
@@ -294,7 +295,7 @@ public class OptionsDoclet {
    */
   public static int optionLength(String option) {
     if (option.equals("-help")) {
-      System.out.printf(USAGE);
+      System.out.println(USAGE);
       return 1;
     }
     if (option.equals("-i") || option.equals("-classdoc") || option.equals("-singledash")) {
