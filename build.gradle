@@ -80,7 +80,6 @@ checkerFramework {
   ]
   extraJavacArgs = [
     '-Werror',
-    "-Astubs=checker.jar/javadoc.astub",
     '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
     '-AwarnUnneededSuppressions',
