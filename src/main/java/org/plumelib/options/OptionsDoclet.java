@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.common.value.qual.MinLen;
 
 /**
@@ -557,7 +558,9 @@ public class OptionsDoclet {
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
-      ClassDoc optDoc = root.classNamed(oi.getDeclaringClass().getName());
+      @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
+      @BinaryName String className = oi.getDeclaringClass().getName();
+      ClassDoc optDoc = root.classNamed(className);
       if (optDoc != null) {
         String nameWithUnderscores = oi.longName.replace('-', '_');
         for (FieldDoc fd : optDoc.fields()) {
@@ -603,7 +606,9 @@ public class OptionsDoclet {
       oi.enumJdoc.put(constant.name(), "");
     }
 
-    ClassDoc enumDoc = root.classNamed(oi.baseType.getName());
+    @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
+    @BinaryName String className = oi.baseType.getName();
+    ClassDoc enumDoc = root.classNamed(className);
     if (enumDoc == null) {
       return;
     }
