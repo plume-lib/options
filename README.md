@@ -22,7 +22,7 @@ class](http://plumelib.org/options/api/org/plumelib/options/Options.html).
 
 ## Editing your buildfile ##
 
-In a gradle buildfile, write
+In a Gradle buildfile, write
 
 ```
 dependencies {
