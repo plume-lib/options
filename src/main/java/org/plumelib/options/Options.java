@@ -1594,7 +1594,7 @@ public class Options {
    */
   @Override
   @SuppressWarnings({
-    "all:purity",
+    "allcheckers:purity",
     "lock:method.guarantee.violated" // side effect to local state (string creation)
   })
   @SideEffectFree
