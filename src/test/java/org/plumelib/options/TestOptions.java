@@ -1,6 +1,5 @@
 package org.plumelib.options;
 
-import static org.junit.Assert.*;
 import static org.plumelib.options.Options.ArgException;
 
 import java.io.File;
@@ -10,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestOptions {
 
@@ -363,13 +363,13 @@ public class TestOptions {
   }
 
   @Test
-  public void testOptionsEnumsFail() {
+  public void testOptionsEnumsFail() throws ArgException {
     Options options = new Options("test", ClassWithOptionsEnums.class);
-    try {
-      // should fail: can not leave out _ or -
-      options.parse(new String[] {"--firstPass", "smartrle"});
-      org.junit.Assert.fail("Didn't throw ArgException as expected");
-    } catch (ArgException e) {
-    }
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          // should fail: can not leave out _ or -
+          options.parse(new String[] {"--firstPass", "smartrle"});
+        });
   }
 }
