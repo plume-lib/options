@@ -232,7 +232,8 @@ public class OptionsDoclet {
 
       Class<?> clazz;
       try {
-        String className = doc.qualifiedName();
+        @SuppressWarnings("signature") // for a ClassDoc, qualifiedName() returns a binary name
+        @BinaryName String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
