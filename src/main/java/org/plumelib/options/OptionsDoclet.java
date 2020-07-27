@@ -218,6 +218,7 @@ public class OptionsDoclet {
    * @param root the root document
    * @return true if processing completed without an error
    */
+  @SuppressWarnings("unneeded.suppression") // TEMPORARY until CF 3.6.0 is released
   public static boolean start(RootDoc root) {
     List<Object> objs = new ArrayList<>();
     for (ClassDoc doc : root.specifiedClasses()) {
