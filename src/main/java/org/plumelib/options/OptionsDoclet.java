@@ -232,7 +232,7 @@ public class OptionsDoclet {
 
       Class<?> clazz;
       try {
-        @SuppressWarnings("signature") // Javadoc source code is not yet annotated
+        @SuppressWarnings("signature") // for a ClassDoc, qualifiedName() returns a binary name
         @BinaryName String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
@@ -559,7 +559,9 @@ public class OptionsDoclet {
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
-      ClassDoc optDoc = root.classNamed(oi.getDeclaringClass().getName());
+      @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
+      @BinaryName String className = oi.getDeclaringClass().getName();
+      ClassDoc optDoc = root.classNamed(className);
       if (optDoc != null) {
         String nameWithUnderscores = oi.longName.replace('-', '_');
         for (FieldDoc fd : optDoc.fields()) {
@@ -605,7 +607,9 @@ public class OptionsDoclet {
       oi.enumJdoc.put(constant.name(), "");
     }
 
-    ClassDoc enumDoc = root.classNamed(oi.baseType.getName());
+    @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
+    @BinaryName String className = oi.baseType.getName();
+    ClassDoc enumDoc = root.classNamed(className);
     if (enumDoc == null) {
       return;
     }
