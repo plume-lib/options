@@ -2,7 +2,7 @@ plugins {
   id 'java-library'
 
   // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
-  id 'com.github.johnrengelman.shadow' version '5.2.0'
+  id 'com.github.johnrengelman.shadow' version '6.0.0'
 
   // Formatting is disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
@@ -13,7 +13,7 @@ plugins {
   id("net.ltgt.errorprone") version "1.1.1"
 
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.5.4' apply false
+  id 'org.checkerframework' version '0.5.6' apply false
 }
 
 repositories {
@@ -24,10 +24,12 @@ dependencies {
   // https://mvnrepository.com/artifact/org.apache.commons/commons-text
   implementation 'org.apache.commons:commons-text:1.8'
   // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-  // https://mvnrepository.com/artifact/junit/junit
-  testImplementation 'junit:junit:4.13'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+
   errorprone 'com.google.errorprone:error_prone_core:2.4.0'
+
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
 sourceCompatibility = 1.8
@@ -46,6 +48,13 @@ dependencies {
   }
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
+
+test {
+    useJUnitPlatform {
+        includeEngines 'junit-jupiter'
+        excludeEngines 'junit-vintage'
+    }
+}
 
 /// Error Prone linter
 
