@@ -232,8 +232,6 @@ public class OptionsDoclet {
 
       Class<?> clazz;
       try {
-        @SuppressWarnings(
-            "signature:assignment.type.incompatible") // ClassDoc.qualifiedName(): @BinaryName
         @BinaryName String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
