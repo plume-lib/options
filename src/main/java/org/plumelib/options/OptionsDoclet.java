@@ -218,7 +218,6 @@ public class OptionsDoclet {
    * @param root the root document
    * @return true if processing completed without an error
    */
-  @SuppressWarnings("unneeded.suppression") // TEMPORARY until CF 3.6.0 is released
   public static boolean start(RootDoc root) {
     List<Object> objs = new ArrayList<>();
     for (ClassDoc doc : root.specifiedClasses()) {
@@ -233,7 +232,8 @@ public class OptionsDoclet {
 
       Class<?> clazz;
       try {
-        @SuppressWarnings("signature") // for a ClassDoc, qualifiedName() returns a binary name
+        @SuppressWarnings(
+            "signature:assignment.type.incompatible") // ClassDoc.qualifiedName(): @BinaryName
         @BinaryName String className = doc.qualifiedName();
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
