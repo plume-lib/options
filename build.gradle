@@ -113,6 +113,7 @@ if (project.hasProperty("cfLocal")) {
 /// Javadoc
 
 // Turn Javadoc warnings into errors.
+if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.addStringOption('private', '-quiet')
@@ -146,6 +147,7 @@ task javadocWeb(type: Javadoc) {
     }
   }
 }
+}
 
 configurations {
   requireJavadoc
@@ -160,7 +162,9 @@ task requireJavadoc(type: JavaExec) {
   args "src/main/java"
 }
 check.dependsOn requireJavadoc
+if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadocWeb.dependsOn requireJavadoc
+}
 
 /// Emacs support
 
