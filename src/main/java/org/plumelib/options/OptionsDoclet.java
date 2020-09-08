@@ -822,7 +822,7 @@ public class OptionsDoclet {
     if (oi.noDocDefault || oi.defaultStr == null) {
       f.format("%s", jdoc);
     } else {
-      String defaultStr = "default " + oi.defaultStr;
+      String defaultStr = "default: " + oi.defaultStr;
       // The default string must be HTML-escaped since it comes from a string
       // rather than a Javadoc comment.
       String suffix = "";
