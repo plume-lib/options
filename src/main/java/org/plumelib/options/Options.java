@@ -318,7 +318,7 @@ public class Options {
   private boolean hasGroups;
 
   /** String describing "[+]" (copied from Mercurial). */
-  private static final String LIST_HELP = "[+] marked option can be specified multiple times";
+  private static final String LIST_HELP = "[+] means option can be specified multiple times";
 
   /** If true, print diagnostic messages. */
   private boolean debugEnabled = false;

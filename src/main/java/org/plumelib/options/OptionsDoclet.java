@@ -175,7 +175,7 @@ public class OptionsDoclet {
 
   /** Help message about options that can be specified multiple times. */
   private static final String LIST_HELP =
-      "<code>[+]</code> marked option can be specified multiple times";
+      "<code>[+]</code> means option can be specified multiple times";
 
   /** Marker for start of options documentation. */
   private String startDelim = "<!-- start options doc (DO NOT EDIT BY HAND) -->";
