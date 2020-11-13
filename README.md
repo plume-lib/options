@@ -45,7 +45,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
 }
 ```
 
-Other build systems are similar.
+Other build systems are [https://search.maven.org/artifact/org.plumelib/options/1.0.4/jar](similar).
 
 
 ## Alternatives ##
