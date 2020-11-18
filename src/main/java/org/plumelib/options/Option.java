@@ -40,7 +40,7 @@ import org.checkerframework.framework.qual.IgnoreInWholeProgramInference;
  * @see org.plumelib.options.Unpublicized
  * @see org.plumelib.options.OptionsDoclet
  */
-@IgnoreInWholeProgramInference
+@IgnoreInWholeProgramInference // a field annotated with @Option is set reflectively
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Option {
