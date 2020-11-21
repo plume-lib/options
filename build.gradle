@@ -95,7 +95,7 @@ checkerFramework {
     // `com.sun.javadoc` is deprecated and superseded by `jdk.javadoc.doclet`.
     //  `jdk.javadoc.doclet` only exists in Java 9 and later, so switching to it means losing support for Java 8.
     // Classes are imported by OptionsDoclet and therefore this warning can't be suppressed there.
-    '-Xlint:-removal'
+    '-Xlint:-removal',
   ]
 }
 
