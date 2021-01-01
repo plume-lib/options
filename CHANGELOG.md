@@ -2,6 +2,11 @@
 
 ## 1.0.4
 
+- Add colon after "default" in option descriptions
+- Documentationc improvements
+
+## 1.0.4
+
 - Documentation and annotation improvements
 
 ## 1.0.3

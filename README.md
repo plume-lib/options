@@ -26,7 +26,7 @@ In a Gradle buildfile, write
 
 ```
 dependencies {
-  implementation 'org.plumelib:options:1.0.4'
+  implementation 'org.plumelib:options:1.0.5'
 }
 ```
 
@@ -45,7 +45,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
 }
 ```
 
-Other build systems are [https://search.maven.org/artifact/org.plumelib/options/1.0.4/jar](similar).
+Other build systems are [https://search.maven.org/artifact/org.plumelib/options/1.0.5/jar](similar).
 
 
 ## Alternatives ##
