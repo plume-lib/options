@@ -689,9 +689,6 @@ public class Options {
       @SuppressWarnings("keyfor")
       @KeyFor("groupMap") String currentGroup = null;
 
-      @SuppressWarnings({
-        "nullness" // if isClass is true, obj is a non-null initialized Class
-      })
       @Initialized @NonNull Class<?> clazz = (isClass ? (@Initialized @NonNull Class<?>) obj : obj.getClass());
       if (mainClass == Void.TYPE) {
         mainClass = clazz;
@@ -700,8 +697,6 @@ public class Options {
 
       for (Field f : fields) {
         try {
-          // Possible exception because "obj" is not yet initialized; catch it and proceed
-          @SuppressWarnings("nullness:initialization.invalid.cast")
           Object objNonraw = (@Initialized Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
@@ -738,8 +733,6 @@ public class Options {
           throw new Error("non-static option " + f + " in class " + obj);
         }
 
-        @SuppressWarnings("nullness:assignment.type.incompatible") // new C(underInit) yields
-        // @UnderInitialization; @Initialized is safe
         @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
 
