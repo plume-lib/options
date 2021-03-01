@@ -8,6 +8,7 @@
 
 package org.plumelib.options;
 
+import io.github.classgraph.ClassGraph;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
@@ -17,6 +18,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -848,8 +850,9 @@ public class Options {
       System.out.printf(
           "Exception in call to f.getAnnotation(%s)%n  for f=%s%n  %s%nClasspath =%n",
           annotationClass, f, e.getMessage());
-      // e.printStackTrace();
-      printClassPath();
+      for (URI uri : new ClassGraph().getClasspathURIs()) {
+        System.out.println("  " + uri);
+      }
       annotation = null;
     }
 
