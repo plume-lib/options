@@ -18,6 +18,6 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
     - name: ./gradlew build javadoc
-      run: ./gradlew build
+      run: _JAVA_OPTIONS=-Xmx2g ./gradlew build javadoc
     - name: ./gradlew requireJavadoc
       run: ./gradlew requireJavadoc
