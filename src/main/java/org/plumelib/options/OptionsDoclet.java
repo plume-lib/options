@@ -162,16 +162,18 @@ public class OptionsDoclet {
 
   /** How to use the Options doclet. */
   private static final String USAGE =
-      String.format(
-          "Provided by Options doclet:%n"
-              + "-docfile <file>        Specify file into which options documentation is inserted%n"
-              + "-outfile <file>        Specify destination for resulting output%n"
-              + "-d <directory>         Destination directory for -outfile%n"
-              + "-i                     Edit the docfile in-place%n"
-              + "-format javadoc        Format output as a Javadoc comment%n"
-              + "-classdoc              Include 'main' class documentation in output%n"
-              + "-singledash            Use single dashes for long options (see org.plumelib.options.Options)%n"
-              + "See the OptionsDoclet documentation for more details.%n");
+      String.join(
+          System.lineSeparator(),
+          "Provided by Options doclet:",
+          "-docfile <file>        Specify file into which options documentation is inserted",
+          "-outfile <file>        Specify destination for resulting output",
+          "-d <directory>         Destination directory for -outfile",
+          "-i                     Edit the docfile in-place",
+          "-format javadoc        Format output as a Javadoc comment",
+          "-classdoc              Include 'main' class documentation in output",
+          "-singledash            Use single dashes for long options (see"
+              + " org.plumelib.options.Options)",
+          "See the OptionsDoclet documentation for more details.");
 
   /** Help message about options that can be specified multiple times. */
   private static final String LIST_HELP =

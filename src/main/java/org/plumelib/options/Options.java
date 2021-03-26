@@ -472,7 +472,8 @@ public class Options {
         Type rawType = pt.getRawType();
         if (!rawType.equals(List.class)) {
           throw new Error(
-              "@Option supports List<...> but no other parameterized type; it does not support type "
+              "@Option supports List<...> but no other parameterized type;"
+                  + " it does not support type "
                   + pt
                   + " for field "
                   + field);
@@ -1684,7 +1685,8 @@ public class Options {
         throw new Error(
             "Malformed @Option argument \""
                 + val
-                + "\".  An argument that starts with '-' should contain a short name, a space, and a description.");
+                + "\".  An argument that starts with '-' should contain"
+                + " a short name, a space, and a description.");
       }
       shortName = val.substring(1, 2);
       description = val.substring(3);
