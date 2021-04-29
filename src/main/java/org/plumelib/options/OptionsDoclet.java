@@ -758,7 +758,7 @@ public class OptionsDoclet {
     int ulPos = in.indexOf(lineSep + "<ul>" + lineSep);
     if (ulPos != -1) {
       @SuppressWarnings(
-          "index:argument.type.incompatible") // https://github.com/panacekcz/checker-framework/issues/23
+          "index:argument") // https://github.com/panacekcz/checker-framework/issues/23
       String suffixTemp = in.substring(ulPos + lineSep.length());
       suffix = suffixTemp;
       in = in.substring(0, ulPos);
