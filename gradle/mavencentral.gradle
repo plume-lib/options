@@ -8,85 +8,83 @@
 //  * git pull
 //  * Update the version number in ../README.md and in this file (multiple times in each).
 //  * Update ../CHANGELOG.md .
-//  * Run in the top-level directory:  ./gradlew clean uploadArchives && ./gradlew javadocWeb
+//  * Run in the top-level directory:  ./gradlew clean publish && ./gradlew javadocWeb
 //  * Browse to https://oss.sonatype.org/#stagingRepositories, complete the Maven Central release.
 //  * Stage changes.
 //  * Add a git tag:
 //    VER=1.0.5 && git commit -m "Version $VER" && git push && git tag -a v$VER -m "Version $VER" && git push && git push --tags
 //  * Make a GitHub release. Go to the GitHub releases page, make a release, call it "options 1.0.5", use the ../CHANGELOG.md text, attach the .jar file from ../build/libs/
 
-///////////////////////////////////////////////////////////////////////////
-/// Maven Central publishing
-/// (From http://central.sonatype.org/pages/gradle.html )
 
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-group = "org.plumelib"
-archivesBaseName = "options"
-version = "1.0.5"
+group "org.plumelib"
+version "1.0.5"
 
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
+final isSnapshot = version.contains('SNAPSHOT')
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    required { project.gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom {
+                name = 'Plume-lib Options'
+                description = 'Command-line option processing for Java.'
+                url = 'https://github.com/plume-lib/options'
 
-uploadArchives {
-  doFirst {
-    repositories {
-      mavenDeployer {
-        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                scm {
+                    connection = 'scm:git:git@github.com:plume-lib/options.git'
+                    developerConnection = 'scm:git:git@github.com:plume-lib/options.git'
+                    url = 'git@github.com:plume-lib/options.git'
+                }
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
 
-        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-          authentication(userName: ossrhUsername, password: ossrhPassword)
-        }
-
-        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-          authentication(userName: ossrhUsername, password: ossrhPassword)
-        }
-
-        pom.project {
-          name 'Plume-lib Options'
-          packaging 'jar'
-          description 'Command-line option processing for Java.'
-          url 'https://github.com/plume-lib/options'
-
-          scm {
-            connection 'scm:git:git@github.com:plume-lib/options.git'
-            developerConnection 'scm:git:git@github.com:plume-lib/options.git'
-            url 'git@github.com:plume-lib/options.git'
-          }
-
-          licenses {
-            license {
-              name 'MIT License'
-              url 'https://opensource.org/licenses/MIT'
+                developers {
+                    developer {
+                        id = 'mernst'
+                        name = 'Michael Ernst'
+                        email = 'mernst@alum.mit.edu'
+                    }
+                }
             }
-          }
-
-          developers {
-            developer {
-              id 'mernst'
-              name 'Michael Ernst'
-              email 'mernst@alum.mit.edu'
-            }
-          }
         }
-      }
     }
-  }
+    repositories {
+        repositories {
+            maven {
+                url = (isSnapshot
+                        ? project.properties.getOrDefault('SNAPSHOT_REPOSITORY_URL', 'https://oss.sonatype.org/content/repositories/snapshots/')
+                        : project.properties.getOrDefault('RELEASE_REPOSITORY_URL', 'https://oss.sonatype.org/service/local/staging/deploy/maven2/')
+                )
+                credentials {
+                    username = project.properties.get('ossrhUsername')
+                    password = project.properties.get('ossrhPassword')
+                }
+            }
+        }
+    }
 }
+
+signing {
+    // If anything about signing is misconfigured, fail loudly rather than quietly continuing with
+    // unsigned artifacts.
+    required = true
+    sign publishing.publications.maven
+}
+
+tasks.withType(Sign).configureEach { onlyIf { !isSnapshot } }
