@@ -50,6 +50,16 @@ dependencies {
 }
 configurations.compileClasspath.extendsFrom configurations.toolsJar
 
+sourceSets {
+  main {
+    java {
+      if (JavaVersion.current().compareTo(JavaVersion.VERSION_13) >= 0) {
+        exclude '**/OptionsDoclet.java'
+      }
+    }
+  }
+}
+
 test {
     useJUnitPlatform {
         includeEngines 'junit-jupiter'
