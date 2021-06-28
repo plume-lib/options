@@ -1,9 +1,9 @@
 # Plume-lib Options change log
 
-## 1.0.4
+## 1.0.5
 
 - Add colon after "default" in option descriptions
-- Documentationc improvements
+- Documentation improvements
 
 ## 1.0.4
 
