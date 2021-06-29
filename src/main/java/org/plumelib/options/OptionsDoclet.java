@@ -81,7 +81,7 @@ import org.checkerframework.checker.signature.qual.BinaryName;
  *       style="white-space: nowrap;">{@code -d}</span> is used, the output is written to a file
  *       with the given name relative to that destination directory.
  *   <li><b>-d</b> <i>directory</i> The destination directory for the output file. Only used if
- *       <span style="white-space: nowrap;">{@code -outfile}</span> is used, in which case, the file
+ *       <span style="white-space: nowrap;">{@code -outfile}</span> is used, in which case the file
  *       is written in this directory.
  *   <li><b>-i</b> Specifies that the docfile should be edited in-place. This option can only be
  *       used if the <span style="white-space: nowrap;">{@code -docfile}</span> option is used, and
