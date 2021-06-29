@@ -19,6 +19,9 @@ messages and printed documentation are generated automatically.
 For more details, see the [API documentation for the `Options`
 class](http://plumelib.org/options/api/org/plumelib/options/Options.html).
 
+Version 1.x works with Java 8-12.
+Version 2.x works with Java 9 and later.
+
 
 ## Editing your buildfile ##
 
@@ -26,9 +29,10 @@ In a Gradle buildfile, write
 
 ```
 dependencies {
-  implementation 'org.plumelib:options:1.0.5'
+  implementation 'org.plumelib:options:2.0.0'
 }
 ```
+(or version 1.0.5 if you are using Java 8).
 
 ```
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
@@ -46,7 +50,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/1.0.5/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.0/jar).
 
 
 ## Alternatives ##

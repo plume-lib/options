@@ -10,13 +10,8 @@ package org.plumelib.options;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.sun.javadoc.ClassDoc;
-import com.sun.javadoc.Doc;
-import com.sun.javadoc.DocErrorReporter;
-import com.sun.javadoc.FieldDoc;
-import com.sun.javadoc.RootDoc;
-import com.sun.javadoc.SeeTag;
-import com.sun.javadoc.Tag;
+import com.sun.source.doctree.DocTree;
+import com.sun.source.doctree.SeeTree;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,15 +25,26 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringJoiner;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.tools.Diagnostic;
+import jdk.javadoc.doclet.Doclet;
+import jdk.javadoc.doclet.DocletEnvironment;
+import jdk.javadoc.doclet.Reporter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.signature.qual.BinaryName;
-import org.checkerframework.common.value.qual.MinLen;
 
 /**
  * Generates HTML documentation of command-line options, for use in a manual or in a Javadoc class
@@ -153,9 +159,8 @@ import org.checkerframework.common.value.qual.MinLen;
  */
 
 // This doesn't itself use org.plumelib.options.Options for its command-line option processing
-// because a Doclet is required to implement the optionLength() and validOptions() methods.
-@SuppressWarnings("deprecation") // JDK 9 deprecates com.sun.javadoc package
-public class OptionsDoclet {
+// because Doclet has a different way of processing command-line options.
+public class OptionsDoclet implements Doclet {
 
   /** The system-specific line separator. */
   private static String lineSep = System.lineSeparator();
@@ -186,7 +191,11 @@ public class OptionsDoclet {
 
   /** The file into which options documentation is inserted. */
   private @Nullable File docFile = null;
-  /** Destination for output. */
+  /** File name of destination for output. */
+  private @Nullable String outFileName = null;
+  /** Name of destination directory. */
+  private @Nullable String destDir = null;
+  /** Destination for output; is set from destDir and outFileName. */
   private @Nullable File outFile = null;
 
   /** If true, then edit docFile in place (and docFile is non-null). */
@@ -197,9 +206,12 @@ public class OptionsDoclet {
   private boolean includeClassDoc = false;
 
   /** The document root. */
-  private RootDoc root;
+  private DocletEnvironment root;
   /** The command-line options. */
   private Options options;
+
+  /** Used to report errors. */
+  private Reporter reporter;
 
   /**
    * Create an OptionsDoclet that documents the given options.
@@ -207,12 +219,41 @@ public class OptionsDoclet {
    * @param root the document root
    * @param options the command-line options
    */
-  public OptionsDoclet(RootDoc root, Options options) {
+  public OptionsDoclet(DocletEnvironment root, Options options) {
     this.root = root;
     this.options = options;
   }
 
-  // Doclet-specific methods
+  ///////////////////////////////////////////////////////////////////////////
+  /// Doclet-specific methods
+  ///
+
+  @Override
+  public void init(Locale locale, Reporter reporter) {
+    this.reporter = reporter;
+  }
+
+  @Override
+  public String getName() {
+    return getClass().getSimpleName();
+  }
+
+  @Override
+  public Set<? extends Option> getSupportedOptions() {
+    return docletOptions;
+  }
+
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latest();
+  }
+
+  @Override
+  public boolean run(DocletEnvironment environment) {
+    postprocessOptions();
+    System.out.printf("Here I am.%n");
+    return OK;
+  }
 
   /**
    * Entry point for the doclet.
@@ -220,21 +261,18 @@ public class OptionsDoclet {
    * @param root the root document
    * @return true if processing completed without an error
    */
-  public static boolean start(RootDoc root) {
+  // TODO: remove, obsolete
+  public static boolean start(DocletEnvironment root) {
     List<Object> objs = new ArrayList<>();
-    for (ClassDoc doc : root.specifiedClasses()) {
-      // TODO: Class.forName() expects a binary name but doc.qualifiedName()
-      // returns a fully qualified name.  I do not know a good way to convert
-      // between these two name formats.  For now, we simply ignore inner
-      // classes.  This limitation can be removed when we figure out a better
-      // way to go from ClassDoc to Class<?>.
-      if (doc.containingClass() != null) {
-        continue;
+    for (Element doc : root.getSpecifiedElements()) {
+      if (!isTypeElement(doc)) {
+        throw new Error(
+            String.format("Unexpected specified element of kind %s: %s", doc.getKind(), doc));
       }
 
       Class<?> clazz;
       try {
-        @BinaryName String className = doc.qualifiedName();
+        @BinaryName String className = getBinaryName((TypeElement) doc);
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
@@ -269,8 +307,6 @@ public class OptionsDoclet {
     }
 
     OptionsDoclet o = new OptionsDoclet(root, options);
-    String[] @MinLen(1) [] rootOptions = root.options();
-    o.setOptions(rootOptions);
     o.processJavadoc();
     try {
       o.write();
@@ -281,6 +317,188 @@ public class OptionsDoclet {
 
     return true;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  /// Javadoc command-line options
+  ///
+
+  // The doclet cannot use the Options class itself because  Javadoc specifies its own way of
+  // handling command-line arguments.
+
+  private static final boolean OK = true;
+
+  /**
+   * A command-line option to the Javadoc doclet; implements the {@link Doclet.Option} interface.
+   *
+   * <p>Is abstract because it does not provide an implementation of the {@code process} method.
+   */
+  abstract class DocletOption implements Doclet.Option {
+    /** The number of arguments this option will consume. */
+    private int argumentCount;
+
+    /** The user-friendly description of the option. */
+    private String description;
+
+    /**
+     * The list of names and aliases that may be used to identify the option. Each starts with "-"
+     * or "--".
+     */
+    private List<String> names;
+
+    /**
+     * A user-friendly string description of the option's parameters, or the empty string if this
+     * option has no parameters.
+     */
+    private String parameters;
+
+    /**
+     * Creates a new DocletOption.
+     *
+     * @param name the option's name, starting with "-" or "--"
+     * @param parameters a user-friendly string description of the option's parameters, or the empty
+     *     string if this option has no parameters
+     * @param argumentCount the number of arguments this option will consume
+     * @param description the user-friendly description of the option
+     */
+    DocletOption(String name, String parameters, int argumentCount, String description) {
+      this.argumentCount = argumentCount;
+      this.description = description;
+      this.names = List.of(name);
+      this.parameters = parameters;
+    }
+
+    /**
+     * Creates a new DocletOption with an aliased name
+     *
+     * @param name the option's name, starting with "-" or "--"
+     * @param alias the option's alias, starting with "-" or "--"
+     * @param parameters a user-friendly string description of the option's parameters, or the empty
+     *     string if this option has no parameters
+     * @param argumentCount the number of arguments this option will consume
+     * @param description the user-friendly description of the option
+     */
+    DocletOption(
+        String name, String alias, String parameters, int argumentCount, String description) {
+      this.argumentCount = argumentCount;
+      this.description = description;
+      this.names = List.of(name, alias);
+      this.parameters = parameters;
+    }
+
+    @Override
+    public int getArgumentCount() {
+      return argumentCount;
+    }
+
+    @Override
+    public String getDescription() {
+      return description;
+    }
+
+    @Override
+    public Doclet.Option.Kind getKind() {
+      return Doclet.Option.Kind.STANDARD;
+    }
+
+    @Override
+    public List<String> getNames() {
+      return names;
+    }
+
+    @Override
+    public String getParameters() {
+      return parameters;
+    }
+  }
+
+  private final Set<DocletOption> docletOptions =
+      Set.of(
+          new DocletOption(
+              "--docfile",
+              "-docfile",
+              "file",
+              1,
+              "the output is the contents of this file, with some text replaced") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 1;
+              String docFileName = arguments.get(0);
+              docFile = new File(docFileName);
+              if (!docFile.exists()) {
+                printError("-docfile file not found: " + docFile);
+                return false;
+              }
+              if (docFile != null && outFile != null && outFile.equals(docFile)) {
+                printError("docfile must be different from outfile");
+                return false;
+              }
+              return OK;
+            }
+          },
+          new DocletOption("--outfile", "-outfile", "file", 1, "the destination for the output") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 1;
+              String outFileName = arguments.get(0);
+              // TODO: move to later and centralize.
+              if (docFile != null && outFileName != null && outFileName.equals(docFile)) {
+                printError("docfile must be different from outfile");
+                return false;
+              }
+              return OK;
+            }
+          },
+          new DocletOption("-d", "directory", 1, "the destination directory for the output file") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 1;
+              destDir = arguments.get(0);
+              return OK;
+            }
+          },
+          new DocletOption("-i", "", 0, "the docfile should be edited in place") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 0;
+              inPlace = true;
+              return OK;
+            }
+          },
+          new DocletOption(
+              "--format", "-format", "formatname", 1, "the output format: javadoc or html") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 1;
+              String format = arguments.get(0);
+              if (!format.equals("javadoc") && !format.equals("html")) {
+                printError("unrecognized output format: " + format);
+                return false;
+              }
+              setFormatJavadoc(format.equals("javadoc"));
+            }
+          },
+          new DocletOption(
+              "--classdoc", "-classdoc", "", 0, "the docfile should be edited in place") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 0;
+              includeClassDoc = true;
+              return OK;
+            }
+          },
+          new DocletOption(
+              "--singledash",
+              "-singledash",
+              "",
+              0,
+              "show long options with leading \"-\" instead of \"--\"") {
+            @Override
+            public boolean process(String option, List<String> arguments) {
+              assert arguments.size() == 0;
+              setUseSingleDash(true);
+              return OK;
+            }
+          });
 
   /**
    * Given a command-line option of this doclet, returns the number of arguments you must specify on
@@ -311,138 +529,37 @@ public class OptionsDoclet {
   }
 
   /**
-   * Tests the validity of command-line arguments passed to this doclet. Returns true if the option
-   * usage is valid, and false otherwise. This method is automatically invoked by Javadoc.
-   *
-   * <p>Also sets fields from the command-line arguments.
-   *
-   * @param options the command-line options to be checked: an array of 1- or 2-element arrays,
-   *     where the length depends on {@link #optionLength} applied to the first element
-   * @param reporter where to report errors
-   * @return true iff the command-line options are valid
-   * @see <a
-   *     href="https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
-   *     overview</a>
+   * Sets variables that can only be set after all command-line options have been processed. Isuses
+   * errors and halts if any command-line options are incompatible with one another.
    */
-  // @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
-  public static boolean validOptions(String[] @MinLen(1) [] options, DocErrorReporter reporter) {
-    boolean hasDocFile = false;
-    boolean hasOutFile = false;
-    boolean hasDestDir = false;
-    boolean hasFormat = false;
-    boolean inPlace = false;
-    String docFile = null;
-    String outFile = null;
-    for (int oi = 0; oi < options.length; oi++) {
-      String[] os = options[oi];
-      String opt = os[0].toLowerCase();
-      if (opt.equals("-docfile")) {
-        if (hasDocFile) {
-          reporter.printError("-docfile option specified twice");
-          return false;
-        }
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"docfile\")==2";
-        docFile = os[1];
-        File f = new File(docFile);
-        if (!f.exists()) {
-          reporter.printError("-docfile file not found: " + docFile);
-          return false;
-        }
-        hasDocFile = true;
-      }
-      if (opt.equals("-outfile")) {
-        if (hasOutFile) {
-          reporter.printError("-outfile option specified twice");
-          return false;
-        }
-        if (inPlace) {
-          reporter.printError("-i and -outfile can not be used at the same time");
-          return false;
-        }
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"outfile\")==2";
-        outFile = os[1];
-        hasOutFile = true;
-      }
-      if (opt.equals("-i")) {
-        if (hasOutFile) {
-          reporter.printError("-i and -outfile can not be used at the same time");
-          return false;
-        }
-        inPlace = true;
-      }
-      if (opt.equals("-format")) {
-        if (hasFormat) {
-          reporter.printError("-format option specified twice");
-          return false;
-        }
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"format\")==2";
-        String format = os[1];
-        if (!format.equals("javadoc") && !format.equals("html")) {
-          reporter.printError("unrecognized output format: " + format);
-          return false;
-        }
-        hasFormat = true;
-      }
-      if (opt.equals("-d")) {
-        if (hasDestDir) {
-          reporter.printError("-d specified twice");
-          return false;
-        }
-        hasDestDir = true;
+  private void postprocessOptions() {
+    if (outFileName != null) {
+      if (destDir != null) {
+        this.outFile = new File(destDir, outFileName);
+      } else {
+        this.outFile = new File(outFileName);
       }
     }
-    if (docFile != null && outFile != null && outFile.equals(docFile)) {
-      reporter.printError("docfile must be different from outfile");
-      return false;
+
+    boolean hasError = false;
+    if (inPlace && outFile != null) {
+      printError("-i and -outfile can not be used at the same time");
+      hasError = true;
     }
     if (inPlace && docFile == null) {
-      reporter.printError("-i supplied but -docfile was not");
-      return false;
+      printError("-i supplied but -docfile was not");
+      hasError = true;
     }
-    return true;
-  }
-
-  /**
-   * Set the underlying Options instance for this class based on command-line arguments given by
-   * RootDoc.options().
-   *
-   * @param options the command-line options to parse: a list of 1- or 2-element arrays
-   */
-  // @SuppressWarnings("index") // dependent: os[1] is legal when optionLength(os[0])==2
-  public void setOptions(String[] @MinLen(1) [] options) {
-    String outFilename = null;
-    File destDir = null;
-    for (int oi = 0; oi < options.length; oi++) {
-      String[] os = options[oi];
-      String opt = os[0].toLowerCase();
-      if (opt.equals("-docfile")) {
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"docfile\")==2";
-        this.docFile = new File(os[1]);
-      } else if (opt.equals("-d")) {
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"d\")==2";
-        destDir = new File(os[1]);
-      } else if (opt.equals("-outfile")) {
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"outfile\")==2";
-        outFilename = os[1];
-      } else if (opt.equals("-i")) {
-        this.inPlace = true;
-      } else if (opt.equals("-format")) {
-        assert os.length == 2 : "@AssumeAssertion(value): dependent: optionLength(\"format\")==2";
-        if (os[1].equals("javadoc")) {
-          setFormatJavadoc(true);
-        }
-      } else if (opt.equals("-classdoc")) {
-        this.includeClassDoc = true;
-      } else if (opt.equals("-singledash")) {
-        setUseSingleDash(true);
-      }
+    if (docFile != null && outFile != null && outFile.equals(docFile)) {
+      printError("--docfile must be different from --outfile");
+      hasError = true;
     }
-    if (outFilename != null) {
-      if (destDir != null) {
-        this.outFile = new File(destDir, outFilename);
-      } else {
-        this.outFile = new File(outFilename);
-      }
+    if (inPlace && docFile == null) {
+      printError("-i supplied but --docfile was not");
+      hasError = true;
+    }
+    if (hasError) {
+      System.exit(1);
     }
   }
 
@@ -461,7 +578,18 @@ public class OptionsDoclet {
     return false;
   }
 
-  // File IO methods
+  /**
+   * Print error message via delegation to {@link #reporter}.
+   *
+   * @param msg message to print
+   */
+  private void printError(String msg) {
+    reporter.print(Diagnostic.Kind.ERROR, msg);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  /// File IO methods
+  ///
 
   /**
    * Write the output of this doclet to the correct file.
@@ -555,17 +683,19 @@ public class OptionsDoclet {
     return b.toString();
   }
 
-  // HTML and Javadoc processing methods
+  ///////////////////////////////////////////////////////////////////////////
+  /// HTML and Javadoc processing methods
+  ///
 
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
       @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
       @BinaryName String className = oi.getDeclaringClass().getName();
-      ClassDoc optDoc = root.classNamed(className);
+      TypeElement optDoc = root.classNamed(className);
       if (optDoc != null) {
         String nameWithUnderscores = oi.longName.replace('-', '_');
-        for (FieldDoc fd : optDoc.fields()) {
+        for (VariableElement fd : optDoc.fields()) {
           if (fd.name().equals(nameWithUnderscores)) {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
@@ -610,14 +740,14 @@ public class OptionsDoclet {
 
     @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
     @BinaryName String className = oi.baseType.getName();
-    ClassDoc enumDoc = root.classNamed(className);
+    TypeElement enumDoc = root.classNamed(className);
     if (enumDoc == null) {
       return;
     }
 
     assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
     for (String name : oi.enumJdoc.keySet()) {
-      for (FieldDoc fd : enumDoc.fields()) {
+      for (VariableElement fd : enumDoc.fields()) {
         if (fd.name().equals(name)) {
           if (formatJavadoc) {
             oi.enumJdoc.put(name, fd.commentText());
@@ -639,7 +769,7 @@ public class OptionsDoclet {
   public String optionsToHtml(int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
 
-    ClassDoc[] classes = root.classes();
+    TypeElement[] classes = root.classes();
     if (includeClassDoc && classes.length > 0) {
       b.add(OptionsDoclet.javadocToHtml(classes[0]));
       b.add("<p>Command line options:</p>");
@@ -861,13 +991,13 @@ public class OptionsDoclet {
    * @param doc a Javadoc comment to convert to HTML
    * @return HTML version of doc
    */
-  public static String javadocToHtml(Doc doc) {
+  public static String javadocToHtml(Element doc) {
     StringBuilder b = new StringBuilder();
-    Tag[] tags = doc.inlineTags();
-    for (Tag tag : tags) {
+    DocTree[] tags = doc.inlineTags();
+    for (DocTree tag : tags) {
       String kind = tag.kind();
       String text = tag.text();
-      if (tag instanceof SeeTag) {
+      if (tag instanceof SeeTree) {
         b.append("<code>" + text.replace('#', '.') + "</code>");
       } else {
         if (kind.equals("@code")) {
@@ -877,12 +1007,12 @@ public class OptionsDoclet {
         }
       }
     }
-    SeeTag[] seetags = doc.seeTags();
+    SeeTree[] seetags = doc.seeTags();
     if (seetags.length > 0) {
       b.append(" See: ");
       {
         StringJoiner bb = new StringJoiner(", ");
-        for (SeeTag tag : seetags) {
+        for (SeeTree tag : seetags) {
           bb.add("<code>" + tag.text() + "</code>");
         }
         b.append(bb);
@@ -892,7 +1022,55 @@ public class OptionsDoclet {
     return b.toString();
   }
 
-  // Getters and Setters
+  ///////////////////////////////////////////////////////////////////////////
+  /// Signature string methods
+  ///
+
+  /**
+   * Returns true if the given element kind is a type, i.e., a class, enum, interface, or annotation
+   * type.
+   *
+   * @param element the element to test
+   * @return true, iff the given kind is a type kind
+   */
+  public static boolean isTypeElement(Element element) {
+    ElementKind enclosingKind = enclosing.getKind();
+    return elementKind.isClass() || elementKind.isInterface();
+  }
+
+  // This method is copied from the Checker Framework's ElementUtils class.
+
+  /**
+   * Returns the binary name of the given type.
+   *
+   * @param te a type
+   * @return the binary name of the type
+   */
+  @SuppressWarnings("signature:return") // string manipulation
+  public static @BinaryName String getBinaryName(TypeElement te) {
+    Element enclosing = te.getEnclosingElement();
+    String simpleName = te.getSimpleName().toString();
+    if (enclosing == null) { // is this possible?
+      return simpleName;
+    }
+    if (isTypeElement(enclosing)) {
+      return getBinaryName((TypeElement) enclosing) + "$" + simpleName;
+    } else if (enclosing.getKind() == ElementKind.PACKAGE) {
+      PackageElement pe = (PackageElement) enclosing;
+      if (pe.isUnnamed()) {
+        return simpleName;
+      } else {
+        return pe.getQualifiedName() + "." + simpleName;
+      }
+    } else {
+      // This case occurs for anonymous inner classes. Fall back to the flatname method.
+      return ((ClassSymbol) te).flatName().toString();
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  /// Getters and Setters
+  ///
 
   /**
    * Returns true if the output format is Javadoc, false if the output format is HTML.

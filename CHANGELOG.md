@@ -1,5 +1,14 @@
 # Plume-lib Options change log
 
+## 2.0.0
+
+- Options version 2.x supports Java 11 and higher.
+  Options version 1.x supports Java 8 and Java 11.
+- OptionsDoclet supports "--" or "-" prefix for long options to OptionsDoclet.
+  For instance, you can pass it `-singledash` as before or the new `--singledash`.
+  This is independent of the `setUseSingleDash()` method of Options itself.
+  This is also independent of the `-singledash` and `--singledash` options to OptionsDoclet.
+
 ## 1.0.5
 
 - Add colon after "default" in option descriptions
