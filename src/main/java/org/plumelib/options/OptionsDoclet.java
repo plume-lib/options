@@ -10,16 +10,15 @@ package org.plumelib.options;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.doctree.DocTree;
-import com.sun.source.doctree.SeeTree;
+import com.sun.source.util.DocTrees;
+import com.sun.source.util.SimpleDocTreeVisitor;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -45,6 +44,8 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.signature.qual.BinaryName;
+import org.checkerframework.checker.signature.qual.FullyQualifiedName;
+import org.plumelib.reflection.Signatures;
 
 /**
  * Generates HTML documentation of command-line options, for use in a manual or in a Javadoc class
@@ -205,23 +206,23 @@ public class OptionsDoclet implements Doclet {
   /** If true, then include the class's main Javadoc comment. */
   private boolean includeClassDoc = false;
 
-  /** The document root. */
-  private DocletEnvironment root;
+  /** The doclet environment. */
+  private DocletEnvironment denv;
   /** The command-line options. */
   private Options options;
+  /** The DocTrees instance assocated with {@link #denv}. */
+  private DocTrees docTrees;
 
   /** Used to report errors. */
   private Reporter reporter;
 
-  /**
-   * Create an OptionsDoclet that documents the given options.
-   *
-   * @param root the document root
-   * @param options the command-line options
-   */
-  public OptionsDoclet(DocletEnvironment root, Options options) {
-    this.root = root;
-    this.options = options;
+  /** Create an OptionsDoclet. */
+  @SuppressWarnings({
+    "nullness:initialization.fields.uninitialized", // init() sets reporter, run() sets denv
+    "initializedfields:contracts.postcondition" // init() sets reporter, run() sets denv
+  })
+  public OptionsDoclet() {
+    // this.options = options;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -250,6 +251,7 @@ public class OptionsDoclet implements Doclet {
 
   @Override
   public boolean run(DocletEnvironment environment) {
+    this.denv = environment;
     postprocessOptions();
     System.out.printf("Here I am.%n");
     return OK;
@@ -258,13 +260,14 @@ public class OptionsDoclet implements Doclet {
   /**
    * Entry point for the doclet.
    *
-   * @param root the root document
+   * @param denv the doclet environment
    * @return true if processing completed without an error
    */
-  // TODO: remove, obsolete
-  public static boolean start(DocletEnvironment root) {
+  // TODO: remove, obsolete (make sure logic is moved elsewhere)
+  public static boolean start(DocletEnvironment denv) {
+    /*
     List<Object> objs = new ArrayList<>();
-    for (Element doc : root.getSpecifiedElements()) {
+    for (Element doc : denv.getSpecifiedElements()) {
       if (!isTypeElement(doc)) {
         throw new Error(
             String.format("Unexpected specified element of kind %s: %s", doc.getKind(), doc));
@@ -306,7 +309,7 @@ public class OptionsDoclet implements Doclet {
       return false;
     }
 
-    OptionsDoclet o = new OptionsDoclet(root, options);
+    OptionsDoclet o = new OptionsDoclet(denv, options);
     o.processJavadoc();
     try {
       o.write();
@@ -314,6 +317,7 @@ public class OptionsDoclet implements Doclet {
       e.printStackTrace();
       return false;
     }
+    */
 
     return true;
   }
@@ -332,7 +336,7 @@ public class OptionsDoclet implements Doclet {
    *
    * <p>Is abstract because it does not provide an implementation of the {@code process} method.
    */
-  abstract class DocletOption implements Doclet.Option {
+  abstract static class DocletOption implements Doclet.Option {
     /** The number of arguments this option will consume. */
     private int argumentCount;
 
@@ -411,6 +415,10 @@ public class OptionsDoclet implements Doclet {
     }
   }
 
+  @SuppressWarnings(
+      "nullness:method.invocation" // when methods such as printError() are called, the receiver
+  // (an OptionsDoclet) is initialized
+  )
   private final Set<DocletOption> docletOptions =
       Set.of(
           new DocletOption(
@@ -441,7 +449,7 @@ public class OptionsDoclet implements Doclet {
               assert arguments.size() == 1;
               String outFileName = arguments.get(0);
               // TODO: move to later and centralize.
-              if (docFile != null && outFileName != null && outFileName.equals(docFile)) {
+              if (docFile != null && outFileName != null && new File(outFileName).equals(docFile)) {
                 printError("docfile must be different from outfile");
                 return false;
               }
@@ -475,6 +483,7 @@ public class OptionsDoclet implements Doclet {
                 return false;
               }
               setFormatJavadoc(format.equals("javadoc"));
+              return OK;
             }
           },
           new DocletOption(
@@ -569,14 +578,19 @@ public class OptionsDoclet implements Doclet {
    * @param clazz the class whose values will be created by command-line arguments
    * @return true if the class needs to be instantiated before command-line arguments are parsed
    */
+  /*
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
-      if (f.isAnnotationPresent(Option.class) && !Modifier.isStatic(f.getModifiers())) {
+      if (
+      // TODO: Why doesn't this compile??
+      // f.isAnnotationPresent(Option.class) &&
+      !Modifier.isStatic(f.getModifiers())) {
         return true;
       }
     }
     return false;
   }
+  */
 
   /**
    * Print error message via delegation to {@link #reporter}.
@@ -687,26 +701,44 @@ public class OptionsDoclet implements Doclet {
   /// HTML and Javadoc processing methods
   ///
 
+  /**
+   * Returns the fields defined by the given type.
+   *
+   * @param type a type
+   * @return the fields defined by the given type
+   */
+  private List<VariableElement> fields(TypeElement type) {
+    List<VariableElement> result = new ArrayList<>();
+    for (Element ee : type.getEnclosedElements()) {
+      if (ee.getKind() == ElementKind.FIELD) {
+        result.add((VariableElement) ee);
+      }
+    }
+    return result;
+  }
+
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
       @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
-      @BinaryName String className = oi.getDeclaringClass().getName();
-      TypeElement optDoc = root.classNamed(className);
+      @FullyQualifiedName String className = Signatures.binaryNameToFullyQualified(oi.getDeclaringClass().getName());
+      TypeElement optDoc = denv.getElementUtils().getTypeElement(className);
       if (optDoc != null) {
         String nameWithUnderscores = oi.longName.replace('-', '_');
-        for (VariableElement fd : optDoc.fields()) {
-          if (fd.name().equals(nameWithUnderscores)) {
+        for (VariableElement fd : fields(optDoc)) {
+          if (fd.getSimpleName().toString().equals(nameWithUnderscores)) {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
-            if (fd.getRawCommentText().length() == 0) {
-              // Input is a string rather than a Javadoc (HTML) comment so we
+            DocCommentTree fieldComment = docTrees.getDocCommentTree(fd);
+            if (fieldComment == null) {
+              // oi.description is a string rather than a Javadoc (HTML) comment so we
               // must escape it.
               oi.jdoc = StringEscapeUtils.escapeHtml4(oi.description);
             } else if (formatJavadoc) {
-              oi.jdoc = fd.commentText();
+              // TODO: does this work?
+              oi.jdoc = fd.toString();
             } else {
-              oi.jdoc = javadocToHtml(fd);
+              oi.jdoc = docCommentToHtml(docTrees.getDocCommentTree(fd));
             }
             break;
           }
@@ -739,20 +771,20 @@ public class OptionsDoclet implements Doclet {
     }
 
     @SuppressWarnings("signature") // non-array non-primitive => Class.getName(): @BinaryName
-    @BinaryName String className = oi.baseType.getName();
-    TypeElement enumDoc = root.classNamed(className);
+    @FullyQualifiedName String className = Signatures.binaryNameToFullyQualified(oi.baseType.getName());
+    TypeElement enumDoc = denv.getElementUtils().getTypeElement(className);
     if (enumDoc == null) {
       return;
     }
 
     assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
     for (String name : oi.enumJdoc.keySet()) {
-      for (VariableElement fd : enumDoc.fields()) {
-        if (fd.name().equals(name)) {
+      for (VariableElement fd : fields(enumDoc)) {
+        if (fd.getSimpleName().toString().equals(name)) {
           if (formatJavadoc) {
-            oi.enumJdoc.put(name, fd.commentText());
+            oi.enumJdoc.put(name, fd.toString());
           } else {
-            oi.enumJdoc.put(name, javadocToHtml(fd));
+            oi.enumJdoc.put(name, docCommentToHtml(docTrees.getDocCommentTree(fd)));
           }
           break;
         }
@@ -769,9 +801,10 @@ public class OptionsDoclet implements Doclet {
   public String optionsToHtml(int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
 
-    TypeElement[] classes = root.classes();
-    if (includeClassDoc && classes.length > 0) {
-      b.add(OptionsDoclet.javadocToHtml(classes[0]));
+    Set<? extends Element> classes = denv.getSpecifiedElements();
+    if (includeClassDoc && classes.size() > 0) {
+      Element firstElement = classes.iterator().next();
+      b.add(OptionsDoclet.docCommentToHtml(docTrees.getDocCommentTree(firstElement)));
       b.add("<p>Command line options:</p>");
     }
 
@@ -988,38 +1021,130 @@ public class OptionsDoclet implements Doclet {
    * comment while still being presentable. Ideally, @link/@see tags would be converted to HTML
    * links that point to actual documentation.
    *
-   * @param doc a Javadoc comment to convert to HTML
+   * @param docCommentTree a Javadoc comment to convert to HTML
    * @return HTML version of doc
    */
-  public static String javadocToHtml(Element doc) {
-    StringBuilder b = new StringBuilder();
-    DocTree[] tags = doc.inlineTags();
-    for (DocTree tag : tags) {
-      String kind = tag.kind();
-      String text = tag.text();
-      if (tag instanceof SeeTree) {
-        b.append("<code>" + text.replace('#', '.') + "</code>");
-      } else {
-        if (kind.equals("@code")) {
-          b.append("<code>" + StringEscapeUtils.escapeHtml4(text) + "</code>");
-        } else {
-          b.append(text);
+  public static String docCommentToHtml(DocCommentTree docCommentTree) {
+    StringBuilder result = new StringBuilder();
+
+    new DocCommentToHtmlVisitor().visitDocComment(docCommentTree, result);
+    return result.toString();
+
+    /*
+        StringBuilder b = new StringBuilder();
+        // This should use a visitor.
+        DocTree[] tags = doc.inlineTags();
+        for (DocTree tag : tags) {
+          String kind = tag.kind();
+          String text = tag.text();
+          if (tag instanceof SeeTree) {
+            b.append("<code>" + text.replace('#', '.') + "</code>");
+          } else {
+            if (kind.equals("@code")) {
+              b.append("<code>" + StringEscapeUtils.escapeHtml4(text) + "</code>");
+            } else {
+              b.append(text);
+            }
+          }
         }
-      }
-    }
-    SeeTree[] seetags = doc.seeTags();
-    if (seetags.length > 0) {
-      b.append(" See: ");
-      {
-        StringJoiner bb = new StringJoiner(", ");
-        for (SeeTree tag : seetags) {
-          bb.add("<code>" + tag.text() + "</code>");
+        SeeTree[] seetags = doc.seeTags();
+        if (seetags.length > 0) {
+          b.append(" See: ");
+          {
+            StringJoiner bb = new StringJoiner(", ");
+            for (SeeTree tag : seetags) {
+              bb.add("<code>" + tag.text() + "</code>");
+            }
+            b.append(bb);
+          }
+          b.append(".");
         }
-        b.append(bb);
-      }
-      b.append(".");
+        return b.toString();
+    */
+  }
+
+  static class DocCommentToHtmlVisitor extends SimpleDocTreeVisitor<Void, StringBuilder> {
+
+    @Override
+    protected Void defaultAction(DocTree node, StringBuilder sb) {
+      sb.append(node.toString());
+      return null;
     }
-    return b.toString();
+
+    // R	visit(DocTree node, StringBuilder sb)
+    // Invokes the appropriate visit method specific to the type of the node.
+    // Invokes the appropriate visit method on each of a sequence of nodes.
+    // R	visitAttribute(AttributeTree node, StringBuilder sb)
+    // Visits an AttributeTree node.
+    // R	visitAuthor(AuthorTree node, StringBuilder sb)
+    // Visits an AuthorTree node.
+    // R	visitComment(CommentTree node, StringBuilder sb)
+    // Visits a CommentTree node.
+    // R	visitDeprecated(DeprecatedTree node, StringBuilder sb)
+    // Visits a DeprecatedTree node.
+    // R	visitDocComment(DocCommentTree node, StringBuilder sb)
+    // Visits a DocCommentTree node.
+    // R	visitDocRoot(DocRootTree node, StringBuilder sb)
+    // Visits a DocRootTree node.
+    // R	visitDocType(DocTypeTree node, StringBuilder sb)
+    // Visits a DocTypeTree node.
+    // R	visitEndElement(EndElementTree node, StringBuilder sb)
+    // Visits an EndElementTree node.
+    // R	visitEntity(EntityTree node, StringBuilder sb)
+    // Visits an EntityTree node.
+    // R	visitErroneous(ErroneousTree node, StringBuilder sb)
+    // Visits an ErroneousTree node.
+    // R	visitHidden(HiddenTree node, StringBuilder sb)
+    // Visits a HiddenTree node.
+    // R	visitIdentifier(IdentifierTree node, StringBuilder sb)
+    // Visits an IdentifierTree node.
+    // R	visitIndex(IndexTree node, StringBuilder sb)
+    // Visits an IndexTree node.
+    // R	visitInheritDoc(InheritDocTree node, StringBuilder sb)
+    // Visits an InheritDocTree node.
+    // R	visitLink(LinkTree node, StringBuilder sb)
+    // Visits a LinkTree node.
+    // R	visitLiteral(LiteralTree node, StringBuilder sb)
+    // Visits an LiteralTree node.
+    // R	visitOther(DocTree node, StringBuilder sb)
+    // Visits an unknown type of DocTree node.
+    // R	visitParam(ParamTree node, StringBuilder sb)
+    // Visits a ParamTree node.
+    // R	visitProvides(ProvidesTree node, StringBuilder sb)
+    // Visits a ProvidesTree node.
+    // R	visitReference(ReferenceTree node, StringBuilder sb)
+    // Visits a ReferenceTree node.
+    // R	visitReturn(ReturnTree node, StringBuilder sb)
+    // Visits a ReturnTree node.
+    // R	visitSee(SeeTree node, StringBuilder sb)
+    // Visits a SeeTree node.
+    // R	visitSerial(SerialTree node, StringBuilder sb)
+    // Visits a SerialTree node.
+    // R	visitSerialData(SerialDataTree node, StringBuilder sb)
+    // Visits a SerialDataTree node.
+    // R	visitSerialField(SerialFieldTree node, StringBuilder sb)
+    // Visits a SerialFieldTree node.
+    // R	visitSince(SinceTree node, StringBuilder sb)
+    // Visits a SinceTree node.
+    // R	visitStartElement(StartElementTree node, StringBuilder sb)
+    // Visits a StartElementTree node.
+    // R	visitSummary(SummaryTree node, StringBuilder sb)
+    // Visits a SummaryTree node.
+    // R	visitText(TextTree node, StringBuilder sb)
+    // Visits a TextTree node.
+    // R	visitThrows(ThrowsTree node, StringBuilder sb)
+    // Visits a ThrowsTree node.
+    // R	visitUnknownBlockTag(UnknownBlockTagTree node, StringBuilder sb)
+    // Visits an UnknownBlockTagTree node.
+    // R	visitUnknownInlineTag(UnknownInlineTagTree node, StringBuilder sb)
+    // Visits an UnknownInlineTagTree node.
+    // R	visitUses(UsesTree node, StringBuilder sb)
+    // Visits a UsesTree node.
+    // R	visitValue(ValueTree node, StringBuilder sb)
+    // Visits a ValueTree node.
+    // R	visitVersion(VersionTree node, StringBuilder sb)
+    // Visits a VersionTreeTree node.
+
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -1034,7 +1159,7 @@ public class OptionsDoclet implements Doclet {
    * @return true, iff the given kind is a type kind
    */
   public static boolean isTypeElement(Element element) {
-    ElementKind enclosingKind = enclosing.getKind();
+    ElementKind elementKind = element.getKind();
     return elementKind.isClass() || elementKind.isInterface();
   }
 
@@ -1064,7 +1189,8 @@ public class OptionsDoclet implements Doclet {
       }
     } else {
       // This case occurs for anonymous inner classes. Fall back to the flatname method.
-      return ((ClassSymbol) te).flatName().toString();
+      // return ((ClassSymbol) te).flatName().toString();
+      throw new Error();
     }
   }
 
