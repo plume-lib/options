@@ -42,6 +42,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   options.addStringOption("docfile", "${projectDir}/src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
+  options.noTimestamp(false)
   title = ""
 }
 ```
