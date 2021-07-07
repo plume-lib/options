@@ -282,7 +282,8 @@ public class OptionsDoclet implements Doclet {
       Class<?> clazz;
       try {
         @BinaryName String className = getBinaryName((TypeElement) doc);
-        clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
+        // Note: Thread.currentThread().getContextClassLoader() lacks the needed classes.
+        clazz = Class.forName(className, true, OptionsDoclet.class.getClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
         for (URI uri : new ClassGraph().getClasspathURIs()) {
