@@ -14,11 +14,16 @@ import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.doctree.DocTree;
 import com.sun.source.util.DocTrees;
 import com.sun.source.util.SimpleDocTreeVisitor;
+import io.github.classgraph.ClassGraph;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -253,19 +258,20 @@ public class OptionsDoclet implements Doclet {
   public boolean run(DocletEnvironment environment) {
     this.denv = environment;
     postprocessOptions();
-    System.out.printf("Here I am.%n");
-    return OK;
-  }
 
-  /**
-   * Entry point for the doclet.
-   *
-   * @param denv the doclet environment
-   * @return true if processing completed without an error
-   */
-  // TODO: remove, obsolete (make sure logic is moved elsewhere)
-  public static boolean start(DocletEnvironment denv) {
-    /*
+    System.out.printf("docFile = %s%n", docFile);
+    System.out.printf("outFileName = %s%n", outFileName);
+    System.out.printf("destDir = %s%n", destDir);
+    System.out.printf("outFile = %s%n", outFile);
+    System.out.printf("inPlace = %s%n", inPlace);
+    System.out.printf("formatJavadoc = %s%n", formatJavadoc);
+    System.out.printf("includeClassDoc = %s%n", includeClassDoc);
+    System.out.printf("denv = %s%n", denv);
+    System.out.printf("options = %s%n", options);
+    System.out.printf("docTrees = %s%n", docTrees);
+
+    System.out.printf("Here I am 2.%n");
+
     List<Object> objs = new ArrayList<>();
     for (Element doc : denv.getSpecifiedElements()) {
       if (!isTypeElement(doc)) {
@@ -283,12 +289,19 @@ public class OptionsDoclet implements Doclet {
         return false;
       }
 
+      // It would be possible for OptionsDoclet to do all its processing without instantiating any
+      // classes, by parsing source files.  However, it is simpler to re-use the existing Options
+      // class, which requires instantiation, rather than re-implementing functionality.
       if (needsInstantiation(clazz)) {
         try {
           Constructor<?> c = clazz.getDeclaredConstructor();
           c.setAccessible(true);
           objs.add(c.newInstance(new Object[0]));
         } catch (Exception e) {
+          System.out.println("Classpath:");
+          for (URI uri : new ClassGraph().getClasspathURIs()) {
+            System.out.println("  " + uri);
+          }
           e.printStackTrace();
           return false;
         }
@@ -309,17 +322,15 @@ public class OptionsDoclet implements Doclet {
       return false;
     }
 
-    OptionsDoclet o = new OptionsDoclet(denv, options);
-    o.processJavadoc();
+    processJavadoc();
     try {
-      o.write();
+      write();
     } catch (Exception e) {
       e.printStackTrace();
       return false;
     }
-    */
 
-    return true;
+    return OK;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -578,11 +589,15 @@ public class OptionsDoclet implements Doclet {
    * @param clazz the class whose values will be created by command-line arguments
    * @return true if the class needs to be instantiated before command-line arguments are parsed
    */
-  /*
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
       if (
       // TODO: Why doesn't this compile??
+      // Option is defined as
+      //   public @interface Option { ... }
+      // `f.isAnnotationPresent(Deprecated.class)` compiles, and Deprecated is defined as
+      //   public @interface Deprecated { ... }
+      //
       // f.isAnnotationPresent(Option.class) &&
       !Modifier.isStatic(f.getModifiers())) {
         return true;
@@ -590,7 +605,6 @@ public class OptionsDoclet implements Doclet {
     }
     return false;
   }
-  */
 
   /**
    * Print error message via delegation to {@link #reporter}.
