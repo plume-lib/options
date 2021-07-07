@@ -19,8 +19,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -859,20 +857,6 @@ public class Options {
     }
 
     return annotation;
-  }
-
-  /** Print the classpath. */
-  static void printClassPath() {
-    URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-    if (sysLoader == null) {
-      System.out.println(
-          "No system class loader. (Maybe means bootstrap class loader is being used?)");
-    } else {
-      System.out.println("Classpath:");
-      for (URL url : sysLoader.getURLs()) {
-        System.out.println(url.getFile());
-      }
-    }
   }
 
   /**

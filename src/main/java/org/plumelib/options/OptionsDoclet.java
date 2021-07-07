@@ -285,7 +285,9 @@ public class OptionsDoclet implements Doclet {
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
-        Options.printClassPath();
+        for (URI uri : new ClassGraph().getClasspathURIs()) {
+          System.out.println(uri);
+        }
         return false;
       }
 
