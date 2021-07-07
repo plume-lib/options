@@ -17,6 +17,7 @@ import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.SeeTag;
 import com.sun.javadoc.Tag;
+import io.github.classgraph.ClassGraph;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,6 +26,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -238,7 +240,9 @@ public class OptionsDoclet {
         clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
-        Options.printClassPath();
+        for (URI uri : new ClassGraph().getClasspathURIs()) {
+          System.out.println(uri);
+        }
         return false;
       }
 
