@@ -319,7 +319,7 @@ public class OptionsDoclet implements Doclet {
     }
 
     Object[] objarray = objs.toArray();
-    Options options = new Options(objarray);
+    options = new Options(objarray);
     if (options.getOptions().size() < 1) {
       System.out.println("Error: no @Option-annotated fields found");
       return false;
