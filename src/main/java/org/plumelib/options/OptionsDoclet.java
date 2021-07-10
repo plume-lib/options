@@ -255,9 +255,10 @@ public class OptionsDoclet implements Doclet {
   }
 
   @Override
-  public boolean run(DocletEnvironment environment) {
-    this.denv = environment;
+  public boolean run(DocletEnvironment denv) {
+    this.denv = denv;
     postprocessOptions();
+    docTrees = denv.getDocTrees();
 
     System.out.printf("docFile = %s%n", docFile);
     System.out.printf("outFileName = %s%n", outFileName);
@@ -747,15 +748,16 @@ public class OptionsDoclet implements Doclet {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
             DocCommentTree fieldComment = docTrees.getDocCommentTree(fd);
+            System.out.printf("%s.fieldComment = %s%n", fd, fieldComment);
             if (fieldComment == null) {
               // oi.description is a string rather than a Javadoc (HTML) comment so we
               // must escape it.
               oi.jdoc = StringEscapeUtils.escapeHtml4(oi.description);
             } else if (formatJavadoc) {
-              // TODO: does this work?
-              oi.jdoc = fd.toString();
+              // TODO: Need to remove tags from this text.
+              oi.jdoc = fieldComment.toString();
             } else {
-              oi.jdoc = docCommentToHtml(docTrees.getDocCommentTree(fd));
+              oi.jdoc = docCommentToHtml(fieldComment);
             }
             break;
           }
