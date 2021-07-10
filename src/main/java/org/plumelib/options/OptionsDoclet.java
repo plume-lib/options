@@ -121,11 +121,11 @@ import org.plumelib.reflection.Signatures;
  *
  * <p><b>Requirements</b>
  *
- * <p>Classes passed to OptionsDoclet that have {@code @}{@link Option} annotations on non-static
- * fields should have a nullary (no-argument) constructor. The nullary constructor may be private or
- * public. This is required because an object instance is needed to get the default value of a
- * non-static field. It is cleaner to require a nullary constructor instead of trying to guess
- * arguments to pass to another constructor.
+ * <p>Classes passed to OptionsDoclet that have {@code @}{@link org.plumelib.options.Option}
+ * annotations on non-static fields should have a nullary (no-argument) constructor. The nullary
+ * constructor may be private or public. This is required because an object instance is needed to
+ * get the default value of a non-static field. It is cleaner to require a nullary constructor
+ * instead of trying to guess arguments to pass to another constructor.
  *
  * <p><b>Hiding default value strings</b>
  *
@@ -245,7 +245,7 @@ public class OptionsDoclet implements Doclet {
   }
 
   @Override
-  public Set<? extends Option> getSupportedOptions() {
+  public Set<? extends Doclet.Option> getSupportedOptions() {
     return docletOptions;
   }
 
@@ -255,9 +255,10 @@ public class OptionsDoclet implements Doclet {
   }
 
   @Override
-  public boolean run(DocletEnvironment environment) {
-    this.denv = environment;
+  public boolean run(DocletEnvironment denv) {
+    this.denv = denv;
     postprocessOptions();
+    docTrees = denv.getDocTrees();
 
     System.out.printf("docFile = %s%n", docFile);
     System.out.printf("outFileName = %s%n", outFileName);
@@ -594,15 +595,8 @@ public class OptionsDoclet implements Doclet {
    */
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
-      if (
-      // TODO: Why doesn't this compile??
-      // Option is defined as
-      //   public @interface Option { ... }
-      // `f.isAnnotationPresent(Deprecated.class)` compiles, and Deprecated is defined as
-      //   public @interface Deprecated { ... }
-      //
-      // f.isAnnotationPresent(Option.class) &&
-      !Modifier.isStatic(f.getModifiers())) {
+      if (f.isAnnotationPresent(org.plumelib.options.Option.class)
+          && !Modifier.isStatic(f.getModifiers())) {
         return true;
       }
     }
@@ -747,15 +741,16 @@ public class OptionsDoclet implements Doclet {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
             DocCommentTree fieldComment = docTrees.getDocCommentTree(fd);
+            System.out.printf("%s.fieldComment = %s%n", fd, fieldComment);
             if (fieldComment == null) {
               // oi.description is a string rather than a Javadoc (HTML) comment so we
               // must escape it.
               oi.jdoc = StringEscapeUtils.escapeHtml4(oi.description);
             } else if (formatJavadoc) {
-              // TODO: does this work?
-              oi.jdoc = fd.toString();
+              // TODO: Need to remove tags from this text.
+              oi.jdoc = fieldComment.toString();
             } else {
-              oi.jdoc = docCommentToHtml(docTrees.getDocCommentTree(fd));
+              oi.jdoc = docCommentToHtml(fieldComment);
             }
             break;
           }
