@@ -1046,38 +1046,6 @@ public class OptionsDoclet implements Doclet {
 
     new DocCommentToHtmlVisitor().visitDocComment(docCommentTree, result);
     return result.toString();
-
-    /*
-        StringBuilder b = new StringBuilder();
-        // This should use a visitor.
-        DocTree[] tags = doc.inlineTags();
-        for (DocTree tag : tags) {
-          String kind = tag.kind();
-          String text = tag.text();
-          if (tag instanceof SeeTree) {
-            b.append("<code>" + text.replace('#', '.') + "</code>");
-          } else {
-            if (kind.equals("@code")) {
-              b.append("<code>" + StringEscapeUtils.escapeHtml4(text) + "</code>");
-            } else {
-              b.append(text);
-            }
-          }
-        }
-        SeeTree[] seetags = doc.seeTags();
-        if (seetags.length > 0) {
-          b.append(" See: ");
-          {
-            StringJoiner bb = new StringJoiner(", ");
-            for (SeeTree tag : seetags) {
-              bb.add("<code>" + tag.text() + "</code>");
-            }
-            b.append(bb);
-          }
-          b.append(".");
-        }
-        return b.toString();
-    */
   }
 
   static class DocCommentToHtmlVisitor extends SimpleDocTreeVisitor<Void, StringBuilder> {
