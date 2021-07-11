@@ -334,6 +334,7 @@ public class OptionsDoclet implements Doclet {
   // The doclet cannot use the Options class itself because  Javadoc specifies its own way of
   // handling command-line arguments.
 
+  /** A value that indicates that a method completed successfully. */
   private static final boolean OK = true;
 
   /**
@@ -420,6 +421,7 @@ public class OptionsDoclet implements Doclet {
     }
   }
 
+  /** The command-line options for OptionsDoclet. */
   @SuppressWarnings(
       "nullness:method.invocation" // when methods such as printError() are called, the receiver
   // (an OptionsDoclet) is initialized
@@ -1048,6 +1050,7 @@ public class OptionsDoclet implements Doclet {
     return result.toString();
   }
 
+  /** Converts DocTree to a HTML string. . */
   static class DocCommentToHtmlVisitor extends SimpleDocTreeVisitor<Void, StringBuilder> {
 
     @Override
