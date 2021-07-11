@@ -263,19 +263,6 @@ public class OptionsDoclet implements Doclet {
     postprocessOptions();
     docTrees = denv.getDocTrees();
 
-    System.out.printf("docFile = %s%n", docFile);
-    System.out.printf("outFileName = %s%n", outFileName);
-    System.out.printf("destDir = %s%n", destDir);
-    System.out.printf("outFile = %s%n", outFile);
-    System.out.printf("inPlace = %s%n", inPlace);
-    System.out.printf("formatJavadoc = %s%n", formatJavadoc);
-    System.out.printf("includeClassDoc = %s%n", includeClassDoc);
-    System.out.printf("denv = %s%n", denv);
-    System.out.printf("options = %s%n", options);
-    System.out.printf("docTrees = %s%n", docTrees);
-
-    System.out.printf("Here I am 2.%n");
-
     List<Object> objs = new ArrayList<>();
     for (Element doc : denv.getSpecifiedElements()) {
       if (!isTypeElement(doc)) {
