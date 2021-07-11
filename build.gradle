@@ -113,19 +113,16 @@ if (project.hasProperty("cfLocal")) {
 /// Javadoc
 
 // Turn Javadoc warnings into errors.
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.addStringOption('private', '-quiet')
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-      options.addStringOption("-release", "8");
+    options.addStringOption("-release", "8");
   }
   doLast {
-    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-      ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-	flags:'g', byline:true) {
-	fileset(dir: destinationDir)
-      }
+    ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
+      flags:'g', byline:true) {
+      fileset(dir: destinationDir)
     }
   }
 }
@@ -139,15 +136,6 @@ task javadocWeb(type: Javadoc) {
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
       options.addStringOption("-release", "8");
   }
-  doLast {
-    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-      ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-	flags:'g', byline:true) {
-	fileset(dir: destinationDir)
-      }
-    }
-  }
-}
 }
 
 configurations {
@@ -163,9 +151,7 @@ task requireJavadoc(type: JavaExec) {
   args "src/main/java"
 }
 check.dependsOn requireJavadoc
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadocWeb.dependsOn requireJavadoc
-}
 
 /// Emacs support
 
