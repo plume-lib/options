@@ -12,6 +12,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.doctree.DocTree;
+import com.sun.source.doctree.LinkTree;
+import com.sun.source.doctree.LiteralTree;
+import com.sun.source.doctree.SeeTree;
 import com.sun.source.util.DocTrees;
 import com.sun.source.util.SimpleDocTreeVisitor;
 import io.github.classgraph.ClassGraph;
@@ -728,6 +731,22 @@ public class OptionsDoclet implements Doclet {
     return result;
   }
 
+  /**
+   * Returns the enum constants defined by the given type.
+   *
+   * @param type a type
+   * @return the enum constants defined by the given type
+   */
+  private List<VariableElement> enumConstants(TypeElement type) {
+    List<VariableElement> result = new ArrayList<>();
+    for (Element ee : type.getEnclosedElements()) {
+      if (ee.getKind() == ElementKind.ENUM_CONSTANT) {
+        result.add((VariableElement) ee);
+      }
+    }
+    return result;
+  }
+
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
   public void processJavadoc() {
     for (Options.OptionInfo oi : options.getOptions()) {
@@ -741,13 +760,12 @@ public class OptionsDoclet implements Doclet {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
             DocCommentTree fieldComment = docTrees.getDocCommentTree(fd);
-            System.out.printf("%s.fieldComment = %s%n", fd, fieldComment);
             if (fieldComment == null) {
               // oi.description is a string rather than a Javadoc (HTML) comment so we
               // must escape it.
               oi.jdoc = StringEscapeUtils.escapeHtml4(oi.description);
             } else if (formatJavadoc) {
-              // TODO: Need to remove tags from this text.
+              // TODO: Need to remove tags from this text?
               oi.jdoc = fieldComment.toString();
             } else {
               oi.jdoc = docCommentToHtml(fieldComment);
@@ -791,7 +809,7 @@ public class OptionsDoclet implements Doclet {
 
     assert oi.enumJdoc != null : "@AssumeAssertion(nullness): bug in flow?";
     for (String name : oi.enumJdoc.keySet()) {
-      for (VariableElement fd : fields(enumDoc)) {
+      for (VariableElement fd : enumConstants(enumDoc)) {
         if (fd.getSimpleName().toString().equals(name)) {
           if (formatJavadoc) {
             oi.enumJdoc.put(name, fd.toString());
@@ -1079,83 +1097,102 @@ public class OptionsDoclet implements Doclet {
 
     @Override
     protected Void defaultAction(DocTree node, StringBuilder sb) {
+      // The default action does not recurse.  It needs to be overridden for any DocTree whose
+      // elements should be investigated (which is most of them!).
       sb.append(node.toString());
       return null;
     }
 
-    // R	visit(DocTree node, StringBuilder sb)
-    // Invokes the appropriate visit method specific to the type of the node.
-    // Invokes the appropriate visit method on each of a sequence of nodes.
-    // R	visitAttribute(AttributeTree node, StringBuilder sb)
-    // Visits an AttributeTree node.
-    // R	visitAuthor(AuthorTree node, StringBuilder sb)
-    // Visits an AuthorTree node.
-    // R	visitComment(CommentTree node, StringBuilder sb)
-    // Visits a CommentTree node.
-    // R	visitDeprecated(DeprecatedTree node, StringBuilder sb)
-    // Visits a DeprecatedTree node.
-    // R	visitDocComment(DocCommentTree node, StringBuilder sb)
-    // Visits a DocCommentTree node.
-    // R	visitDocRoot(DocRootTree node, StringBuilder sb)
-    // Visits a DocRootTree node.
-    // R	visitDocType(DocTypeTree node, StringBuilder sb)
-    // Visits a DocTypeTree node.
-    // R	visitEndElement(EndElementTree node, StringBuilder sb)
-    // Visits an EndElementTree node.
-    // R	visitEntity(EntityTree node, StringBuilder sb)
-    // Visits an EntityTree node.
-    // R	visitErroneous(ErroneousTree node, StringBuilder sb)
-    // Visits an ErroneousTree node.
-    // R	visitHidden(HiddenTree node, StringBuilder sb)
-    // Visits a HiddenTree node.
-    // R	visitIdentifier(IdentifierTree node, StringBuilder sb)
-    // Visits an IdentifierTree node.
-    // R	visitIndex(IndexTree node, StringBuilder sb)
-    // Visits an IndexTree node.
-    // R	visitInheritDoc(InheritDocTree node, StringBuilder sb)
-    // Visits an InheritDocTree node.
-    // R	visitLink(LinkTree node, StringBuilder sb)
-    // Visits a LinkTree node.
-    // R	visitLiteral(LiteralTree node, StringBuilder sb)
-    // Visits an LiteralTree node.
-    // R	visitOther(DocTree node, StringBuilder sb)
-    // Visits an unknown type of DocTree node.
-    // R	visitParam(ParamTree node, StringBuilder sb)
-    // Visits a ParamTree node.
-    // R	visitProvides(ProvidesTree node, StringBuilder sb)
-    // Visits a ProvidesTree node.
-    // R	visitReference(ReferenceTree node, StringBuilder sb)
-    // Visits a ReferenceTree node.
-    // R	visitReturn(ReturnTree node, StringBuilder sb)
-    // Visits a ReturnTree node.
-    // R	visitSee(SeeTree node, StringBuilder sb)
-    // Visits a SeeTree node.
-    // R	visitSerial(SerialTree node, StringBuilder sb)
-    // Visits a SerialTree node.
-    // R	visitSerialData(SerialDataTree node, StringBuilder sb)
-    // Visits a SerialDataTree node.
-    // R	visitSerialField(SerialFieldTree node, StringBuilder sb)
-    // Visits a SerialFieldTree node.
-    // R	visitSince(SinceTree node, StringBuilder sb)
-    // Visits a SinceTree node.
-    // R	visitStartElement(StartElementTree node, StringBuilder sb)
-    // Visits a StartElementTree node.
-    // R	visitSummary(SummaryTree node, StringBuilder sb)
-    // Visits a SummaryTree node.
-    // R	visitText(TextTree node, StringBuilder sb)
-    // Visits a TextTree node.
-    // R	visitThrows(ThrowsTree node, StringBuilder sb)
-    // Visits a ThrowsTree node.
-    // R	visitUnknownBlockTag(UnknownBlockTagTree node, StringBuilder sb)
-    // Visits an UnknownBlockTagTree node.
-    // R	visitUnknownInlineTag(UnknownInlineTagTree node, StringBuilder sb)
-    // Visits an UnknownInlineTagTree node.
-    // R	visitUses(UsesTree node, StringBuilder sb)
-    // Visits a UsesTree node.
-    // R	visitValue(ValueTree node, StringBuilder sb)
-    // Visits a ValueTree node.
-    // R	visitVersion(VersionTree node, StringBuilder sb)
-    // Visits a VersionTreeTree node.
+    /**
+     * Visit each element of a list in turn.
+     *
+     * @param list a list of DocTrees
+     * @param sb where to produce output
+     */
+    void visitList(List<? extends DocTree> list, StringBuilder sb) {
+      for (DocTree dt : list) {
+        visit(dt, sb);
+      }
+    }
+
+    // public Void visit(DocTree node, StringBuilder sb)
+
+    // public Void visitAttribute(AttributeTree node, StringBuilder sb)
+    // public Void visitAuthor(AuthorTree node, StringBuilder sb)
+    // public Void visitComment(CommentTree node, StringBuilder sb)
+    // public Void visitDeprecated(DeprecatedTree node, StringBuilder sb)
+
+    @Override
+    public Void visitDocComment(DocCommentTree node, StringBuilder sb) {
+      visitList(node.getFullBody(), sb);
+      return null;
+    }
+
+    // public Void visitDocRoot(DocRootTree node, StringBuilder sb)
+    // public Void visitDocType(DocTypeTree node, StringBuilder sb)
+    // public Void visitEndElement(EndElementTree node, StringBuilder sb)
+    // public Void visitEntity(EntityTree node, StringBuilder sb)
+    // public Void visitErroneous(ErroneousTree node, StringBuilder sb)
+    // public Void visitHidden(HiddenTree node, StringBuilder sb)
+    // public Void visitIdentifier(IdentifierTree node, StringBuilder sb)
+    // public Void visitIndex(IndexTree node, StringBuilder sb)
+    // public Void visitInheritDoc(InheritDocTree node, StringBuilder sb)
+
+    @Override
+    public Void visitLink(LinkTree node, StringBuilder sb) {
+      List<? extends DocTree> label = node.getLabel();
+      if (label.size() > 0) {
+        visitList(label, sb);
+      } else {
+        sb.append("<code>");
+        sb.append(node.getReference().getSignature());
+        sb.append("</code>");
+      }
+      return null;
+    }
+
+    // LiteralTree is for {@code ...} and {@literal ...}.
+    @Override
+    public Void visitLiteral(LiteralTree node, StringBuilder sb) {
+      sb.append("<code>");
+      visitText(node.getBody(), sb);
+      sb.append("</code>");
+      return null;
+    }
+
+    // public Void visitOther(DocTree node, StringBuilder sb)
+    // public Void visitParam(ParamTree node, StringBuilder sb)
+    // public Void visitProvides(ProvidesTree node, StringBuilder sb)
+    // public Void visitReference(ReferenceTree node, StringBuilder sb)
+    // public Void visitReturn(ReturnTree node, StringBuilder sb)
+
+    @Override
+    public Void visitSee(SeeTree node, StringBuilder sb) {
+      List<? extends DocTree> references = node.getReference();
+      for (int i = 0; i < references.size(); i++) {
+        if (i > 0) {
+          sb.append(", ");
+        }
+        sb.append("<code>");
+        visit(references.get(i), sb);
+        sb.append("</code>");
+      }
+      return null;
+    }
+
+    // public Void visitSerial(SerialTree node, StringBuilder sb)
+    // public Void visitSerialData(SerialDataTree node, StringBuilder sb)
+    // public Void visitSerialField(SerialFieldTree node, StringBuilder sb)
+    // public Void visitSince(SinceTree node, StringBuilder sb)
+    // public Void visitStartElement(StartElementTree node, StringBuilder sb)
+    // public Void visitSummary(SummaryTree node, StringBuilder sb)
+    // public Void visitText(TextTree node, StringBuilder sb)
+    // public Void visitThrows(ThrowsTree node, StringBuilder sb)
+    // public Void visitUnknownBlockTag(UnknownBlockTagTree node, StringBuilder sb)
+    // public Void visitUnknownInlineTag(UnknownInlineTagTree node, StringBuilder sb)
+    // public Void visitUses(UsesTree node, StringBuilder sb)
+    // public Void visitValue(ValueTree node, StringBuilder sb)
+    // public Void visitVersion(VersionTree node, StringBuilder sb)
 
   }
 
