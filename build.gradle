@@ -2,7 +2,7 @@ plugins {
   id 'java-library'
 
   // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
-  id 'com.github.johnrengelman.shadow' version '6.1.0'
+  id 'com.github.johnrengelman.shadow' version '7.0.0'
 
   // Formatting is disabled due to poor handling of type annotations; wait until
   // this issue is fixed: https://github.com/google/google-java-format/issues/5
@@ -10,7 +10,7 @@ plugins {
   // id 'com.github.sherter.google-java-format' version '0.7.1'
 
   // Error Prone linter
-  id("net.ltgt.errorprone") version "2.0.1"
+  id("net.ltgt.errorprone") version "2.0.2"
 
   // Checker Framework pluggable type-checking
   id 'org.checkerframework' version '0.5.22'
@@ -21,11 +21,10 @@ repositories {
 }
 
 dependencies {
-  // https://mvnrepository.com/artifact/org.apache.commons/commons-text
+  implementation 'org.plumelib:reflection-util:1.0.3'
   implementation 'org.apache.commons:commons-text:1.9'
-  // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-  implementation 'io.github.classgraph:classgraph:4.8.108'
+  implementation 'io.github.classgraph:classgraph:4.8.110'
 
   errorprone 'com.google.errorprone:error_prone_core:2.7.1'
 
@@ -124,19 +123,16 @@ if (project.hasProperty("cfLocal")) {
 /// Javadoc
 
 // Turn Javadoc warnings into errors.
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.addStringOption('private', '-quiet')
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-      options.addStringOption("-release", "8");
+    options.addStringOption("-release", "8");
   }
   doLast {
-    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-      ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-	flags:'g', byline:true) {
-	fileset(dir: destinationDir)
-      }
+    ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
+      flags:'g', byline:true) {
+      fileset(dir: destinationDir)
     }
   }
 }
@@ -150,15 +146,6 @@ task javadocWeb(type: Javadoc) {
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
       options.addStringOption("-release", "8");
   }
-  doLast {
-    if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-      ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-	flags:'g', byline:true) {
-	fileset(dir: destinationDir)
-      }
-    }
-  }
-}
 }
 
 configurations {
@@ -174,9 +161,7 @@ task requireJavadoc(type: JavaExec) {
   args "src/main/java"
 }
 check.dependsOn requireJavadoc
-if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
 javadocWeb.dependsOn requireJavadoc
-}
 
 /// Emacs support
 
