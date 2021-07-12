@@ -120,7 +120,6 @@ javadoc {
   options.addStringOption('Xwerror', '-Xdoclint:all')
   options.addStringOption('private', '-quiet')
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-    // options.addStringOption("-release", "8");
     options.addStringOption('source', '8')
   }
   doLast {
