@@ -1602,6 +1602,7 @@ public class Options {
    * than the message string.
    */
   public static class ArgException extends Exception {
+    /** Unique identifier for serialization. If you add or remove fields, change this number. */
     static final long serialVersionUID = 20051223L;
 
     /**
