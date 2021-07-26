@@ -1,6 +1,6 @@
 # Plume-lib Options change log
 
-## 2.0.0
+## 2.0.0 (2021-07-11)
 
 - Options version 2.x supports Java 11 and higher.
   Options version 1.x supports Java 8 and Java 11.
@@ -9,20 +9,20 @@
   This is independent of the `setUseSingleDash()` method of Options itself.
   This is also independent of the `-singledash` and `--singledash` options to OptionsDoclet.
 
-## 1.0.5
+## 1.0.5 (2021-01-01)
 
 - Add colon after "default" in option descriptions
 - Documentation improvements
 
-## 1.0.4
+## 1.0.4 (2020-01-25)
 
 - Documentation and annotation improvements
 
-## 1.0.3
+## 1.0.3 (2019-10-30)
 
 - Bug fixes
 
-## 1.0.2
+## 1.0.2 (2019-07-03)
 
 - Minor improvements
 
