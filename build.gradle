@@ -26,7 +26,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   implementation 'io.github.classgraph:classgraph:4.8.115'
 
-  errorprone 'com.google.errorprone:error_prone_core:2.8.1'
+  errorprone 'com.google.errorprone:error_prone_core:2.9.0'
 
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
@@ -59,7 +59,7 @@ test {
 /// Error Prone linter
 
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.8.0")
+  errorprone("com.google.errorprone:error_prone_core:2.9.0")
   // JDK 8 support for Error Prone:
   errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
 }
