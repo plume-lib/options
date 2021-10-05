@@ -24,7 +24,7 @@ dependencies {
   implementation 'org.plumelib:reflection-util:1.0.4'
   implementation 'org.apache.commons:commons-text:1.9'
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-  implementation 'io.github.classgraph:classgraph:4.8.120'
+  implementation 'io.github.classgraph:classgraph:4.8.122'
 
   errorprone 'com.google.errorprone:error_prone_core:2.9.0'
 
@@ -64,7 +64,8 @@ dependencies {
   errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
 }
 tasks.withType(JavaCompile).configureEach {
-  options.compilerArgs << "-Xlint:all,-processing" << "-Werror"
+  // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
+  options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
   options.errorprone {
     disable("ReferenceEquality") // Use Interning Checker instead
     disable("StringSplitter") // obscure case isn't likely
