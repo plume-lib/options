@@ -10,10 +10,15 @@ plugins {
   // id 'com.github.sherter.google-java-format' version '0.7.1'
 
   // Error Prone linter
-  id("net.ltgt.errorprone") version "2.0.2"
+  id("net.ltgt.errorprone") version "2.0.2" apply false
 
   // Checker Framework pluggable type-checking
   id 'org.checkerframework' version '0.6.7'
+}
+
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+  // Error Prone linter
+  apply plugin: "net.ltgt.errorprone"
 }
 
 repositories {
@@ -25,8 +30,6 @@ dependencies {
   implementation 'org.apache.commons:commons-text:1.9'
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   implementation 'io.github.classgraph:classgraph:4.8.138'
-
-  errorprone 'com.google.errorprone:error_prone_core:2.10.0'
 
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
@@ -58,10 +61,9 @@ test {
 
 /// Error Prone linter
 
+if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.9.0")
-  // JDK 8 support for Error Prone:
-  errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
+  errorprone("com.google.errorprone:error_prone_core:2.11.0")
 }
 tasks.withType(JavaCompile).configureEach {
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
@@ -72,6 +74,7 @@ tasks.withType(JavaCompile).configureEach {
     disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
     disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
   }
+}
 }
 
 /// Checker Framework pluggable type-checking
