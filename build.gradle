@@ -26,8 +26,6 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   implementation 'io.github.classgraph:classgraph:4.8.138'
 
-  errorprone 'com.google.errorprone:error_prone_core:2.10.0'
-
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
@@ -59,14 +57,13 @@ test {
 /// Error Prone linter
 
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.9.0")
-  // JDK 8 support for Error Prone:
-  errorproneJavac("com.google.errorprone:javac:9+181-r4173-1")
+  errorprone("com.google.errorprone:error_prone_core:2.11.0")
 }
 tasks.withType(JavaCompile).configureEach {
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
   options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
   options.errorprone {
+    enabled = JavaVersion.current() != JavaVersion.VERSION_1_8
     disable("ReferenceEquality") // Use Interning Checker instead
     disable("StringSplitter") // obscure case isn't likely
     disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
