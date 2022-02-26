@@ -46,7 +46,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   options.memberLevel = JavadocMemberLevel.PRIVATE
   options.docletpath = project.sourceSets.main.runtimeClasspath as List
   options.doclet = "org.plumelib.options.OptionsDoclet"
-  options.addStringOption("docfile", "${projectDir}/src/main/java/org/plumelib/multiversioncontrol/MultiVersionControl.java")
+  options.addStringOption("docfile", "${projectDir}/path/to/Main.java")
   options.addStringOption("format", "javadoc")
   options.addStringOption("i", "-quiet")
   options.noTimestamp(false)
