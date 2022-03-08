@@ -547,6 +547,7 @@ public class OptionsDoclet implements Doclet {
       hasError = true;
     }
     if (hasError) {
+      System.err.println(USAGE);
       System.exit(1);
     }
   }
