@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.signedness.qual.Signed;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -1453,7 +1454,9 @@ public class Options {
     Object val;
     try {
       if (oi.constructor != null) {
-        val = oi.constructor.newInstance(new Object[] {argValue});
+        @SuppressWarnings("signedness:cast.unsafe") // assume command-line numeric args are signed
+        Object signedVal = (@Signed Object) oi.constructor.newInstance(new Object[] {argValue});
+        val = signedVal;
       } else if (oi.baseType.isEnum()) {
         @SuppressWarnings({"unchecked", "rawtypes"})
         Object tmpVal = getEnumValue((Class<Enum>) oi.baseType, argValue);
