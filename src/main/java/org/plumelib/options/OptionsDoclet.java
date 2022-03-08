@@ -53,6 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
+import org.checkerframework.checker.signedness.qual.Signed;
 import org.plumelib.reflection.Signatures;
 
 /**
@@ -290,7 +291,9 @@ public class OptionsDoclet implements Doclet {
         try {
           Constructor<?> c = clazz.getDeclaredConstructor();
           c.setAccessible(true);
-          objs.add(c.newInstance(new Object[0]));
+          @SuppressWarnings("signedness:assignment")
+          @Signed Object signedObj = c.newInstance(new Object[0]);
+          objs.add(signedObj);
         } catch (Exception e) {
           System.out.println("Classpath:");
           for (URI uri : new ClassGraph().getClasspathURIs()) {

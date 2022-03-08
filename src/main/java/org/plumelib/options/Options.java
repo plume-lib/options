@@ -1454,8 +1454,8 @@ public class Options {
     Object val;
     try {
       if (oi.constructor != null) {
-        @SuppressWarnings("signedness:cast.unsafe") // assume command-line numeric args are signed
-        Object signedVal = (@Signed Object) oi.constructor.newInstance(new Object[] {argValue});
+        @SuppressWarnings("signedness:assignment") // assume command-line numeric args are signed
+        @Signed Object signedVal = oi.constructor.newInstance(new Object[] {argValue});
         val = signedVal;
       } else if (oi.baseType.isEnum()) {
         @SuppressWarnings({"unchecked", "rawtypes"})
