@@ -454,7 +454,7 @@ public class OptionsDoclet implements Doclet {
             @Override
             public boolean process(String option, List<String> arguments) {
               assert arguments.size() == 1;
-              String outFileName = arguments.get(0);
+              outFileName = arguments.get(0);
               // TODO: move to later and centralize.
               if (docFile != null && outFileName != null && new File(outFileName).equals(docFile)) {
                 printError("docfile must be different from outfile");
