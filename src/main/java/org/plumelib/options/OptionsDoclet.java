@@ -517,34 +517,6 @@ public class OptionsDoclet implements Doclet {
           });
 
   /**
-   * Given a command-line option of this doclet, returns the number of arguments you must specify on
-   * the command line for the given option. Returns 0 if the argument is not recognized. This method
-   * is automatically invoked by Javadoc.
-   *
-   * @param option the command-line option
-   * @return the number of command-line arguments needed when using the option
-   * @see <a
-   *     href="https://docs.oracle.com/javase/8/docs/technotes/guides/javadoc/doclet/overview.html">Doclet
-   *     overview</a>
-   */
-  public static int optionLength(String option) {
-    if (option.equals("-help")) {
-      System.out.println(USAGE);
-      return 1;
-    }
-    if (option.equals("-i") || option.equals("-classdoc") || option.equals("-singledash")) {
-      return 1;
-    }
-    if (option.equals("-docfile")
-        || option.equals("-outfile")
-        || option.equals("-format")
-        || option.equals("-d")) {
-      return 2;
-    }
-    return 0;
-  }
-
-  /**
    * Sets variables that can only be set after all command-line options have been processed. Isuses
    * errors and halts if any command-line options are incompatible with one another.
    */
