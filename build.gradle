@@ -57,7 +57,7 @@ test {
 /// Error Prone linter
 
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.13.1")
+  errorprone("com.google.errorprone:error_prone_core:2.14.0")
 }
 tasks.withType(JavaCompile).configureEach {
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
