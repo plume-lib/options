@@ -636,43 +636,42 @@ public class OptionsDoclet implements Doclet {
   @RequiresNonNull("docFile")
   private String newDocFileText() throws Exception {
     StringJoiner b = new StringJoiner(lineSep);
-    BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8);
-    String docline;
-    boolean replacing = false;
-    boolean replacedOnce = false;
+    try (BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8)) {
+      String docline;
+      boolean replacing = false;
+      boolean replacedOnce = false;
 
-    while ((docline = doc.readLine()) != null) {
-      if (replacing) {
-        if (docline.trim().equals(endDelim)) {
-          replacing = false;
-        } else {
-          continue;
-        }
-      }
-
-      b.add(docline);
-
-      if (!replacedOnce && docline.trim().equals(startDelim)) {
-        if (formatJavadoc) {
-          int starIndex = docline.indexOf('*');
-          b.add(docline.substring(0, starIndex + 1));
-          String jdoc = optionsToJavadoc(starIndex, 100);
-          b.add(jdoc);
-          if (jdoc.endsWith("</ul>")) {
-            b.add(docline.substring(0, starIndex + 1));
+      while ((docline = doc.readLine()) != null) {
+        if (replacing) {
+          if (docline.trim().equals(endDelim)) {
+            replacing = false;
+          } else {
+            continue;
           }
-        } else {
-          b.add(optionsToHtml(0));
         }
-        replacedOnce = true;
-        replacing = true;
+
+        b.add(docline);
+
+        if (!replacedOnce && docline.trim().equals(startDelim)) {
+          if (formatJavadoc) {
+            int starIndex = docline.indexOf('*');
+            b.add(docline.substring(0, starIndex + 1));
+            String jdoc = optionsToJavadoc(starIndex, 100);
+            b.add(jdoc);
+            if (jdoc.endsWith("</ul>")) {
+              b.add(docline.substring(0, starIndex + 1));
+            }
+          } else {
+            b.add(optionsToHtml(0));
+          }
+          replacedOnce = true;
+          replacing = true;
+        }
+      }
+      if (!replacedOnce) {
+        System.err.println("Did not find start delimiter: " + startDelim);
       }
     }
-    if (!replacedOnce) {
-      System.err.println("Did not find start delimiter: " + startDelim);
-    }
-
-    doc.close();
     return b.toString();
   }
 
