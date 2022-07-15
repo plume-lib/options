@@ -1,5 +1,9 @@
 # Plume-lib Options change log
 
+## 2.0.1 (2021-07-11)
+
+- Tested under JDK 17.
+
 ## 2.0.0 (2021-07-11)
 
 - Options version 2.x supports Java 11 and higher.
