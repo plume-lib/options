@@ -987,7 +987,7 @@ public class Options {
    * available &mdash; for example, for the {@code premain} method of a Java agent.
    *
    * @param args the command line to be tokenized
-   * @return a string array analogous to the argument to {@code main}.
+   * @return a string array analogous to the argument to {@code main}
    */
   // TODO: should this throw some exceptions?
   public static String[] tokenize(String args) {
