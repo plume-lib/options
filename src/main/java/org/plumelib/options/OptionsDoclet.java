@@ -591,7 +591,6 @@ public class OptionsDoclet implements Doclet {
    */
   public void write() throws Exception {
     PrintWriter out;
-    String output = output();
 
     if (outFile != null) {
       out = new PrintWriter(Files.newBufferedWriter(outFile.toPath(), UTF_8));
@@ -603,7 +602,7 @@ public class OptionsDoclet implements Doclet {
       out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
     }
 
-    out.println(output);
+    out.println(output());
     out.flush();
     out.close();
   }
