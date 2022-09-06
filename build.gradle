@@ -13,7 +13,7 @@ plugins {
   id("net.ltgt.errorprone") version "2.0.2"
 
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.6.14'
+  id 'org.checkerframework' version '0.6.16'
 }
 
 repositories {
@@ -26,7 +26,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
   implementation 'io.github.classgraph:classgraph:4.8.149'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
@@ -57,7 +57,7 @@ test {
 /// Error Prone linter
 
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.14.0")
+  errorprone("com.google.errorprone:error_prone_core:2.15.0")
 }
 tasks.withType(JavaCompile).configureEach {
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
@@ -137,6 +137,15 @@ task javadocWeb(type: Javadoc) {
   classpath = project.sourceSets.main.compileClasspath
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
       options.addStringOption("-release", "8");
+  }
+  doLast {
+    // Set permissions
+    project.exec {
+      commandLine('chgrp', '-R',  'plse_www', "/cse/web/research/plumelib/${project.name}/api")
+    }
+    project.exec {
+      commandLine('chmod', '-R',  'g+w', "/cse/web/research/plumelib/${project.name}/api")
+    }
   }
 }
 
