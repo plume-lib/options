@@ -136,7 +136,7 @@ task javadocWeb(type: Javadoc) {
   destinationDir = file("/cse/web/research/plumelib/${project.name}/api")
   classpath = project.sourceSets.main.compileClasspath
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
-      options.addStringOption("-release", "8");
+    options.addStringOption('source', '8')
   }
   doLast {
     // Set permissions
