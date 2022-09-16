@@ -1030,6 +1030,9 @@ public class OptionsDoclet implements Doclet {
   /** Converts DocTree to a HTML string. . */
   static class DocCommentToHtmlVisitor extends SimpleDocTreeVisitor<Void, StringBuilder> {
 
+    /** Create a new DocCommentToHtmlVisitor. */
+    public DocCommentToHtmlVisitor() {}
+
     @Override
     protected Void defaultAction(DocTree node, StringBuilder sb) {
       // The default action does not recurse.  It needs to be overridden for any DocTree whose
