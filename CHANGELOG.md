@@ -1,5 +1,9 @@
 # Plume-lib Options change log
 
+## ?? (??)
+
+- Tested under JDK 18.
+
 ## 2.0.1 (2022-07-15)
 
 - Tested under JDK 17.
