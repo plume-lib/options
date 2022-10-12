@@ -72,7 +72,7 @@ spotless {
 /// Error Prone linter
 
 dependencies {
-  errorprone("com.google.errorprone:error_prone_core:2.15.0")
+  errorprone("com.google.errorprone:error_prone_core:2.16")
 }
 tasks.withType(JavaCompile).configureEach {
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
