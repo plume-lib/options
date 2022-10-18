@@ -1,5 +1,9 @@
 # Plume-lib Options change log
 
+## 1.0.6 (2022-10-18)
+
+- Don't use version of Apache Commons Text that has a security vulnerability.
+
 ## 1.0.5
 
 - Add colon after "default" in option descriptions
