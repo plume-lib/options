@@ -1,8 +1,9 @@
 # Plume-lib Options change log
 
-## ?? (??)
+## 2.0.2 (2022-10-18)
 
 - Tested under JDK 18.
+- Don't use version of Apache Commons Text that has a security vulnerability.
 
 ## 2.0.1 (2022-07-15)
 

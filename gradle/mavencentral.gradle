@@ -9,19 +9,19 @@
 //  * git pull
 //  * Update the version number in ../README.md and in this file (multiple times in each).
 //  * Update ../CHANGELOG.md .
+//  * Save changes, and stage them.
 //  * Run in the top-level directory:  ./gradlew clean publish && ./gradlew javadocWeb
 //  * Browse to https://oss.sonatype.org/#stagingRepositories, complete the Maven Central release.
-//  * Stage changes.
 //  * Add a git tag:
-//    VER=2.0.1 && git commit -m "Version $VER" && git push && git tag -a v$VER -m "Version $VER" && git push && git push --tags
-//  * Make a GitHub release. Go to the GitHub releases page, make a release, call it "options 2.0.1", use the ../CHANGELOG.md text, attach the .jar file from ../build/libs/
+//    VER=2.0.2 && git commit -m "Version $VER" && git push && git tag -a v$VER -m "Version $VER" && git push && git push --tags
+//  * Make a GitHub release. Go to the GitHub releases page, make a release, call it "options 2.0.2", use the ../CHANGELOG.md text, attach the .jar file from ../build/libs/
 
 
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 group "org.plumelib"
-version "2.0.1"
+version "2.0.2"
 
 final isSnapshot = version.contains('SNAPSHOT')
 
