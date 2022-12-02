@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import org.checkerframework.checker.formatter.qual.FormatMethod;
 import org.checkerframework.checker.initialization.qual.Initialized;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
+import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -1488,12 +1489,13 @@ public class Options {
    * @param name the name of the constant to return
    * @return the enum constant of the specified enum type with the specified name
    */
+  @SuppressWarnings("interning:return") // generics problem; #979?
   private <T extends Enum<T>> T getEnumValue(Class<T> enumType, String name) {
-    T[] constants = enumType.getEnumConstants();
+    @Interned T[] constants = enumType.getEnumConstants();
     if (constants == null) {
       throw new IllegalArgumentException(enumType.getName() + " is not an enum type");
     }
-    for (T constant : constants) {
+    for (@Interned T constant : constants) {
       if (constant.name().equalsIgnoreCase(name.replace('-', '_'))) {
         return constant;
       }
