@@ -12,7 +12,9 @@ of sync with the rest of the program.
 
 The programmer does not have to write any code, only declare and document
 variables. For each field that you want to set from a command-line
-argument, you write Javadoc and an `@Option` annotation. Then, the field is
+argument, you write Javadoc and an
+[`@Option`](http://plumelib.org/options/api/org/plumelib/options/Option.html)
+annotation. Then, the field is
 automatically set from a command-line option of the same name, and usage
 messages and printed documentation are generated automatically.
 
@@ -36,6 +38,11 @@ dependencies {
   }
 }
 ```
+
+That's it!
+
+To update user documentation after an option or its documentation has changed,
+use a rule like this:
 
 ```
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
