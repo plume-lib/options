@@ -24,7 +24,7 @@ import org.checkerframework.framework.qual.IgnoreInWholeProgramInference;
  *   public static File outfile = new File("/tmp/foobar");
  *
  *   &#64;Option("-i ignore case")
- *   public static boolean ignore_case;
+ *   public static boolean ignoreCase; // or, name the variable ignore_case
  *
  *   &#64;Option("set the initial temperature")
  *   public static double temperature = 75.0;

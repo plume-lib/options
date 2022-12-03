@@ -32,7 +32,7 @@ public class TestOptions {
     public double temperature;
 
     @Option("-f the input file")
-    public @Nullable File input_file;
+    public @Nullable File inputFile;
 
     @Option("-g the input file")
     public @Nullable Path input_path;
@@ -41,7 +41,7 @@ public class TestOptions {
     public boolean bool;
 
     @Option("-i Integer")
-    public @Nullable Integer integer_reference;
+    public @Nullable Integer IntegerReference;
 
     @Option("list of doubles")
     public List<Double> ld = new ArrayList<>();
@@ -90,7 +90,7 @@ public class TestOptions {
 
     assert t.lp.get(0).toString().equals("foo");
     assert t.lp.get(1).toString().equals("bar");
-    assert t.integer_reference != null && t.integer_reference.intValue() == 24;
+    assert t.IntegerReference != null && t.IntegerReference.intValue() == 24;
     assert t.temperature == 37.8;
     assert t.bool == false;
     assert t.ld.get(0).doubleValue() == 34.6;
@@ -135,10 +135,10 @@ public class TestOptions {
     assert t.ls.get(1).equals("world");
 
     // Test files and paths
-    assert t.input_file != null
+    assert t.inputFile != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-file";
-    assert t.input_file.exists();
-    assert t.input_file.getName().equals("TestOptions1.txt");
+    assert t.inputFile.exists();
+    assert t.inputFile.getName().equals("TestOptions1.txt");
     assert t.input_path != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-path";
     assert t.input_path.toFile().exists();
