@@ -309,10 +309,10 @@ public class Options {
   private final List<OptionInfo> options = new ArrayList<>();
 
   /** Map from short or long option names (with leading dashes) to option information. */
-  private final Map<String, OptionInfo> nameMap = new LinkedHashMap<>();
+  private final Map<String, OptionInfo> nameToOption = new LinkedHashMap<>();
 
   /** Map from option group name to option group information. */
-  private final Map<String, OptionGroupInfo> groupMap = new LinkedHashMap<>();
+  private final Map<String, OptionGroupInfo> groupNameToOptionGroup = new LinkedHashMap<>();
 
   /**
    * If true, then the user is using {@code @OptionGroup} annotations correctly (as per the
@@ -695,9 +695,9 @@ public class Options {
     // Loop through each specified object or class
     for (Object obj : args) {
       boolean isClass = obj instanceof Class<?>;
-      // null or a key in groupMap (that is, an option group name)
+      // null or a key in groupNameToOptionGroup (that is, an option group name)
       @SuppressWarnings("keyfor")
-      @KeyFor("groupMap") String currentGroup = null;
+      @KeyFor("groupNameToOptionGroup") String currentGroup = null;
 
       @SuppressWarnings({
         "nullness" // if isClass is true, obj is a non-null initialized Class
@@ -787,11 +787,11 @@ public class Options {
 
         if (optionGroup != null) {
           String name = optionGroup.value();
-          if (groupMap.containsKey(name)) {
+          if (groupNameToOptionGroup.containsKey(name)) {
             throw new Error("option group " + name + " declared twice");
           }
           OptionGroupInfo gi = new OptionGroupInfo(optionGroup);
-          groupMap.put(name, gi);
+          groupNameToOptionGroup.put(name, gi);
           currentGroup = name;
         }
         // The variable currentGroup is set to null at the start of every iteration through 'args'.
@@ -802,7 +802,7 @@ public class Options {
           throw new Error("missing @OptionGroup annotation in field " + f + " of class " + obj);
         }
 
-        @NonNull OptionGroupInfo ogi = groupMap.get(currentGroup);
+        @NonNull OptionGroupInfo ogi = groupNameToOptionGroup.get(currentGroup);
         ogi.optionList.add(oi);
       } // loop through fields
     } // loop through args
@@ -812,24 +812,24 @@ public class Options {
     // Add each option to the option name map
     for (OptionInfo oi : options) {
       if (oi.shortName != null) {
-        if (nameMap.containsKey("-" + oi.shortName)) {
+        if (nameToOption.containsKey("-" + oi.shortName)) {
           throw new Error("short name " + oi + " appears twice");
         }
-        nameMap.put("-" + oi.shortName, oi);
+        nameToOption.put("-" + oi.shortName, oi);
       }
-      if (nameMap.containsKey(prefix + oi.longName)) {
+      if (nameToOption.containsKey(prefix + oi.longName)) {
         throw new Error("long name " + oi + " appears twice");
       }
-      nameMap.put(prefix + oi.longName, oi);
+      nameToOption.put(prefix + oi.longName, oi);
       if (useDashes && oi.longName.contains("-")) {
-        nameMap.put(prefix + oi.longName.replace('-', '_'), oi);
+        nameToOption.put(prefix + oi.longName.replace('-', '_'), oi);
       }
       if (oi.aliases.length > 0) {
         for (String alias : oi.aliases) {
-          if (nameMap.containsKey(alias)) {
+          if (nameToOption.containsKey(alias)) {
             throw new Error("alias " + oi + " appears twice");
           }
-          nameMap.put(alias, oi);
+          nameToOption.put(alias, oi);
         }
       }
     }
@@ -975,13 +975,13 @@ public class Options {
           argName = arg.substring(0, eqPos);
           argValue = arg.substring(eqPos + 1);
         }
-        OptionInfo oi = nameMap.get(argName);
+        OptionInfo oi = nameToOption.get(argName);
         if (oi == null) {
           StringBuilder msg = new StringBuilder();
           msg.append(String.format("unknown option name '%s' in arg '%s'", argName, arg));
           if (false) { // for debugging
             msg.append("; known options:");
-            for (String optionName : sortedKeySet(nameMap)) {
+            for (String optionName : sortedKeySet(nameToOption)) {
               msg.append(" ");
               msg.append(optionName);
             }
@@ -1192,19 +1192,19 @@ public class Options {
     List<OptionGroupInfo> groups = new ArrayList<>();
     if (groupNames.length > 0) {
       for (String groupName : groupNames) {
-        if (!groupMap.containsKey(groupName)) {
+        if (!groupNameToOptionGroup.containsKey(groupName)) {
           throw new IllegalArgumentException("invalid option group: " + groupName);
         }
-        OptionGroupInfo gi = groupMap.get(groupName);
+        OptionGroupInfo gi = groupNameToOptionGroup.get(groupName);
         if (!showUnpublicized && !gi.anyPublicized()) {
           throw new IllegalArgumentException(
               "group does not contain any publicized options: " + groupName);
         } else {
-          groups.add(groupMap.get(groupName));
+          groups.add(groupNameToOptionGroup.get(groupName));
         }
       }
     } else { // return usage for all groups that are not unpublicized
-      for (OptionGroupInfo gi : groupMap.values()) {
+      for (OptionGroupInfo gi : groupNameToOptionGroup.values()) {
         if ((gi.unpublicized || !gi.anyPublicized()) && !showUnpublicized) {
           continue;
         }
@@ -1319,7 +1319,7 @@ public class Options {
    * @return all the option groups
    */
   Collection<OptionGroupInfo> getOptionGroups() {
-    return groupMap.values();
+    return groupNameToOptionGroup.values();
   }
 
   /**
