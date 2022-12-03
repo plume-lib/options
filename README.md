@@ -37,6 +37,11 @@ dependencies {
 }
 ```
 
+That's it!
+
+To update user documentation after an option or its documentation has changed,
+use a rule like this:
+
 ```
 task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
   group "Documentation"
