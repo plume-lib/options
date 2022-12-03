@@ -342,22 +342,22 @@ public class TestOptions {
   public void testOptionsEnums() throws ArgException {
     Options options = new Options("test", ClassWithOptionsEnums.class);
 
-    options.parse(new String[] {"--firstPass", "SMART_RLE"});
+    options.parse(new String[] {"--first-pass", "SMART_RLE"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
-    options.parse(new String[] {"--firstPass", "smart_rle"});
+    options.parse(new String[] {"--first-pass", "smart_rle"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
-    options.parse(new String[] {"--firstPass", "smart-rle"});
+    options.parse(new String[] {"--first-pass", "smart-rle"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
 
-    options.parse(new String[] {"--firstPass", "rle", "--secondPass", "SMART-RLE"});
+    options.parse(new String[] {"--first-pass", "rle", "--second-pass", "SMART-RLE"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
     assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
 
-    options.parse(new String[] {"--secondPass", "Huffman"});
+    options.parse(new String[] {"--second-pass", "Huffman"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
     assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.HUFFMAN;
   }
@@ -369,7 +369,7 @@ public class TestOptions {
         ArgException.class,
         () -> {
           // should fail: can not leave out _ or -
-          options.parse(new String[] {"--firstPass", "smartrle"});
+          options.parse(new String[] {"--first-pass", "smartrle"});
         });
   }
 }
