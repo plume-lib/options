@@ -1,6 +1,6 @@
 # Plume-lib Options change log
 
-## 2.0.3 (??)
+## 2.0.3 (2022-12-07)
 
 - Tested under JDK 19.
 - Permit variable names to use either camelCase or snake_case.

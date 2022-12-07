@@ -34,7 +34,7 @@ dependencies {
   if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
     implementation 'org.plumelib:options:1.0.6'
   } else {
-    implementation 'org.plumelib:options:2.0.2'
+    implementation 'org.plumelib:options:2.0.3'
   }
 }
 ```
@@ -61,7 +61,7 @@ task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.2/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
 
 
 ## Alternatives ##
