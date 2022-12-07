@@ -4,6 +4,7 @@
 
 - Tested under JDK 19.
 - Permit variable names to use either camelCase or snake_case.
+  This has no effect on how the user supplies command-line arguments.
 
 ## 2.0.2 (2022-10-18)
 

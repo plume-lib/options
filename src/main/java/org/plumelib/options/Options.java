@@ -115,8 +115,8 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *
  * <p>For example, both the <span style="white-space: nowrap;">{@code --multi-word-variable}</span>
  * and <span style="white-space: nowrap;">{@code --multi_word_variable}</span> command-line options
- * would set a variable named {@code multi_word_variable} or {@code multi_word_variable}. (It is an
- * error to define two variables {@code multi_word_variable} and {@code multi_word_variable}, and to
+ * would set a variable named {@code multiWordVariable} or {@code multi_word_variable}. (It is an
+ * error to define two variables {@code multiWordVariable} and {@code multi_word_variable}, and to
  * annotate both of them with {@code @Option}.)
  *
  * <p>A user of your program supplies command-line options in the form <span style="white-space:
@@ -280,7 +280,7 @@ public class Options {
    * <p>For example, when this is true, a command line containing <span style="white-space:
    * nowrap;">{@code --my-option="foo bar"}</span> is equivalent to <span style="white-space:
    * nowrap;">{@code --my-option="foo" --my-option="bar"}</span>. Both of them have the effect of
-   * adding two elements, "foo" and "bar", to the list {@code myOption}.
+   * adding two elements, "foo" and "bar", to the list {@code myOption} (or {@code my_option}).
    */
   public static boolean spaceSeparatedLists = false;
 
@@ -836,7 +836,7 @@ public class Options {
   }
 
   /**
-   * Converts a Java field name to a (long) option name. The option name uses '-' to separate words.
+   * Converts a Java field name to a (long) option name. The option name uses '_' to separate words.
    *
    * @param fieldName the name of the field
    * @return the (long) name of the option
@@ -1730,29 +1730,6 @@ public class Options {
     // Return the result
     return new ParseResult(shortName, typeName, description);
   }
-
-  //   /**
-  //    * Test class with some defined arguments.
-  //    */
-  //   private static class Test {
-  //
-  //     @Option("generic") List<Pattern> lp = new ArrayList<>();
-  //     @Option("-a <filename> argument 1") String arg1 = "/tmp/foobar";
-  //     @Option("argument 2") String arg2;
-  //     @Option("-d double value") double temperature;
-  //     @Option("-f the input file") File inputFile;
-  //   }
-  //
-  //   /**
-  //    * Simple example
-  //    */
-  //   private static void main (String[] args) throws ArgException {
-  //
-  //     Options options = new Options("test", new Test());
-  //     System.out.printf("Options:%n%s", options);
-  //     options.parse(true, args);
-  //     System.out.printf("Results:%n%s", options.settings());
-  //   }
 
   /**
    * Returns a sorted version of m.keySet().
