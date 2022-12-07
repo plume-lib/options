@@ -32,7 +32,7 @@ public class TestOptions {
     public double temperature;
 
     @Option("-f the input file")
-    public @Nullable File input_file;
+    public @Nullable File inputFile;
 
     @Option("-g the input file")
     public @Nullable Path input_path;
@@ -41,7 +41,7 @@ public class TestOptions {
     public boolean bool;
 
     @Option("-i Integer")
-    public @Nullable Integer integer_reference;
+    public @Nullable Integer IntegerReference;
 
     @Option("list of doubles")
     public List<Double> ld = new ArrayList<>();
@@ -90,7 +90,7 @@ public class TestOptions {
 
     assert t.lp.get(0).toString().equals("foo");
     assert t.lp.get(1).toString().equals("bar");
-    assert t.integer_reference != null && t.integer_reference.intValue() == 24;
+    assert t.IntegerReference != null && t.IntegerReference.intValue() == 24;
     assert t.temperature == 37.8;
     assert t.bool == false;
     assert t.ld.get(0).doubleValue() == 34.6;
@@ -135,10 +135,10 @@ public class TestOptions {
     assert t.ls.get(1).equals("world");
 
     // Test files and paths
-    assert t.input_file != null
+    assert t.inputFile != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-file";
-    assert t.input_file.exists();
-    assert t.input_file.getName().equals("TestOptions1.txt");
+    assert t.inputFile.exists();
+    assert t.inputFile.getName().equals("TestOptions1.txt");
     assert t.input_path != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-path";
     assert t.input_path.toFile().exists();
@@ -342,22 +342,22 @@ public class TestOptions {
   public void testOptionsEnums() throws ArgException {
     Options options = new Options("test", ClassWithOptionsEnums.class);
 
-    options.parse(new String[] {"--firstPass", "SMART_RLE"});
+    options.parse(new String[] {"--first-pass", "SMART_RLE"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
-    options.parse(new String[] {"--firstPass", "smart_rle"});
+    options.parse(new String[] {"--first_pass", "smart_rle"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
     ClassWithOptionsEnums.firstPass = ClassWithOptionsEnums.Compressor.HUFFMAN;
 
-    options.parse(new String[] {"--firstPass", "smart-rle"});
+    options.parse(new String[] {"--first-pass", "smart-rle"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
 
-    options.parse(new String[] {"--firstPass", "rle", "--secondPass", "SMART-RLE"});
+    options.parse(new String[] {"--first_pass", "rle", "--second-pass", "SMART-RLE"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
     assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.SMART_RLE;
 
-    options.parse(new String[] {"--secondPass", "Huffman"});
+    options.parse(new String[] {"--second-pass", "Huffman"});
     assert ClassWithOptionsEnums.firstPass == ClassWithOptionsEnums.Compressor.RLE;
     assert ClassWithOptionsEnums.secondPass == ClassWithOptionsEnums.Compressor.HUFFMAN;
   }
@@ -368,8 +368,14 @@ public class TestOptions {
     Assertions.assertThrows(
         ArgException.class,
         () -> {
-          // should fail: can not leave out _ or -
-          options.parse(new String[] {"--firstPass", "smartrle"});
+          // should fail: option argument can not leave out _ or -
+          options.parse(new String[] {"--first-pass", "smartrle"});
+        });
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          // should fail: option name can not leave out _ or -
+          options.parse(new String[] {"--firstpass", "smart-rle"});
         });
   }
 }

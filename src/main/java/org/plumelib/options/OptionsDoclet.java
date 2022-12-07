@@ -722,7 +722,8 @@ public class OptionsDoclet implements Doclet {
       if (optDoc != null) {
         String nameWithUnderscores = oi.longName.replace('-', '_');
         for (VariableElement fd : fields(optDoc)) {
-          if (fd.getSimpleName().toString().equals(nameWithUnderscores)) {
+          if (nameWithUnderscores.equals(
+              Options.fieldNameToOptionName(fd.getSimpleName().toString()))) {
             // If Javadoc for field is unavailable, then use the @Option
             // description in the documentation.
             DocCommentTree fieldComment = docTrees.getDocCommentTree(fd);

@@ -79,7 +79,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *   public static File outfile = new File("/tmp/foobar");
  *
  *   &#64;Option("-i ignore case")
- *   public static boolean ignore_case;
+ *   public static boolean ignoreCase; // or, name the variable ignore_case
  *
  *   &#64;Option("set the initial temperature")
  *   public static double temperature = 75.0;
@@ -109,10 +109,15 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *
  * <p>The {@code @}{@link Option} annotation on a field specifies brief user documentation and,
  * optionally, a one-character short name that a user may supply on the command line. The long name
- * is taken from the name of the variable. When the name contains an underscore, the user may
- * substitute a hyphen on the command line instead; for example, the <span style="white-space:
- * nowrap;">{@code --multi-word-variable}</span> command-line option would set the variable {@code
- * multi_word_variable}.
+ * is taken from the name of the variable. When the name contains a capital letter, the user must
+ * use a hyphen or underscore to separate words. When the name contains an underscore, the user may
+ * substitute a hyphen on the command line instead.
+ *
+ * <p>For example, both the <span style="white-space: nowrap;">{@code --multi-word-variable}</span>
+ * and <span style="white-space: nowrap;">{@code --multi_word_variable}</span> command-line options
+ * would set a variable named {@code multiWordVariable} or {@code multi_word_variable}. (It is an
+ * error to define two variables {@code multiWordVariable} and {@code multi_word_variable}, and to
+ * annotate both of them with {@code @Option}.)
  *
  * <p>A user of your program supplies command-line options in the form <span style="white-space:
  * nowrap;">"--name=value"</span> or <span style="white-space: nowrap;">"-name value"</span>. The
@@ -225,7 +230,8 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *   <li>The programmer may set {@link #usageSynopsis} to masquerade as another program.
  *   <li>If {@link #useDashes} is false, then usage messages advertise long options with underscores
  *       (as in {@code --my_option_name}) instead of dashes (as in {@code --my-option-name}). The
- *       user can always specify either; this just affects usage messages. It defaults to false.
+ *       user can always specify either one on the command line; {@link #useDashes} just affects
+ *       usage messages. It defaults to false.
  * </ul>
  *
  * <p><b>Limitations</b>
@@ -274,7 +280,7 @@ public class Options {
    * <p>For example, when this is true, a command line containing <span style="white-space:
    * nowrap;">{@code --my-option="foo bar"}</span> is equivalent to <span style="white-space:
    * nowrap;">{@code --my-option="foo" --my-option="bar"}</span>. Both of them have the effect of
-   * adding two elements, "foo" and "bar", to the list {@code my_option}.
+   * adding two elements, "foo" and "bar", to the list {@code myOption} (or {@code my_option}).
    */
   public static boolean spaceSeparatedLists = false;
 
@@ -354,7 +360,10 @@ public class Options {
     /** Short (one-character) argument name. */
     @Nullable String shortName;
 
-    /** Long argument name. */
+    /**
+     * Long argument name. Uses '-' or '_' to separate words, depending on the value of {@link
+     * useDashes}.
+     */
     String longName;
 
     /** Aliases for this option. */
@@ -443,8 +452,7 @@ public class Options {
         throw new Error("obj is null for non-static field " + field);
       }
 
-      // The long name is the name of the field
-      longName = field.getName();
+      longName = fieldNameToOptionName(field.getName());
       if (useDashes) {
         longName = longName.replace('_', '-');
       }
@@ -825,6 +833,33 @@ public class Options {
         }
       }
     }
+  }
+
+  /**
+   * Converts a Java field name to a (long) option name. The option name uses '_' to separate words.
+   *
+   * @param fieldName the name of the field
+   * @return the (long) name of the option
+   */
+  /* package-protected */ static String fieldNameToOptionName(String fieldName) {
+    String optionName = fieldName;
+    if (optionName.indexOf('_') == -1 && !optionName.equals(optionName.toLowerCase())) {
+      // optionName contains no underscores, but does contain a capital letter.
+      // Insert an underscore before each capital letter, which is downcased.
+      StringBuilder lnb = new StringBuilder();
+      int optionNamelength = optionName.length();
+      for (int i = 0; i < optionNamelength; i++) {
+        char ch = optionName.charAt(i);
+        if (Character.isUpperCase(ch)) {
+          lnb.append('_');
+          lnb.append(Character.toLowerCase(ch));
+        } else {
+          lnb.append(ch);
+        }
+      }
+      optionName = lnb.toString();
+    }
+    return optionName;
   }
 
   /**
@@ -1695,29 +1730,6 @@ public class Options {
     // Return the result
     return new ParseResult(shortName, typeName, description);
   }
-
-  //   /**
-  //    * Test class with some defined arguments.
-  //    */
-  //   private static class Test {
-  //
-  //     @Option("generic") List<Pattern> lp = new ArrayList<>();
-  //     @Option("-a <filename> argument 1") String arg1 = "/tmp/foobar";
-  //     @Option("argument 2") String arg2;
-  //     @Option("-d double value") double temperature;
-  //     @Option("-f the input file") File input_file;
-  //   }
-  //
-  //   /**
-  //    * Simple example
-  //    */
-  //   private static void main (String[] args) throws ArgException {
-  //
-  //     Options options = new Options("test", new Test());
-  //     System.out.printf("Options:%n%s", options);
-  //     options.parse(true, args);
-  //     System.out.printf("Results:%n%s", options.settings());
-  //   }
 
   /**
    * Returns a sorted version of m.keySet().

@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  *  /** comment for first option{@literal *}/
  * {@literal @}OptionGroup("the group")
  * {@literal @}Option("the first option")
- *  public static int first_option = blah;</pre>
+ *  public static int firstOption = blah;</pre>
  *
  * instead of
  *
@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  *
  *  /** comment for first option{@literal *}/
  * {@literal @}Option("the first option")
- *  public static int first_option = blah;</pre>
+ *  public static int firstOption = blah;</pre>
  *
  * @see org.plumelib.options.Options
  * @see org.plumelib.options.Option
