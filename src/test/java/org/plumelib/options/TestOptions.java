@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/** Test the Options package. */
 public class TestOptions {
 
   /** Test class for Options testing. */
@@ -34,14 +35,18 @@ public class TestOptions {
     @Option("-f the input file")
     public @Nullable File inputFile;
 
+    // CHECKSTYLE:OFF : testing with variable name containing underscore
     @Option("-g the input file")
     public @Nullable Path input_path;
+    // CHECKSTYLE:ON
 
     @Option("-b boolean")
     public boolean bool;
 
+    // CHECKSTYLE:OFF
     @Option("-i Integer")
     public @Nullable Integer IntegerReference;
+    // CHECKSTYLE:ON : testing with variable name starting with uppercase letter
 
     @Option("list of doubles")
     public List<Double> ld = new ArrayList<>();
@@ -324,7 +329,7 @@ public class TestOptions {
     assert options2.usage(true).indexOf("Internal options") > -1;
   }
 
-  public static class ClassWithOptionsEnums {
+  static class ClassWithOptionsEnums {
     enum Compressor {
       RLE,
       SMART_RLE,

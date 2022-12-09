@@ -53,8 +53,8 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *   <li>creates documentation suitable for a manual or manpage.
  * </ul>
  *
- * Thus, the programmer is freed from writing duplicative, boilerplate code. The user documentation
- * is automatically generated and never gets out of sync with the rest of the program.
+ * <p>Thus, the programmer is freed from writing duplicative, boilerplate code. The user
+ * documentation is automatically generated and never gets out of sync with the rest of the program.
  *
  * <p>The programmer does not have to write any code, only declare and document variables. For each
  * field that you want to set from a command-line argument, you write Javadoc and an {@code @Option}
@@ -94,7 +94,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * }
  * </pre>
  *
- * In the code above, the call to {@link #parse(boolean, String[])} sets fields in object {@code
+ * <p>In the code above, the call to {@link #parse(boolean, String[])} sets fields in object {@code
  * myInstance} and sets static fields in class {@code MyUtilityClass}. It returns the original
  * command line, with all options removed. If a command-line argument is incorrect, it prints a
  * usage message and terminates the program. The program can also explicitly create or print a usage
@@ -170,7 +170,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *       for a manual.
  * </ul>
  *
- * If an option group is not unpublicized but contains only unpublicized options, it will not be
+ * <p>If an option group is not unpublicized but contains only unpublicized options, it will not be
  * included in the default usage message.
  *
  * <p><b>Option aliases</b>
@@ -186,13 +186,14 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * meaning:
  *
  * <pre>
- *     // The user may supply --help, -h, or -help, all of which mean the same thing and set this variable.
- *     &#64;Option(value="-h Print a help message", aliases={"-help"})
- *     public static boolean help;</pre>
+ * // The user may supply --help, -h, or -help, which all mean the same thing and set this variable.
+ * &#64;Option(value="-h Print a help message", aliases={"-help"})
+ * public static boolean help;</pre>
  *
- * Aliases should start with a single dash or double dash. If there is only a single, one-character
- * alias, it can be put at the beginning of the value field or in the aliases field. It is the
- * programmer's responsibility to ensure that no alias is the same as other options or aliases.
+ * <p>Aliases should start with a single dash or double dash. If there is only a single,
+ * one-character alias, it can be put at the beginning of the value field or in the aliases field.
+ * It is the programmer's responsibility to ensure that no alias is the same as other options or
+ * aliases.
  *
  * <p><b>Generating documentation for a manual or manpage</b>
  *
@@ -922,6 +923,57 @@ public class Options {
   }
 
   /**
+   * Splits the argument string into an array of tokens (command-line flags and arguments),
+   * respecting single and double quotes.
+   *
+   * <p>This method is only appropriate when the {@code String[]} version of the arguments is not
+   * available &mdash; for example, for the {@code premain} method of a Java agent.
+   *
+   * @param args the command line to be tokenized
+   * @return a string array analogous to the argument to {@code main}
+   */
+  // TODO: should this throw some exceptions?
+  public static String[] tokenize(String args) {
+
+    // Split the args string on whitespace boundaries accounting for quoted
+    // strings.
+    args = args.trim();
+    List<String> argList = new ArrayList<>();
+    String arg = "";
+    for (int ii = 0; ii < args.length(); ii++) {
+      char ch = args.charAt(ii);
+      if ((ch == '\'') || (ch == '"')) {
+        arg += ch;
+        ii++;
+        while ((ii < args.length()) && (args.charAt(ii) != ch)) {
+          arg += args.charAt(ii++);
+        }
+        arg += ch;
+      } else if (Character.isWhitespace(ch)) {
+        // System.out.printf ("adding argument '%s'%n", arg);
+        argList.add(arg);
+        arg = "";
+        while ((ii < args.length()) && Character.isWhitespace(args.charAt(ii))) {
+          ii++;
+        }
+        if (ii < args.length()) {
+          // Encountered a non-whitespace character.
+          // Back up to process it on the next loop iteration.
+          ii--;
+        }
+      } else { // must be part of current argument
+        arg += ch;
+      }
+    }
+    if (!arg.equals("")) {
+      argList.add(arg);
+    }
+
+    String[] argsArray = argList.toArray(new String[argList.size()]);
+    return argsArray;
+  }
+
+  /**
    * Sets option variables from the given command line.
    *
    * @param args the commandline to be parsed
@@ -1012,57 +1064,6 @@ public class Options {
     }
     String[] result = nonOptions.toArray(new String[nonOptions.size()]);
     return result;
-  }
-
-  /**
-   * Splits the argument string into an array of tokens (command-line flags and arguments),
-   * respecting single and double quotes.
-   *
-   * <p>This method is only appropriate when the {@code String[]} version of the arguments is not
-   * available &mdash; for example, for the {@code premain} method of a Java agent.
-   *
-   * @param args the command line to be tokenized
-   * @return a string array analogous to the argument to {@code main}
-   */
-  // TODO: should this throw some exceptions?
-  public static String[] tokenize(String args) {
-
-    // Split the args string on whitespace boundaries accounting for quoted
-    // strings.
-    args = args.trim();
-    List<String> argList = new ArrayList<>();
-    String arg = "";
-    for (int ii = 0; ii < args.length(); ii++) {
-      char ch = args.charAt(ii);
-      if ((ch == '\'') || (ch == '"')) {
-        arg += ch;
-        ii++;
-        while ((ii < args.length()) && (args.charAt(ii) != ch)) {
-          arg += args.charAt(ii++);
-        }
-        arg += ch;
-      } else if (Character.isWhitespace(ch)) {
-        // System.out.printf ("adding argument '%s'%n", arg);
-        argList.add(arg);
-        arg = "";
-        while ((ii < args.length()) && Character.isWhitespace(args.charAt(ii))) {
-          ii++;
-        }
-        if (ii < args.length()) {
-          // Encountered a non-whitespace character.
-          // Back up to process it on the next loop iteration.
-          ii--;
-        }
-      } else { // must be part of current argument
-        arg += ch;
-      }
-    }
-    if (!arg.equals("")) {
-      argList.add(arg);
-    }
-
-    String[] argsArray = argList.toArray(new String[argList.size()]);
-    return argsArray;
   }
 
   /**
@@ -1160,11 +1161,11 @@ public class Options {
   /**
    * Returns a usage message for command-line options.
    *
-   * @return the command-line usage message
    * @param groupNames the list of option groups to include in the usage message. If empty and
    *     option groups are being used, will return usage for all option groups that are not
    *     unpublicized. If empty and option groups are not being used, will return usage for all
    *     options that are not unpublicized.
+   * @return the command-line usage message
    */
   public String usage(String... groupNames) {
     return usage(false, groupNames);
@@ -1173,12 +1174,12 @@ public class Options {
   /**
    * Returns a usage message for command-line options.
    *
-   * @return the command-line usage message
    * @param showUnpublicized if true, treat all unpublicized options and option groups as publicized
    * @param groupNames the list of option groups to include in the usage message. If empty and
    *     option groups are being used, will return usage for all option groups that are not
    *     unpublicized. If empty and option groups are not being used, will return usage for all
    *     options that are not unpublicized.
+   * @return the command-line usage message
    */
   public String usage(boolean showUnpublicized, String... groupNames) {
     if (!hasGroups) {
@@ -1305,7 +1306,7 @@ public class Options {
   }
 
   /**
-   * Return all the defined options
+   * Returns all the defined options.
    *
    * @return all the defined options
    */
@@ -1314,7 +1315,7 @@ public class Options {
   }
 
   /**
-   * Return all the option groups
+   * Returns all the option groups.
    *
    * @return all the option groups
    */
