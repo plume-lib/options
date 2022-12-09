@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * {@literal @}Option("the first option")
  *  public static int firstOption = blah;</pre>
  *
- * instead of
+ * <p>instead of
  *
  * <pre>
  * {@literal @}OptionGroup("the group")

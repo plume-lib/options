@@ -30,7 +30,7 @@ import org.checkerframework.framework.qual.IgnoreInWholeProgramInference;
  *   public static double temperature = 75.0;
  * </pre>
  *
- * See the documentation for the elements of this annotation (just below).
+ * <p>See the documentation for the elements of this annotation (just below).
  *
  * <p>Also see the documentation for the {@link org.plumelib.options.Options} class, which processes
  * the command-line options.
@@ -73,10 +73,10 @@ public @interface Option {
    * <p>Each string includes leading hyphens, as in
    *
    * <pre>
-   * <code>@Option(value = "Print the program version", aliases = {"-v", "-version", "--version"})</code>
+   * <code>@Option(value="Show the program version", aliases={"-v", "-version", "--version"})</code>
    * </pre>
    *
-   * If there is only a single, one-character alias, it can be put at the beginning of the value
+   * <p>If there is only a single, one-character alias, it can be put at the beginning of the value
    * field without the need for an {@code aliases} element.
    *
    * <p>For more information about the use of this field, see the section on "Option aliases" in
