@@ -35,18 +35,14 @@ public class TestOptions {
     @Option("-f the input file")
     public @Nullable File inputFile;
 
-    // CHECKSTYLE:OFF : testing with variable name containing underscore
     @Option("-g the input file")
     public @Nullable Path input_path;
-    // CHECKSTYLE:ON
 
     @Option("-b boolean")
     public boolean bool;
 
-    // CHECKSTYLE:OFF
     @Option("-i Integer")
     public @Nullable Integer IntegerReference;
-    // CHECKSTYLE:ON : testing with variable name starting with uppercase letter
 
     @Option("list of doubles")
     public List<Double> ld = new ArrayList<>();
