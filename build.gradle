@@ -1,7 +1,7 @@
 plugins {
   id 'java-library'
 
-  // To create a fat jar build/libs/options-all.jar, run: ./gradlew shadowJar
+  // To create a fat jar build/libs/...-all.jar, run: ./gradlew shadowJar
   id 'com.github.johnrengelman.shadow' version '7.1.2'
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
@@ -28,8 +28,8 @@ dependencies {
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 // To upload to Maven Central, see instructions in the file.
 apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
@@ -84,6 +84,25 @@ tasks.withType(JavaCompile).configureEach {
     disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
     disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
   }
+}
+
+/// Checkstyle linter
+
+// Run by `gradle check`, which is run by `gradle build`
+
+apply plugin: 'checkstyle'
+
+ext.checkstyleVersion = '10.5.0'
+configurations {
+  checkstyleConfig
+}
+dependencies {
+  checkstyleConfig("com.puppycrawl.tools:checkstyle:${checkstyleVersion}") { transitive = false }
+}
+checkstyle {
+  toolVersion "${checkstyleVersion}"
+  config = resources.text.fromArchiveEntry(configurations.checkstyleConfig, 'google_checks.xml')
+  ignoreFailures = false
 }
 
 /// Checker Framework pluggable type-checking
