@@ -67,7 +67,7 @@ import org.plumelib.reflection.Signatures;
  * <pre>javadoc -quiet -doclet org.plumelib.options.OptionsDoclet [doclet options] [java files]
  * </pre>
  *
- * You must specify a docletpath to Javadoc, and it needs to include the class files for the
+ * <p>You must specify a docletpath to Javadoc, and it needs to include the class files for the
  * documented classes.
  *
  * <p><b>Doclet Options</b>
@@ -146,10 +146,10 @@ import org.plumelib.reflection.Signatures;
  * &#64;Option(value="&lt;timezone&gt; Set the timezone", noDocDefault=true)
  * public static String timezone = TimeZone.getDefault().getID();</pre>
  *
- * Suppose that HTML documentation is generated in Chicago. Without {@code noDocDefault}, the HTML
- * documentation would incorrectly state that the default time zone is {@code "America/Chicago"},
- * which is incorrect for users elsewhere. Using {@code noDocDefault} keeps the HTML documentation
- * system-agnostic.
+ * <p>Suppose that HTML documentation is generated in Chicago. Without {@code noDocDefault}, the
+ * HTML documentation would incorrectly state that the default time zone is {@code
+ * "America/Chicago"}, which is incorrect for users elsewhere. Using {@code noDocDefault} keeps the
+ * HTML documentation system-agnostic.
  *
  * <p><b>Uppublicized options</b>
  *
@@ -381,7 +381,7 @@ public class OptionsDoclet implements Doclet {
     }
 
     /**
-     * Creates a new DocletOption with an aliased name
+     * Creates a new DocletOption with an aliased name.
      *
      * @param name the option's name, starting with "-" or "--"
      * @param alias the option's alias, starting with "-" or "--"
@@ -749,7 +749,7 @@ public class OptionsDoclet implements Doclet {
 
   /**
    * Initializes {@link Options.OptionInfo#enumJdoc} for the given {@code OptionInfo}: creates a
-   * mapping from enum constants to their Javadoc
+   * mapping from enum constants to their Javadoc.
    *
    * @param oi the enum option whose Javadoc to read
    */

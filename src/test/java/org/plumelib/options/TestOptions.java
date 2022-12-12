@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/** Test the Options package. */
 public class TestOptions {
 
   /** Test class for Options testing. */
@@ -324,7 +325,7 @@ public class TestOptions {
     assert options2.usage(true).indexOf("Internal options") > -1;
   }
 
-  public static class ClassWithOptionsEnums {
+  static class ClassWithOptionsEnums {
     enum Compressor {
       RLE,
       SMART_RLE,
