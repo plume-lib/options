@@ -28,11 +28,11 @@ dependencies {
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
 // To upload to Maven Central, see instructions in the file.
 apply from: "${buildscript.sourceFile.parent}/gradle/mavencentral.gradle"
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 // Work around https://github.com/johnrengelman/shadow/issues/324
 configurations {
@@ -75,12 +75,13 @@ dependencies {
   errorprone("com.google.errorprone:error_prone_core:2.16")
 }
 tasks.withType(JavaCompile).configureEach {
+  // "-processing" avoids javac warning "No processor claimed any of these annotations".
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
   options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
   options.errorprone {
     enabled = JavaVersion.current() != JavaVersion.VERSION_1_8
-    disable("ReferenceEquality") // Use Interning Checker instead
-    disable("StringSplitter") // obscure case isn't likely
+    disable("ReferenceEquality") // Use Interning Checker instead.
+    disable("StringSplitter") // Obscure case isn't likely.
     disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
     disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
   }
@@ -110,10 +111,6 @@ checkerFramework {
     '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
     '-AwarnUnneededSuppressions',
-    // `com.sun.javadoc` is deprecated and superseded by `jdk.javadoc.doclet`.
-    //  `jdk.javadoc.doclet` only exists in Java 9 and later, so switching to it means losing support for Java 8.
-    // Classes are imported by OptionsDoclet and therefore this warning can't be suppressed there.
-    '-Xlint:-removal',
   ]
 }
 
@@ -135,12 +132,6 @@ javadoc {
   options.addStringOption('private', '-quiet')
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
     options.addStringOption('source', '8')
-  }
-  doLast {
-    ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-      flags:'g', byline:true) {
-      fileset(dir: destinationDir)
-    }
   }
 }
 check.dependsOn javadoc
