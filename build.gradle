@@ -133,6 +133,12 @@ javadoc {
   if (JavaVersion.current().compareTo(org.gradle.api.JavaVersion.VERSION_1_9) >= 0) {
     options.addStringOption('source', '8')
   }
+  doLast {
+    ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
+      flags:'g', byline:true) {
+      fileset(dir: destinationDir)
+    }
+  }
 }
 check.dependsOn javadoc
 
@@ -145,6 +151,10 @@ task javadocWeb(type: Javadoc) {
     options.addStringOption('source', '8')
   }
   doLast {
+    ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
+      flags:'g', byline:true) {
+      fileset(dir: destinationDir)
+    }
     // Set permissions
     project.exec {
       commandLine('chgrp', '-R',  'plse_www', "/cse/web/research/plumelib/${project.name}/api")
