@@ -46,10 +46,10 @@ dependencies {
 configurations.compileClasspath.extendsFrom configurations.toolsJar
 
 test {
-    useJUnitPlatform {
-        includeEngines 'junit-jupiter'
-        excludeEngines 'junit-vintage'
-    }
+  useJUnitPlatform {
+    includeEngines 'junit-jupiter'
+    excludeEngines 'junit-vintage'
+  }
 }
 
 spotless {
@@ -66,6 +66,13 @@ spotless {
     targetExclude('**/WeakIdentityHashMap.java')
     googleJavaFormat()
     formatAnnotations()
+  }
+  groovyGradle {
+    target '**/*.gradle'
+    greclipse()  // which formatter Spotless should use to format .gradle files.
+    indentWithSpaces(2)
+    trimTrailingWhitespace()
+    // endWithNewline() // Don't want to end empty files with a newline
   }
 }
 
@@ -135,7 +142,7 @@ javadoc {
   }
   doLast {
     ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-      flags:'g', byline:true) {
+    flags:'g', byline:true) {
       fileset(dir: destinationDir)
     }
   }
@@ -152,7 +159,7 @@ task javadocWeb(type: Javadoc) {
   }
   doLast {
     ant.replaceregexp(match:"@import url\\('resources/fonts/dejavu.css'\\);\\s*", replace:'',
-      flags:'g', byline:true) {
+    flags:'g', byline:true) {
       fileset(dir: destinationDir)
     }
     // Set permissions
