@@ -5,7 +5,7 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.0'
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
-  id 'com.diffplug.spotless' version '6.15.0'
+  id 'com.diffplug.spotless' version '6.16.0'
 
   // Error Prone linter
   id('net.ltgt.errorprone') version '3.0.1'
