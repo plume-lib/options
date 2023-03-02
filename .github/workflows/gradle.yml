@@ -22,3 +22,5 @@ jobs:
       run: _JAVA_OPTIONS=-Xmx2g ./gradlew build javadoc
     - name: ./gradlew requireJavadoc
       run: ./gradlew requireJavadoc
+    - name: ./gradlew spotlessCheck
+      run: ./gradlew spotlessCheck
