@@ -4,7 +4,7 @@ The Options class:
 
  * parses command-line options and sets fields in your program accordingly,
  * creates usage messages (such as printed by a `--help` option), and
- * creates documentation suitable for a manual or manpage.
+ * (at build time) creates documentation suitable for a manual or manpage.
 
 Thus, the programmer is freed from writing duplicative, boilerplate code.
 The user documentation is automatically generated and never gets out
@@ -21,8 +21,12 @@ messages and printed documentation are generated automatically.
 For more details, see the [API documentation for the `Options`
 class](http://plumelib.org/options/api/org/plumelib/options/Options.html).
 
-Version 1.x works with Java 8-12.
-Version 2.x works with Java 9 and later.
+The options package provides two types of functionality:
+ * It reads command-line options and creates usage messages when your program runs.
+   Both version 1.x and version 2.x work with all versions of Java.
+ * It generates documentation at build time.
+   Version 1.x works with Java 8-12.
+   Version 2.x works with Java 9 and later.
 
 
 ## Editing your buildfile ##

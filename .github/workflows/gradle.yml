@@ -12,12 +12,15 @@ jobs:
         java: [ '11', '17', '19' ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
+        distribution: 'temurin'
         java-version: ${{ matrix.java }}
     - name: ./gradlew build javadoc
       run: _JAVA_OPTIONS=-Xmx2g ./gradlew build javadoc
     - name: ./gradlew requireJavadoc
       run: ./gradlew requireJavadoc
+    - name: ./gradlew spotlessCheck
+      run: ./gradlew spotlessCheck

@@ -6,7 +6,7 @@
  * <ul>
  *   <li>parses command-line options and sets fields in your program accordingly,
  *   <li>creates usage messages (such as printed by a `--help` option), and
- *   <li>creates documentation suitable for a manual or manpage.
+ *   <li>(at build time) creates documentation suitable for a manual or manpage.
  * </ul>
  *
  * <p>Thus, the programmer is freed from writing duplicative, boilerplate code. The user
