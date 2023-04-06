@@ -118,6 +118,7 @@ checkerFramework {
     '-Werror',
     '-AcheckPurityAnnotations',
     '-ArequirePrefixInWarningSuppressions',
+    '-AwarnRedundantAnnotations',
     '-AwarnUnneededSuppressions',
   ]
 }
