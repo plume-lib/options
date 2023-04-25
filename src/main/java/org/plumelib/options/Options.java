@@ -749,9 +749,6 @@ public class Options {
           throw new Error("non-static option " + f + " in class " + obj);
         }
 
-        @SuppressWarnings(
-            "nullness:assignment" // new C(underInit): @UnderInitialization; @Initialized is safe
-        )
         @Initialized OptionInfo oi = new OptionInfo(f, option, isClass ? null : obj, unpublicized);
         options.add(oi);
 
