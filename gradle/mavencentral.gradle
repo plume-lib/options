@@ -1,27 +1,27 @@
 // REQUIREMENTS to make a release:
-//  * Perform work on a machine connected to the CSE filesystem.
 //  * Your ~/.gradle/gradle.properties file must contain:
 //     ossrhUsername=YOUR_USER_NAME_HERE
 //     ossrhPassword=YOUR_PASSWORD_HERE
 
-// To make a release:
-//  * Use JDK version 11.
+// To make a release (run on any filesystem, except the last step):
 //  * git pull
+//  * In ../build.gradle, ensure that "To use a snapshot version" is not enabled.
 //  * Update the version number in ../README.md and in this file (multiple times in each).
+//    Ensure the version number in this file does not contain "-SNAPSHOT".
 //  * Update ../CHANGELOG.md .
-//  * Save changes, and stage them.
-//  * Run in the top-level directory:  ./gradlew clean publish && ./gradlew javadocWeb
+//  * Save files and stage changes.
+//  * Run in the top-level directory:  ./gradlew clean publish
 //  * Browse to https://oss.sonatype.org/#stagingRepositories, complete the Maven Central release.
 //  * Add a git tag:
 //    VER=2.0.3 && git commit -m "Version $VER" && git push && git tag -a v$VER -m "Version $VER" && git push && git push --tags
-//  * Make a GitHub release. Go to the GitHub releases page, make a release, call it "options 2.0.3", use the ../CHANGELOG.md text, attach the .jar file from ../build/libs/
-
+//  * Make a GitHub release. Go to the GitHub releases page, make a release, call it "options 2.0.3", use the text from ../CHANGELOG.md as the description, attach the .jar and -all.jar files from ../build/libs/ .
+//  * Finally, run on the CSE filesystem:  git pull && ./gradlew javadocWeb
 
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-group "org.plumelib"
-version "2.0.3"
+group 'org.plumelib'
+version '2.0.3'
 
 final isSnapshot = version.contains('SNAPSHOT')
 
