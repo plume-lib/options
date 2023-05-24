@@ -53,6 +53,7 @@ public @interface OptionGroup {
    * @return the name of this option group
    */
   String value();
+
   /**
    * Whether this option group is unpublicized.
    *

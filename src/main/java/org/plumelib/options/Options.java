@@ -1672,8 +1672,10 @@ public class Options {
   private static class ParseResult {
     /** The short name of an option, or null if none. */
     @Nullable String shortName;
+
     /** The type name of an option, or null if none. */
     @Nullable String typeName;
+
     /** The description of an option. */
     String description;
 

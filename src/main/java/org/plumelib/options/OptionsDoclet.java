@@ -196,29 +196,37 @@ public class OptionsDoclet implements Doclet {
 
   /** Marker for start of options documentation. */
   private String startDelim = "<!-- start options doc (DO NOT EDIT BY HAND) -->";
+
   /** Marker for end of options documentation. */
   private String endDelim = "<!-- end options doc -->";
 
   /** The file into which options documentation is inserted. */
   private @Nullable File docFile = null;
+
   /** File name of destination for output. */
   private @Nullable String outFileName = null;
+
   /** Name of destination directory. */
   private @Nullable String destDir = null;
+
   /** Destination for output; is set from destDir and outFileName. */
   private @Nullable File outFile = null;
 
   /** If true, then edit docFile in place (and docFile is non-null). */
   private boolean inPlace = false;
+
   /** If true, then output format is Javadoc. */
   private boolean formatJavadoc = false;
+
   /** If true, then include the class's main Javadoc comment. */
   private boolean includeClassDoc = false;
 
   /** The doclet environment. */
   private DocletEnvironment denv;
+
   /** The command-line options. */
   private Options options;
+
   /** The DocTrees instance assocated with {@link #denv}. */
   private DocTrees docTrees;
 
