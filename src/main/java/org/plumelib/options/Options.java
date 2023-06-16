@@ -713,7 +713,7 @@ public class Options {
       for (Field f : fields) {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
-          @SuppressWarnings("nullness:initialization.cast")
+          @SuppressWarnings("nullness:cast.unsafe")
           Object objNonraw = (@Initialized Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
