@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -712,7 +713,7 @@ public class Options {
       for (Field f : fields) {
         try {
           // Possible exception because "obj" is not yet initialized; catch it and proceed
-          @SuppressWarnings("nullness:initialization.cast")
+          @SuppressWarnings("nullness:cast.unsafe")
           Object objNonraw = (@Initialized Object) obj;
           if (debugEnabled) {
             System.err.printf("Considering field %s of object %s%n", f, objNonraw);
@@ -841,7 +842,8 @@ public class Options {
    */
   /* package-protected */ static String fieldNameToOptionName(String fieldName) {
     String optionName = fieldName;
-    if (optionName.indexOf('_') == -1 && !optionName.equals(optionName.toLowerCase())) {
+    if (optionName.indexOf('_') == -1
+        && !optionName.equals(optionName.toLowerCase(Locale.getDefault()))) {
       // optionName contains no underscores, but does contain a capital letter.
       // Insert an underscore before each capital letter, which is downcased.
       StringBuilder lnb = new StringBuilder();
@@ -1367,7 +1369,7 @@ public class Options {
       if (type.isPrimitive()) {
         if (type == Boolean.TYPE) {
           boolean val;
-          String argValueLowercase = argValue.toLowerCase();
+          String argValueLowercase = argValue.toLowerCase(Locale.getDefault());
           if (argValueLowercase.equals("true") || argValueLowercase.equals("t")) {
             val = true;
           } else if (argValueLowercase.equals("false") || argValueLowercase.equals("f")) {
@@ -1555,7 +1557,7 @@ public class Options {
     } else if (type.isEnum()) {
       return "enum";
     } else {
-      return type.getSimpleName().toLowerCase();
+      return type.getSimpleName().toLowerCase(Locale.getDefault());
     }
   }
 
@@ -1667,8 +1669,10 @@ public class Options {
   private static class ParseResult {
     /** The short name of an option, or null if none. */
     @Nullable String shortName;
+
     /** The type name of an option, or null if none. */
     @Nullable String typeName;
+
     /** The description of an option. */
     String description;
 

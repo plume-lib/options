@@ -6,26 +6,27 @@ plugins {
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
   // Requires JDK 11 or higher; the plugin crashes under JDK 8.
-  id 'com.diffplug.spotless' version '6.18.0'
+  id 'com.diffplug.spotless' version '6.20.0'
 
   // Error Prone linter
   id('net.ltgt.errorprone') version '3.1.0'
 
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.6.26'
+  id 'org.checkerframework' version '0.6.30'
 }
 
 repositories {
   mavenCentral()
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
-  implementation 'io.github.classgraph:classgraph:4.8.157'
-  implementation 'org.apache.commons:commons-lang3:3.12.0'
+  implementation 'io.github.classgraph:classgraph:4.8.161'
+  implementation 'org.apache.commons:commons-lang3:3.13.0'
   implementation 'org.apache.commons:commons-text:1.10.0'
-  implementation 'org.plumelib:reflection-util:1.0.6'
+  implementation 'org.plumelib:reflection-util:1.1.0'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
@@ -85,7 +86,7 @@ spotless {
 /// Error Prone linter
 
 dependencies {
-  errorprone('com.google.errorprone:error_prone_core:2.18.0')
+  errorprone('com.google.errorprone:error_prone_core:2.21.1')
 }
 tasks.withType(JavaCompile).configureEach {
   // "-processing" avoids javac warning "No processor claimed any of these annotations".
@@ -127,7 +128,19 @@ checkerFramework {
     '-AwarnUnneededSuppressions',
   ]
 }
-
+// To use a snapshot version of the Checker Framework.
+if (false) {
+  // TODO: Change the above test to false when CF is released.
+  ext.checkerFrameworkVersion = '3.37.0'
+  dependencies {
+    compileOnly "org.checkerframework:checker-qual:${checkerFrameworkVersion}"
+    testCompileOnly "org.checkerframework:checker-qual:${checkerFrameworkVersion}"
+    checkerFramework "org.checkerframework:checker:${checkerFrameworkVersion}"
+  }
+  configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'minutes'
+  }
+}
 // To use a locally-built Checker Framework, run gradle with "-PcfLocal".
 if (project.hasProperty('cfLocal')) {
   def cfHome = String.valueOf(System.getenv('CHECKERFRAMEWORK'))
