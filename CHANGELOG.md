@@ -1,5 +1,9 @@
 # Plume-lib Options change log
 
+## 2.1.0 (2023-09-??)
+
+- Require Java 11.
+
 ## 2.0.3 (2022-12-07)
 
 - Tested under JDK 19.
