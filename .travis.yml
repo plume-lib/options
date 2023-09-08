@@ -11,7 +11,7 @@ cache:
     - $HOME/.m2/
 
 jdk:
-  - oraclejdk8
+  - oraclejdk17
 
 # Add "verGJF" task when google-java-format handles type annotations better;
 # see https://github.com/google/google-java-format/issues/5
