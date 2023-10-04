@@ -35,11 +35,7 @@ In a Gradle buildfile, write
 
 ```
 dependencies {
-  if (JavaVersion.current() == JavaVersion.VERSION_1_8) {
-    implementation 'org.plumelib:options:1.0.6'
-  } else {
-    implementation 'org.plumelib:options:2.0.3'
-  }
+  implementation 'org.plumelib:options:2.0.3'
 }
 ```
 
