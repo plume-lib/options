@@ -6,13 +6,13 @@ plugins {
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
   // Requires JDK 11 or higher; the plugin crashes under JDK 8.
-  id 'com.diffplug.spotless' version '6.22.0'
+  id 'com.diffplug.spotless' version '6.23.3'
 
   // Error Prone linter
   id('net.ltgt.errorprone') version '3.1.0'
 
   // Checker Framework pluggable type-checking
-  id 'org.checkerframework' version '0.6.34'
+  id 'org.checkerframework' version '0.6.36'
 }
 
 repositories {
@@ -21,12 +21,12 @@ repositories {
 }
 
 dependencies {
-  implementation 'io.github.classgraph:classgraph:4.8.162'
-  implementation 'org.apache.commons:commons-lang3:3.13.0'
-  implementation 'org.apache.commons:commons-text:1.10.0'
-  implementation 'org.plumelib:reflection-util:1.1.0'
+  implementation 'io.github.classgraph:classgraph:4.8.165'
+  implementation 'org.apache.commons:commons-lang3:3.14.0'
+  implementation 'org.apache.commons:commons-text:1.11.0'
+  implementation 'org.plumelib:reflection-util:1.1.1'
 
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
@@ -76,7 +76,7 @@ spotless {
 /// Error Prone linter
 
 dependencies {
-  errorprone('com.google.errorprone:error_prone_core:2.22.0')
+  errorprone('com.google.errorprone:error_prone_core:2.23.0')
 }
 tasks.withType(JavaCompile).configureEach {
   // "-processing" avoids javac warning "No processor claimed any of these annotations".
@@ -120,7 +120,7 @@ checkerFramework {
 // To use a snapshot version of the Checker Framework.
 if (false) {
   // TODO: Change the above test to false when CF is released.
-  ext.checkerFrameworkVersion = '3.39.0'
+  ext.checkerFrameworkVersion = '3.41.0'
   dependencies {
     compileOnly "org.checkerframework:checker-qual:${checkerFrameworkVersion}"
     testCompileOnly "org.checkerframework:checker-qual:${checkerFrameworkVersion}"
