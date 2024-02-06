@@ -48,6 +48,7 @@ publishing {
           developerConnection = 'scm:git:git@github.com:plume-lib/options.git'
           url = 'git@github.com:plume-lib/options.git'
         }
+
         licenses {
           license {
             name = 'MIT License'
