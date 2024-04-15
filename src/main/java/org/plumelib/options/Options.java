@@ -86,20 +86,29 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *   public static double temperature = 75.0;
  *
  *   public static void main(String[] args) {
+ *
+ *     // variant 1
  *     MyProgram myInstance = new MyProgram();
  *     Options options = new Options("MyProgram [options] infile outfile",
  *                                   myInstance, MyUtilityClass.class);
  *     String[] remainingArgs = options.parse(true, args);
+ *
+ *     // variant 2
+ *     Options options = new Options("MyProgram [options] infile outfile",
+ *                                   MyProgram.class, MyUtilityClass.class);
+ *     String[] remainingArgs = options.parse(true, args);
+ *
  *     ...
  *   }
  * }
  * </pre>
  *
- * <p>In the code above, the call to {@link #parse(boolean, String[])} sets fields in object {@code
- * myInstance} and sets static fields in class {@code MyUtilityClass}. It returns the original
- * command line, with all options removed. If a command-line argument is incorrect, it prints a
- * usage message and terminates the program. The program can also explicitly create or print a usage
- * message; see {@link #usage(String...)} and {@link #printUsage()}.
+ * <p>In the first variant code above, the call to {@link #parse(boolean, String[])} sets fields in
+ * object {@code myInstance} and sets static fields in class {@code MyUtilityClass}. (In the second
+ * variant, it sets static fields in both classes.) It returns the original command line, with all
+ * options removed. If a command-line argument is incorrect, it prints a usage message and
+ * terminates the program. The program can also explicitly create or print a usage message; see
+ * {@link #usage(String...)} and {@link #printUsage()}.
  *
  * <p>For examples of generated HTML documentation, see the documentation for <a
  * href="https://types.cs.washington.edu/plume-lib/api/plume/Lookup.html#command-line-options">Lookup</a>,
