@@ -132,9 +132,10 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * <p>A user of your program supplies command-line options in the form <span style="white-space:
  * nowrap;">"--name=value"</span> or <span style="white-space: nowrap;">"-name value"</span>. The
  * value (after the "=" or " ") is mandatory for all options except booleans. Booleans are set to
- * true if no value is specified. Booleans support <span style="white-space:
+ * true if no value is specified.
+ * <!-- Booleans support <span style="white-space:
  * nowrap;">"--no-<em>optionname</em>"</span> which is equivalent to <span style="white-space:
- * nowrap;">"--optionname=false"</span>.
+ * nowrap;">"--optionname=false"</span>. -->
  *
  * <p>A user may provide an option multiple times on the command line. If the field is a list, each
  * entry is added to the list. If the field is not a list, then only the last occurrence is used
@@ -251,9 +252,9 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  *   <li>Short options are only supported as separate entries (e.g., <span style="white-space:
  *       nowrap;">"-a -b"</span>) and not as a single group (e.g., <span style="white-space:
  *       nowrap;">"-ab"</span>).
- *   <li>If you have a boolean option named exactly "long", you must use <span style="white-space:
+ *   <li>If you have a boolean option named "long", you must use <span style="white-space:
  *       nowrap;">"--long=false"</span> to turn it off; <span style="white-space:
- *       nowrap;">"--no-long"</span> is not supported.
+ *       nowrap;">"--no-long"</span> is not yet supported.
  * </ul>
  *
  * @see org.plumelib.options.Option
