@@ -1776,6 +1776,9 @@ public class Options {
     try {
       return field.get(obj);
     } catch (Exception e) {
+      // TODO: Accessibility problems could be related to the field or to the class itself.
+      // This should diagnose those problems and report them (though accessibility is not the only
+      // possible problem here).
       throw new Error("Unexpected error reading " + field + " in " + obj, e);
     }
   }
