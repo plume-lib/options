@@ -39,7 +39,7 @@ dependencies {
 }
 ```
 
-That's it!
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
 
 To update user documentation after an option or its documentation has changed,
 use a rule like this:
