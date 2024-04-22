@@ -978,7 +978,7 @@ public class Options {
       argList.add(arg);
     }
 
-    String[] argsArray = argList.toArray(new String[argList.size()]);
+    String[] argsArray = argList.toArray(new String[0]);
     return argsArray;
   }
 
@@ -1071,7 +1071,7 @@ public class Options {
         ii++;
       }
     }
-    String[] result = nonOptions.toArray(new String[nonOptions.size()]);
+    String[] result = nonOptions.toArray(new String[0]);
     return result;
   }
 
