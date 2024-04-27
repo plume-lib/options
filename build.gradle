@@ -20,7 +20,7 @@ repositories {
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
-ext.errorproneVersion = '2.26.1'
+ext.errorproneVersion = '2.27.0'
 
 dependencies {
   implementation 'io.github.classgraph:classgraph:4.8.172'
