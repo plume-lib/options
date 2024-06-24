@@ -70,3 +70,8 @@ The popular JCommander library was written later than Plume-lib Options and
 takes a similar approach, having many of the same features.  One difference
 is that JCommander does not generate usage messages nor documentation for a
 manual.
+
+Another similar library is picocli.  It generates usage messages, and also
+man pages.  It does not support having multiple different programs share
+command lines arguments; if you want to do that, it suggests making them
+subcommands of a single program.
