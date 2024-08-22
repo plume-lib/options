@@ -374,7 +374,7 @@ public class Options {
 
     /**
      * Long argument name. Uses '-' or '_' to separate words, depending on the value of {@link
-     * useDashes}.
+     * #useDashes}.
      */
     String longName;
 
