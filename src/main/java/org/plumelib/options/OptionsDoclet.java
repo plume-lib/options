@@ -242,9 +242,9 @@ public class OptionsDoclet implements Doclet {
     // this.options = options;
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Doclet-specific methods
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // Doclet-specific methods
+  //
 
   @Override
   public void init(Locale locale, Reporter reporter) {
@@ -338,9 +338,9 @@ public class OptionsDoclet implements Doclet {
     return OK;
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Javadoc command-line options
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // Javadoc command-line options
+  //
 
   // The doclet cannot use the Options class itself because  Javadoc specifies its own way of
   // handling command-line arguments.
@@ -588,9 +588,9 @@ public class OptionsDoclet implements Doclet {
     reporter.print(Diagnostic.Kind.ERROR, msg);
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// File IO methods
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // File IO methods
+  //
 
   /**
    * Write the output of this doclet to the correct file.
@@ -685,9 +685,9 @@ public class OptionsDoclet implements Doclet {
     return b.toString();
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// HTML and Javadoc processing methods
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // HTML and Javadoc processing methods
+  //
 
   /**
    * Returns the fields defined by the given type.
@@ -1143,9 +1143,9 @@ public class OptionsDoclet implements Doclet {
 
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Signature string methods
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // Signature string methods
+  //
 
   /**
    * Returns true if the given element kind is a type, i.e., a class, enum, interface, or annotation
@@ -1190,9 +1190,9 @@ public class OptionsDoclet implements Doclet {
     }
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  /// Getters and Setters
-  ///
+  // //////////////////////////////////////////////////////////////////////
+  // Getters and Setters
+  //
 
   /**
    * Returns true if the output format is Javadoc, false if the output format is HTML.
