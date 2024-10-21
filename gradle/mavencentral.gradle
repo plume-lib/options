@@ -1,9 +1,9 @@
 // REQUIREMENTS to make a release:
 //  * Your ~/.gradle/gradle.properties file must contain:
-//     ossrhUsername=YOUR_USER_NAME_HERE
-//     ossrhPassword=YOUR_PASSWORD_HERE
+//     SONATYPE_NEXUS_USERNAME=...
+//     SONATYPE_NEXUS_PASSWORD=...
 
-// To make a release (run on any filesystem, except the last step):
+// To make a release (run on any filesystem, except the `javadocWeb` step):
 //  * git pull
 //  * In ../build.gradle, ensure that "To use a snapshot version" is not enabled.
 //  * Update the version number in ../README.md and in this file (multiple times in each).
@@ -22,6 +22,9 @@ apply plugin: 'signing'
 
 group 'org.plumelib'
 version '2.0.3'
+ext {
+  packageName = 'options'
+}
 
 final isSnapshot = version.contains('SNAPSHOT')
 
@@ -41,12 +44,12 @@ publishing {
       pom {
         name = 'Plume-lib Options'
         description = 'Command-line option processing for Java.'
-        url = 'https://github.com/plume-lib/options'
+        url = "https://github.com/plume-lib/${packageName}"
 
         scm {
-          connection = 'scm:git:git@github.com:plume-lib/options.git'
-          developerConnection = 'scm:git:git@github.com:plume-lib/options.git'
-          url = 'git@github.com:plume-lib/options.git'
+          connection = "scm:git:git@github.com:plume-lib/${packageName}.git"
+          developerConnection = "scm:git:git@github.com:plume-lib/${packageName}.git"
+          url = "git@github.com:plume-lib/${packageName}.git"
         }
 
         licenses {
@@ -74,8 +77,8 @@ publishing {
             : project.properties.getOrDefault('RELEASE_REPOSITORY_URL', 'https://oss.sonatype.org/service/local/staging/deploy/maven2/')
             )
         credentials {
-          username = project.properties.get('ossrhUsername')
-          password = project.properties.get('ossrhPassword')
+          username = project.properties.get('SONATYPE_NEXUS_USERNAME')
+          password = project.properties.get('SONATYPE_NEXUS_PASSWORD')
         }
       }
     }
