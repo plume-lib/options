@@ -20,8 +20,8 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-group 'org.plumelib'
-version '2.0.3'
+group = 'org.plumelib'
+version = '2.0.3'
 ext {
   packageName = 'options'
 }
