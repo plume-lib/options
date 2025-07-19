@@ -28,7 +28,7 @@ ext {
 
 dependencies {
   implementation 'io.github.classgraph:classgraph:4.8.181'
-  implementation 'org.apache.commons:commons-lang3:3.17.0'
+  implementation 'org.apache.commons:commons-lang3:3.18.0'
   implementation 'org.apache.commons:commons-text:1.13.1'
   implementation 'org.plumelib:reflection-util:1.1.5'
 

@@ -48,6 +48,7 @@ import jdk.javadoc.doclet.Doclet;
 import jdk.javadoc.doclet.DocletEnvironment;
 import jdk.javadoc.doclet.Reporter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
@@ -1213,8 +1214,8 @@ public class OptionsDoclet implements Doclet {
       startDelim = "* " + startDelim;
       endDelim = "* " + endDelim;
     } else if (!val && formatJavadoc) {
-      startDelim = StringUtils.removeStart("* ", startDelim);
-      endDelim = StringUtils.removeStart("* ", endDelim);
+      startDelim = Strings.CS.removeStart("* ", startDelim);
+      endDelim = Strings.CS.removeStart("* ", endDelim);
     }
     this.formatJavadoc = val;
   }
