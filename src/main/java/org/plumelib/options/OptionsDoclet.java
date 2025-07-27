@@ -193,7 +193,7 @@ public class OptionsDoclet implements Doclet {
 
   /** Help message about options that can be specified multiple times. */
   private static final String LIST_HELP =
-      "<code>[+]</code> means option can be specified multiple times";
+      "{@code [+]} means option can be specified multiple times";
 
   /** Marker for start of options documentation. */
   private String startDelim = "<!-- start options doc (DO NOT EDIT BY HAND) -->";
@@ -620,8 +620,8 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the final output of this doclet. The string returned by this method is the output seen by
-   * the user.
+   * Returns the final output of this doclet. The string returned by this method is the output seen
+   * by the user.
    *
    * @return the user-visible doclet output
    * @throws Exception if there is trouble
@@ -639,7 +639,7 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the result of inserting the options documentation into the docfile.
+   * Returns the result of inserting the options documentation into the docfile.
    *
    * @return the docfile, but with the command-line argument documentation updated
    * @throws Exception if there is trouble reading files
@@ -799,7 +799,7 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the HTML documentation for the underlying Options instance.
+   * Returns the HTML documentation for the underlying Options instance.
    *
    * @param refillWidth the number of columns to fit the text into, by breaking lines
    * @return the HTML documentation for the underlying Options instance
@@ -850,7 +850,8 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the HTML documentation for the underlying Options instance, formatted as a Javadoc comment.
+   * Returns the HTML documentation for the underlying Options instance, formatted as a Javadoc
+   * comment.
    *
    * @param padding the number of leading spaces to add in the Javadoc output, before "* "
    * @param refillWidth the number of columns to fit the text into, by breaking lines
@@ -876,7 +877,7 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the HTML describing many options, formatted as an HTML list.
+   * Returns the HTML describing many options, formatted as an HTML list.
    *
    * @param optList the options to document
    * @param padding the number of leading spaces to add before each line of HTML output, except the
@@ -965,7 +966,7 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Get the line of HTML describing one Option.
+   * Returns the line of HTML describing one Option.
    *
    * @param oi the option to describe
    * @param padding the number of spaces to add at the begginning of the detail line (after the line
@@ -984,7 +985,7 @@ public class OptionsDoclet implements Doclet {
     String prefix = getUseSingleDash() ? "-" : "--";
     f.format("<b>%s%s=</b><i>%s</i>", prefix, oi.longName, oi.typeName);
     if (oi.list != null) {
-      b.append(" <code>[+]</code>");
+      b.append(" {@code [+]}");
     }
     f.format(".%n ");
     f.format("%s", StringUtils.repeat(" ", padding));
@@ -1092,9 +1093,9 @@ public class OptionsDoclet implements Doclet {
       if (label.size() > 0) {
         visitList(label, sb);
       } else {
-        sb.append("<code>");
+        sb.append("{@code ");
         sb.append(node.getReference().getSignature());
-        sb.append("</code>");
+        sb.append("}");
       }
       return null;
     }
@@ -1102,9 +1103,9 @@ public class OptionsDoclet implements Doclet {
     // LiteralTree is for {@code ...} and {@literal ...}.
     @Override
     public Void visitLiteral(LiteralTree node, StringBuilder sb) {
-      sb.append("<code>");
+      sb.append("{@code ");
       visitText(node.getBody(), sb);
-      sb.append("</code>");
+      sb.append("}");
       return null;
     }
 
@@ -1221,9 +1222,9 @@ public class OptionsDoclet implements Doclet {
   }
 
   /**
-   * Return true if using a single dash (as opposed to a double dash) for command-line options.
+   * Returns true if using a single dash (as opposed to a double dash) for command-line options.
    *
-   * @return whether to use a single dash (as opposed to a double dash) for command-line options
+   * @return true if using a single dash (as opposed to a double dash) for command-line options
    */
   public boolean getUseSingleDash() {
     return options.getUseSingleDash();
@@ -1232,7 +1233,7 @@ public class OptionsDoclet implements Doclet {
   /**
    * See {@link Options#setUseSingleDash(boolean)}.
    *
-   * @param val whether to use a single dash (as opposed to a double dash) for command-line options
+   * @param val if true, use a single dash (as opposed to a double dash) for command-line options
    */
   public void setUseSingleDash(boolean val) {
     options.setUseSingleDash(true);

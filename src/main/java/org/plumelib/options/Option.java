@@ -90,7 +90,7 @@ public @interface Option {
   /**
    * If true, {@link org.plumelib.options.OptionsDoclet} does not report the field's default value.
    *
-   * @return whether not to hide default values
+   * @return true if hiding default values
    */
   boolean noDocDefault() default false;
 }
