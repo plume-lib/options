@@ -55,7 +55,7 @@ public @interface OptionGroup {
   String value();
 
   /**
-   * Whether this option group is unpublicized.
+   * True if this option group is unpublicized.
    *
    * @return true if this option group is unpublicized, false if it is publicized
    */
