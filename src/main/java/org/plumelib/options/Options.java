@@ -345,7 +345,7 @@ public class Options {
   /**
    * Enable or disable debug logging.
    *
-   * @param enabled if true, enable or disable logging
+   * @param enabled whether to enable or disable logging
    */
   public void enableDebugLogging(boolean enabled) {
     debugEnabled = enabled;
