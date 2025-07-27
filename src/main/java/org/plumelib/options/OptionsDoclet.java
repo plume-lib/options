@@ -1224,7 +1224,7 @@ public class OptionsDoclet implements Doclet {
   /**
    * Returns true if using a single dash (as opposed to a double dash) for command-line options.
    *
-   * @return if true, use a single dash (as opposed to a double dash) for command-line options
+   * @return true if using a single dash (as opposed to a double dash) for command-line options
    */
   public boolean getUseSingleDash() {
     return options.getUseSingleDash();
