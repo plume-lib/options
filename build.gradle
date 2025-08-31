@@ -174,7 +174,7 @@ javadoc {
 }
 check.dependsOn javadoc
 
-tasks.register("javadocWeb", Javadoc) {
+tasks.register('javadocWeb', Javadoc) {
   description = 'Upload API documentation to website.'
   source = sourceSets.main.allJava
   destinationDir = file("/cse/web/research/plumelib/${project.name}/api")
@@ -201,7 +201,7 @@ configurations {
 dependencies {
   requireJavadoc 'org.plumelib:require-javadoc:2.0.0'
 }
-tasks.register("requireJavadoc", JavaExec) {
+tasks.register('requireJavadoc', JavaExec) {
   // Gradle resolves requireJavadoc's Option dependency to the jar built by this project,
   // so declare an explicit dependency on jar.
   dependsOn jar
@@ -227,7 +227,7 @@ javadocWeb.dependsOn requireJavadoc
 // Emacs support
 
 /* Make Emacs TAGS table */
-tasks.register("tags", Exec) {
+tasks.register('tags', Exec) {
   description = 'Run etags to create an Emacs TAGS table'
   commandLine 'bash', '-c', "find src/ -name '*.java' | sort | xargs etags"
 }
