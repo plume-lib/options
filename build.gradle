@@ -17,7 +17,8 @@ plugins {
 
 repositories {
   mavenCentral()
-  maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
+  maven { url = "https://central.sonatype.com/repository/maven-snapshots/" }
+  gradlePluginPortal()
 }
 
 ext {
@@ -173,7 +174,7 @@ javadoc {
 }
 check.dependsOn javadoc
 
-task javadocWeb(type: Javadoc) {
+tasks.register("javadocWeb", Javadoc) {
   description = 'Upload API documentation to website.'
   source = sourceSets.main.allJava
   destinationDir = file("/cse/web/research/plumelib/${project.name}/api")
@@ -200,7 +201,7 @@ configurations {
 dependencies {
   requireJavadoc 'org.plumelib:require-javadoc:2.0.0'
 }
-task requireJavadoc(type: JavaExec) {
+tasks.register("requireJavadoc", JavaExec) {
   // Gradle resolves requireJavadoc's Option dependency to the jar built by this project,
   // so declare an explicit dependency on jar.
   dependsOn jar
@@ -226,7 +227,7 @@ javadocWeb.dependsOn requireJavadoc
 // Emacs support
 
 /* Make Emacs TAGS table */
-task tags(type: Exec) {
+tasks.register("tags", Exec) {
   description = 'Run etags to create an Emacs TAGS table'
   commandLine 'bash', '-c', "find src/ -name '*.java' | sort | xargs etags"
 }
