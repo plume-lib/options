@@ -9,7 +9,7 @@ plugins {
   id("com.diffplug.spotless").version("8.0.0")
 
   // Error Prone linter
-  id("net.ltgt.errorprone").version("4.3.0")
+  id("net.ltgt.errorprone").version("4.3.0") apply false
 
   // Checker Framework pluggable type-checking
   id("org.checkerframework").version("0.6.60")
@@ -22,7 +22,7 @@ repositories {
 }
 
 ext {
-  errorproneVersion = "2.42.0"
+  errorproneVersion = "2.43.0"
   isJava17orHigher = JavaVersion.current() >= JavaVersion.VERSION_17
   isJava21orHigher = JavaVersion.current() >= JavaVersion.VERSION_21
 }
@@ -91,21 +91,23 @@ spotless {
 
 // Error Prone linter
 
-dependencies {
-  errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
-}
-tasks.withType(JavaCompile).configureEach {
-  // "-processing" avoids javac warning "No processor claimed any of these annotations".
-  // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
-  options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
-  options.errorprone {
-    disable("ExtendsObject")  // Incorrect when using the Checker Framework
-    disable("ReferenceEquality") // Use Interning Checker instead.
-    disable("StringSplitter") // Obscure case isn't likely.
-    disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
-    disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
+if (isJava21orHigher) {
+  apply plugin: "net.ltgt.errorprone"
+  dependencies {
+    errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
   }
-  options.errorprone.enabled = isJava17orHigher
+  tasks.withType(JavaCompile).configureEach {
+    // "-processing" avoids javac warning "No processor claimed any of these annotations".
+    // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
+    options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
+    options.errorprone {
+      disable("ExtendsObject")  // Incorrect when using the Checker Framework
+      disable("ReferenceEquality") // Use Interning Checker instead.
+      disable("StringSplitter") // Obscure case isn't likely.
+      disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
+      disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
+    }
+  }
 }
 
 // Checker Framework pluggable type-checking
