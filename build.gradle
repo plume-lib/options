@@ -5,11 +5,15 @@ plugins {
   id("com.gradleup.shadow").version("9.2.2")
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
-  // Requires JDK 11 or higher; the plugin crashes under JDK 8.
+  // Version 8.0.0 and later requires Java 17+.
   id("com.diffplug.spotless").version("8.0.0")
 
   // Error Prone linter
   id("net.ltgt.errorprone").version("4.3.0") apply false
+
+  // TODO: reinstate when all PMD warnings have been addressed.
+  // // PMD linter
+  // id("pmd")
 
   // Checker Framework pluggable type-checking
   id("org.checkerframework").version("0.6.60")
@@ -91,24 +95,47 @@ spotless {
 
 // Error Prone linter
 
+tasks.withType(JavaCompile).configureEach {
+  options.forkOptions.jvmArgs += "-Xmx6g"
+  options.compilerArgs << "-Werror"
+  // "-processing" avoids javac warning "No processor claimed any of these annotations".
+  // "-options" is because of JDK 21 warning "source value 8 is obsolete..."
+  // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
+  if (isJava21orHigher) {
+    options.compilerArgs << "-Xlint:all,-processing,-options,-classfile,-this-escape"
+  } else {
+    options.compilerArgs << "-Xlint:all,-processing,-options,-classfile"
+  }
+  // // Only needed when debugging.
+  // options.compilerArgs << "-g"
+}
 if (isJava21orHigher) {
   apply plugin: "net.ltgt.errorprone"
   dependencies {
     errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
   }
   tasks.withType(JavaCompile).configureEach {
-    // "-processing" avoids javac warning "No processor claimed any of these annotations".
-    // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
-    options.compilerArgs << "-Xlint:all,-processing,-classfile" << "-Werror"
     options.errorprone {
-      disable("ExtendsObject")  // Incorrect when using the Checker Framework
+      disable("ExtendsObject")  // Incorrect when using the Checker Framework.
       disable("ReferenceEquality") // Use Interning Checker instead.
       disable("StringSplitter") // Obscure case isn't likely.
-      disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod
+      disable("AnnotateFormatMethod") // Error Prone doesn't know about Checker Framework @FormatMethod.
       disable("UseCorrectAssertInTests") // https://github.com/typetools/checker-framework/issues/3345
     }
   }
 }
+
+// TODO: reinstate when all PMD warnings have been addressed.
+// // PMD linter
+//
+// pmd {
+//   toolVersion = "7.17.0"
+//   ruleSetFiles =(files("${rootDir}/.pmd-ruleset.xml"))
+//   consoleOutput = true
+//   ignoreFailures = false
+//   incrementalAnalysis = true
+// }
+
 
 // Checker Framework pluggable type-checking
 
@@ -131,6 +158,8 @@ checkerFramework {
   ]
   extraJavacArgs = [
     "-Werror",
+    "-Aversion",
+    // "-verbose",
     "-AcheckPurityAnnotations",
     "-ArequirePrefixInWarningSuppressions",
     "-AwarnRedundantAnnotations",
@@ -138,7 +167,7 @@ checkerFramework {
   ]
 }
 // To use a snapshot version of the Checker Framework.
-if (true) {
+if (false) {
   // TODO: Change the above test to false when CF is released.
   ext.checkerFrameworkVersion = "3.51.1"
   dependencies {
