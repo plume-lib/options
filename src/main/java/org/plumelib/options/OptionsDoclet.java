@@ -606,18 +606,15 @@ public class OptionsDoclet implements Doclet {
           : "@AssumeAssertion(nullness): dependent: docFile is non-null if inPlace is true";
       file = docFile;
     } else {
-      file = null;
+      System.out.println(output);
+      return;
     }
 
-    if (file != null) {
-      try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file.toPath(), UTF_8))) {
-        out.println(output);
-        out.flush();
-      } catch (IOException e) {
-        throw new Error("Problem writing to " + file, e);
-      }
-    } else {
-      System.out.println(output);
+    try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file.toPath(), UTF_8))) {
+      out.println(output);
+      out.flush();
+    } catch (IOException e) {
+      throw new Error("Problem writing to " + file, e);
     }
   }
 
