@@ -19,10 +19,8 @@ import com.sun.source.util.DocTrees;
 import com.sun.source.util.SimpleDocTreeVisitor;
 import io.github.classgraph.ClassGraph;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -436,10 +434,10 @@ public class OptionsDoclet implements Doclet {
   }
 
   /** The command-line options for OptionsDoclet. */
-  @SuppressWarnings({
-    "nullness:method.invocation" // when methods such as printError() are called, the receiver
-    // (an OptionsDoclet) is initialized
-  })
+  @SuppressWarnings(
+      "nullness:method.invocation" // when methods such as printError() are called, the receiver
+  // (an OptionsDoclet) is initialized
+  )
   private final Set<DocletOption> docletOptions =
       Set.of(
           new DocletOption(
@@ -619,11 +617,7 @@ public class OptionsDoclet implements Doclet {
         throw new Error("Problem writing to " + file, e);
       }
     } else {
-      try (PrintWriter out =
-          new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)))) {
-        out.println(output);
-        out.flush();
-      }
+      System.out.println(output);
     }
   }
 
