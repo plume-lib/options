@@ -262,6 +262,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
  * @see org.plumelib.options.Unpublicized
  * @see org.plumelib.options.OptionsDoclet
  */
+@SuppressWarnings("PMD.BooleanGetMethodName")
 public class Options {
 
   // User-settable fields
@@ -318,6 +319,7 @@ public class Options {
   private Class<?> mainClass = Void.TYPE;
 
   /** List of all of the defined options. */
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingTypeName")
   private final List<OptionInfo> options = new ArrayList<>();
 
   /** Map from short or long option names (with leading dashes) to option information. */
@@ -358,6 +360,7 @@ public class Options {
   private static String lineSeparator = System.lineSeparator();
 
   /** Information about an option. */
+  @SuppressWarnings("PMD.TooManyFields")
   class OptionInfo {
 
     /** What variable the option sets. */
@@ -409,7 +412,7 @@ public class Options {
      * If true, the default value string for this option will be excluded from OptionsDoclet
      * documentation.
      */
-    boolean noDocDefault = false;
+    boolean noDocDefault;
 
     /** If the option is a list, this references that list. */
     @MonotonicNonNull List<Object> list = null;
@@ -638,7 +641,7 @@ public class Options {
      * @param unpublicized if true, this option group is unpublicized
      */
     OptionGroupInfo(String name, boolean unpublicized) {
-      optionList = new ArrayList<OptionInfo>();
+      optionList = new ArrayList<>();
       this.name = name;
       this.unpublicized = unpublicized;
     }
@@ -649,7 +652,7 @@ public class Options {
      * @param optionGroup the option group to copy
      */
     OptionGroupInfo(OptionGroup optionGroup) {
-      optionList = new ArrayList<OptionInfo>();
+      optionList = new ArrayList<>();
       this.name = optionGroup.value();
       this.unpublicized = optionGroup.unpublicized();
     }
@@ -738,7 +741,7 @@ public class Options {
             System.err.printf(
                 "  with annotations %s%n", Arrays.toString(f.getDeclaredAnnotations()));
           }
-        } catch (java.lang.ArrayStoreException e) {
+        } catch (ArrayStoreException e) {
           if (e.getMessage() != null
               && Objects.equals(
                   e.getMessage(), "sun.reflect.annotation.TypeNotPresentExceptionProxy")) {
@@ -942,6 +945,7 @@ public class Options {
    * @return a string array analogous to the argument to {@code main}
    */
   // TODO: should this throw some exceptions?
+  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public static String[] tokenize(String args) {
 
     // Split the args string on whitespace boundaries accounting for quoted
@@ -989,6 +993,7 @@ public class Options {
    * @return all non-option arguments
    * @throws ArgException if the command line contains unknown option or misused options
    */
+  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public String[] parse(String[] args) throws ArgException {
 
     List<String> nonOptions = new ArrayList<>();
@@ -1038,12 +1043,16 @@ public class Options {
         }
         OptionInfo oi = nameToOption.get(argName);
         if (oi == null) {
-          StringBuilder msg = new StringBuilder();
-          msg.append(String.format("unknown option name '%s' in arg '%s'", argName, arg));
-          if (false) { // for debugging
+          StringBuilder msg = new StringBuilder(64);
+          msg.append("unknown option name '")
+              .append(argName)
+              .append("' in arg '")
+              .append(arg)
+              .append('\'');
+          if (debugEnabled) {
             msg.append("; known options:");
             for (String optionName : sortedKeySet(nameToOption)) {
-              msg.append(" ");
+              msg.append(' ');
               msg.append(optionName);
             }
           }
@@ -1246,6 +1255,7 @@ public class Options {
    * @param showUnpublicized if true, include unpublicized options in the output
    * @return the formatted options
    */
+  @SuppressWarnings("PMD.UnusedAssignment") // false positive, `hasListOption` is read elsewhere
   private String formatOptions(List<OptionInfo> optList, int maxLength, boolean showUnpublicized) {
     StringJoiner buf = new StringJoiner(lineSeparator);
     for (OptionInfo oi : optList) {
@@ -1388,7 +1398,6 @@ public class Options {
             throw new ArgException(
                 "Value \"%s\" for argument %s is not a boolean", argValue, argName);
           }
-          argValue = val ? "true" : "false";
           // System.out.printf ("Setting %s to %s%n", argName, val);
           f.setBoolean(oi.obj, val);
         } else if (type == Byte.TYPE) {
@@ -1499,7 +1508,10 @@ public class Options {
     Object val;
     try {
       if (oi.constructor != null) {
-        @SuppressWarnings("signedness:assignment") // assume command-line numeric args are signed
+        @SuppressWarnings({
+          "signedness:assignment", // assume command-line numeric args are signed
+          "PMD.UnnecessaryVarargsArrayCreation" // false positive due to overloads
+        })
         @Signed Object signedVal = oi.constructor.newInstance(new Object[] {argValue});
         val = signedVal;
       } else if (oi.baseType.isEnum()) {
