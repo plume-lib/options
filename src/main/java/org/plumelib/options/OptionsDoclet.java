@@ -612,7 +612,6 @@ public class OptionsDoclet implements Doclet {
 
     try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file.toPath(), UTF_8))) {
       out.println(output);
-      out.flush();
     } catch (IOException e) {
       throw new Error("Problem writing to " + file, e);
     }
