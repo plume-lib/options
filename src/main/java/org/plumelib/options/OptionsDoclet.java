@@ -621,9 +621,8 @@ public class OptionsDoclet implements Doclet {
    * by the user.
    *
    * @return the user-visible doclet output
-   * @throws Exception if there is trouble
    */
-  public String output() throws Exception {
+  public String output() {
     if (docFile == null) {
       if (formatJavadoc) {
         return optionsToJavadoc(0, 99);
@@ -639,10 +638,9 @@ public class OptionsDoclet implements Doclet {
    * Returns the result of inserting the options documentation into the docfile.
    *
    * @return the docfile, but with the command-line argument documentation updated
-   * @throws Exception if there is trouble reading files
    */
   @RequiresNonNull("docFile")
-  private String newDocFileText() throws Exception {
+  private String newDocFileText() {
     StringJoiner b = new StringJoiner(lineSep);
     try (BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8)) {
       String docline;
@@ -679,6 +677,8 @@ public class OptionsDoclet implements Doclet {
       if (!replacedOnce) {
         System.err.println("Did not find start delimiter: " + startDelim);
       }
+    } catch (IOException e) {
+      throw new Error(e);
     }
     return b.toString();
   }
