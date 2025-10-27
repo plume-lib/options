@@ -1050,7 +1050,11 @@ public class OptionsDoclet implements Doclet {
    * @param docCommentTree a Javadoc comment to convert to HTML
    * @return HTML version of doc
    */
-  public static String docCommentToHtml(DocCommentTree docCommentTree) {
+  public static String docCommentToHtml(@Nullable DocCommentTree docCommentTree) {
+    if (docCommentTree == null) {
+      return "";
+    }
+
     StringBuilder result = new StringBuilder();
 
     new DocCommentToHtmlVisitor().visitDocComment(docCommentTree, result);
