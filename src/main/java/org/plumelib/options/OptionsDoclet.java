@@ -505,8 +505,7 @@ public class OptionsDoclet implements Doclet {
               return OK;
             }
           },
-          new DocletOption(
-              "--classdoc", "-classdoc", "", 0, "the docfile should be edited in place") {
+          new DocletOption("--classdoc", "-classdoc", "", 0, "include 'main' class documentation") {
             @Override
             public boolean process(String option, List<String> arguments) {
               assert arguments.size() == 0;
