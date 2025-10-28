@@ -1255,6 +1255,6 @@ public class OptionsDoclet implements Doclet {
    * @param val if true, use a single dash (as opposed to a double dash) for command-line options
    */
   public void setUseSingleDash(boolean val) {
-    options.setUseSingleDash(true);
+    options.setUseSingleDash(val);
   }
 }

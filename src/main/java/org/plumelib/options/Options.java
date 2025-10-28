@@ -1378,7 +1378,7 @@ public class Options {
     }
     // Argument values are required for everything but booleans
     if (argValue == null) {
-      if ((type != Boolean.TYPE) || (type != Boolean.class)) {
+      if ((type == Boolean.TYPE) || (type == Boolean.class)) {
         argValue = "true";
       } else {
         throw new ArgException("Value required for option " + argName);
