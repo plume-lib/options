@@ -330,7 +330,7 @@ public class OptionsDoclet implements Doclet {
     processJavadoc();
     try {
       write();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return false;
     }
