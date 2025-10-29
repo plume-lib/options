@@ -947,7 +947,7 @@ public class OptionsDoclet implements Doclet {
         break;
       }
       String firstPart = oneLine.substring(0, breakLoc);
-      if (isWhitespace(firstPart)) {
+      if (firstPart.isBlank()) {
         break;
       }
       multiLine.add(firstPart);
@@ -962,21 +962,6 @@ public class OptionsDoclet implements Doclet {
       }
     }
     return multiLine.toString();
-  }
-
-  /**
-   * Returns true if the string contains only whitespace.
-   *
-   * @param str a string
-   * @return true if the string contains only whitespace.
-   */
-  private static boolean isWhitespace(String str) {
-    for (int i = 0; i < str.length(); i++) {
-      if (!Character.isWhitespace(str.charAt(i))) {
-        return false;
-      }
-    }
-    return true;
   }
 
   /**
