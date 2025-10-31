@@ -170,6 +170,7 @@ import org.plumelib.reflection.Signatures;
 
 // This doesn't itself use org.plumelib.options.Options for its command-line option processing
 // because Doclet has a different way of processing command-line options.
+@SuppressWarnings("PMD.BooleanGetMethodName")
 public class OptionsDoclet implements Doclet {
 
   /** The system-specific line separator. */
@@ -322,7 +323,7 @@ public class OptionsDoclet implements Doclet {
 
     Object[] objarray = objs.toArray();
     options = new Options(objarray);
-    if (options.getOptions().size() < 1) {
+    if (options.getOptions().isEmpty()) {
       System.out.println("Error: no @Option-annotated fields found");
       return false;
     }
@@ -342,7 +343,7 @@ public class OptionsDoclet implements Doclet {
   // Javadoc command-line options
   //
 
-  // The doclet cannot use the Options class itself because  Javadoc specifies its own way of
+  // The doclet cannot use the Options class itself because Javadoc specifies its own way of
   // handling command-line arguments.
 
   /** A value that indicates that a method completed successfully. */
@@ -485,7 +486,7 @@ public class OptionsDoclet implements Doclet {
           new DocletOption("-i", "", 0, "the docfile should be edited in place") {
             @Override
             public boolean process(String option, List<String> arguments) {
-              assert arguments.size() == 0;
+              assert arguments.isEmpty();
               inPlace = true;
               return OK;
             }
@@ -507,7 +508,7 @@ public class OptionsDoclet implements Doclet {
           new DocletOption("--classdoc", "-classdoc", "", 0, "include 'main' class documentation") {
             @Override
             public boolean process(String option, List<String> arguments) {
-              assert arguments.size() == 0;
+              assert arguments.isEmpty();
               includeClassDoc = true;
               return OK;
             }
@@ -520,7 +521,7 @@ public class OptionsDoclet implements Doclet {
               "show long options with leading \"-\" instead of \"--\"") {
             @Override
             public boolean process(String option, List<String> arguments) {
-              assert arguments.size() == 0;
+              assert arguments.isEmpty();
               setUseSingleDash(true);
               return OK;
             }
@@ -568,6 +569,7 @@ public class OptionsDoclet implements Doclet {
    * @param clazz the class whose values will be created by command-line arguments
    * @return true if the class needs to be instantiated before command-line arguments are parsed
    */
+  @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName") // false positive
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
       if (f.isAnnotationPresent(org.plumelib.options.Option.class)
@@ -803,9 +805,9 @@ public class OptionsDoclet implements Doclet {
     StringJoiner b = new StringJoiner(lineSep);
 
     Set<? extends Element> classes = denv.getSpecifiedElements();
-    if (includeClassDoc && classes.size() > 0) {
+    if (includeClassDoc && !classes.isEmpty()) {
       Element firstElement = classes.iterator().next();
-      b.add(OptionsDoclet.docCommentToHtml(docTrees.getDocCommentTree(firstElement)));
+      b.add(docCommentToHtml(docTrees.getDocCommentTree(firstElement)));
       b.add("<p>Command line options:</p>");
     }
 
@@ -854,18 +856,18 @@ public class OptionsDoclet implements Doclet {
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
-    Scanner s = new Scanner(optionsToHtml(refillWidth - padding - 2));
-
-    while (s.hasNextLine()) {
-      String line = s.nextLine();
-      StringBuilder bb = new StringBuilder();
-      bb.append(StringUtils.repeat(" ", padding));
-      if (line.trim().equals("")) {
-        bb.append("*");
-      } else {
-        bb.append("* ").append(line);
+    try (Scanner s = new Scanner(optionsToHtml(refillWidth - padding - 2))) {
+      while (s.hasNextLine()) {
+        String line = s.nextLine();
+        StringBuilder bb = new StringBuilder();
+        bb.append(StringUtils.repeat(' ', padding));
+        if (line.trim().equals("")) {
+          bb.append('*');
+        } else {
+          bb.append("* ").append(line);
+        }
+        b.add(bb);
       }
-      b.add(bb);
     }
 
     return b.toString();
@@ -889,10 +891,10 @@ public class OptionsDoclet implements Doclet {
       if (oi.unpublicized) {
         continue;
       }
-      StringBuilder bb = new StringBuilder();
+      StringBuilder bb = new StringBuilder(32);
       String optHtml = optionToHtml(oi, padding);
       bb.append(StringUtils.repeat(" ", padding));
-      bb.append("<li id=\"option:" + oi.longName + "\">").append(optHtml);
+      bb.append("<li id=\"option:").append(oi.longName).append("\">").append(optHtml);
       // .append("</li>");
       if (refillWidth <= 0) {
         b.add(bb);
@@ -944,7 +946,7 @@ public class OptionsDoclet implements Doclet {
         break;
       }
       String firstPart = oneLine.substring(0, breakLoc);
-      if (firstPart.trim().isEmpty()) {
+      if (firstPart.isBlank()) {
         break;
       }
       multiLine.add(firstPart);
@@ -952,9 +954,10 @@ public class OptionsDoclet implements Doclet {
     }
     multiLine.add(oneLine);
     if (suffix != null) {
-      Scanner s = new Scanner(suffix);
-      while (s.hasNextLine()) {
-        multiLine.add(StringUtils.repeat(" ", padding) + s.nextLine());
+      try (Scanner s = new Scanner(suffix)) {
+        while (s.hasNextLine()) {
+          multiLine.add(StringUtils.repeat(" ", padding) + s.nextLine());
+        }
       }
     }
     return multiLine.toString();
@@ -969,35 +972,36 @@ public class OptionsDoclet implements Doclet {
    * @return HTML describing oi
    */
   public String optionToHtml(Options.OptionInfo oi, int padding) {
-    StringBuilder b = new StringBuilder();
-    Formatter f = new Formatter(b);
-    if (oi.shortName != null) {
-      f.format("<b>-%s</b> ", oi.shortName);
-    }
-    for (String a : oi.aliases) {
-      f.format("<b>%s</b> ", a);
-    }
-    String prefix = getUseSingleDash() ? "-" : "--";
-    f.format("<b>%s%s=</b><i>%s</i>", prefix, oi.longName, oi.typeName);
-    if (oi.list != null) {
-      b.append(" {@code [+]}");
-    }
-    f.format(".%n ");
-    f.format("%s", StringUtils.repeat(" ", padding));
-
-    String jdoc = ((oi.jdoc == null) ? "" : oi.jdoc);
-    if (oi.noDocDefault || oi.defaultStr == null) {
-      f.format("%s", jdoc);
-    } else {
-      String defaultStr = "default: " + oi.defaultStr;
-      // The default string must be HTML-escaped since it comes from a string
-      // rather than a Javadoc comment.
-      String suffix = "";
-      if (jdoc.endsWith("</p>")) {
-        suffix = "</p>";
-        jdoc = jdoc.substring(0, jdoc.length() - suffix.length());
+    StringBuilder b = new StringBuilder(64);
+    try (Formatter f = new Formatter(b)) {
+      if (oi.shortName != null) {
+        f.format("<b>-%s</b> ", oi.shortName);
       }
-      f.format("%s [%s]%s", jdoc, StringEscapeUtils.escapeHtml4(defaultStr), suffix);
+      for (String a : oi.aliases) {
+        f.format("<b>%s</b> ", a);
+      }
+      String prefix = getUseSingleDash() ? "-" : "--";
+      f.format("<b>%s%s=</b><i>%s</i>", prefix, oi.longName, oi.typeName);
+      if (oi.list != null) {
+        b.append(" {@code [+]}");
+      }
+      f.format(".%n ");
+      f.format("%s", StringUtils.repeat(" ", padding));
+
+      String jdoc = ((oi.jdoc == null) ? "" : oi.jdoc);
+      if (oi.noDocDefault || oi.defaultStr == null) {
+        f.format("%s", jdoc);
+      } else {
+        String defaultStr = "default: " + oi.defaultStr;
+        // The default string must be HTML-escaped since it comes from a string
+        // rather than a Javadoc comment.
+        String suffix = "";
+        if (jdoc.endsWith("</p>")) {
+          suffix = "</p>";
+          jdoc = jdoc.substring(0, jdoc.length() - suffix.length());
+        }
+        f.format("%s [%s]%s", jdoc, StringEscapeUtils.escapeHtml4(defaultStr), suffix);
+      }
     }
     if (oi.baseType.isEnum()) {
       b.append(lineSep).append("<ul>").append(lineSep);
@@ -1006,7 +1010,7 @@ public class OptionsDoclet implements Doclet {
       for (Map.Entry<String, String> entry : oi.enumJdoc.entrySet()) {
         b.append("  <li><b>").append(entry.getKey()).append("</b>");
         if (entry.getValue().length() != 0) {
-          b.append(" ").append(entry.getValue());
+          b.append(' ').append(entry.getValue());
         }
         // b.append("</li>");
         b.append(lineSep);
@@ -1026,7 +1030,11 @@ public class OptionsDoclet implements Doclet {
    * @param docCommentTree a Javadoc comment to convert to HTML
    * @return HTML version of doc
    */
-  public static String docCommentToHtml(DocCommentTree docCommentTree) {
+  public static String docCommentToHtml(@Nullable DocCommentTree docCommentTree) {
+    if (docCommentTree == null) {
+      return "";
+    }
+
     StringBuilder result = new StringBuilder();
 
     new DocCommentToHtmlVisitor().visitDocComment(docCommentTree, result);
@@ -1085,12 +1093,12 @@ public class OptionsDoclet implements Doclet {
     @Override
     public Void visitLink(LinkTree node, StringBuilder sb) {
       List<? extends DocTree> label = node.getLabel();
-      if (label.size() > 0) {
+      if (!label.isEmpty()) {
         visitList(label, sb);
       } else {
         sb.append("{@code ");
         sb.append(node.getReference().getSignature());
-        sb.append("}");
+        sb.append('}');
       }
       return null;
     }
@@ -1100,7 +1108,7 @@ public class OptionsDoclet implements Doclet {
     public Void visitLiteral(LiteralTree node, StringBuilder sb) {
       sb.append("{@code ");
       visitText(node.getBody(), sb);
-      sb.append("}");
+      sb.append('}');
       return null;
     }
 
@@ -1231,6 +1239,6 @@ public class OptionsDoclet implements Doclet {
    * @param val if true, use a single dash (as opposed to a double dash) for command-line options
    */
   public void setUseSingleDash(boolean val) {
-    options.setUseSingleDash(true);
+    options.setUseSingleDash(val);
   }
 }

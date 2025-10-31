@@ -33,8 +33,9 @@ java {
   withSourcesJar()
 }
 
-artifacts {
-  archives(javadocJar, sourcesJar)
+tasks.named("assemble") {
+  dependsOn(javadocJar)
+  dependsOn(sourcesJar)
 }
 
 publishing {
