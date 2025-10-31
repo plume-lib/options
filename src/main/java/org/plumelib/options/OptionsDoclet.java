@@ -19,9 +19,8 @@ import com.sun.source.util.DocTrees;
 import com.sun.source.util.SimpleDocTreeVisitor;
 import io.github.classgraph.ClassGraph;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.OutputStreamWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -331,7 +330,7 @@ public class OptionsDoclet implements Doclet {
     processJavadoc();
     try {
       write();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return false;
     }
@@ -592,30 +591,27 @@ public class OptionsDoclet implements Doclet {
   // File IO methods
   //
 
-  /**
-   * Write the output of this doclet to the correct file.
-   *
-   * @throws Exception if there is trouble
-   */
-  public void write() throws Exception {
-    PrintWriter out;
-    // `output()` is called here because it might throw an exception; if called after `out` is set,
-    // that exception might prevent `out` from being closed.
+  /** Write the output of this doclet to the correct file. */
+  public void write() {
     String output = output();
 
+    File file;
     if (outFile != null) {
-      out = new PrintWriter(Files.newBufferedWriter(outFile.toPath(), UTF_8));
+      file = outFile;
     } else if (inPlace) {
       assert docFile != null
           : "@AssumeAssertion(nullness): dependent: docFile is non-null if inPlace is true";
-      out = new PrintWriter(Files.newBufferedWriter(docFile.toPath(), UTF_8));
+      file = docFile;
     } else {
-      out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)));
+      System.out.println(output);
+      return;
     }
 
-    out.println(output);
-    out.flush();
-    out.close();
+    try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file.toPath(), UTF_8))) {
+      out.println(output);
+    } catch (IOException e) {
+      throw new Error("Problem writing to " + file, e);
+    }
   }
 
   /**
@@ -623,9 +619,8 @@ public class OptionsDoclet implements Doclet {
    * by the user.
    *
    * @return the user-visible doclet output
-   * @throws Exception if there is trouble
    */
-  public String output() throws Exception {
+  public String output() {
     if (docFile == null) {
       if (formatJavadoc) {
         return optionsToJavadoc(0, 99);
@@ -641,10 +636,9 @@ public class OptionsDoclet implements Doclet {
    * Returns the result of inserting the options documentation into the docfile.
    *
    * @return the docfile, but with the command-line argument documentation updated
-   * @throws Exception if there is trouble reading files
    */
   @RequiresNonNull("docFile")
-  private String newDocFileText() throws Exception {
+  private String newDocFileText() {
     StringJoiner b = new StringJoiner(lineSep);
     try (BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8)) {
       String docline;
@@ -681,6 +675,8 @@ public class OptionsDoclet implements Doclet {
       if (!replacedOnce) {
         System.err.println("Did not find start delimiter: " + startDelim);
       }
+    } catch (IOException e) {
+      throw new Error(e);
     }
     return b.toString();
   }
