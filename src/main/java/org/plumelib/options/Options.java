@@ -1470,7 +1470,7 @@ public class Options {
         // argument value.
         if (oi.list != null) {
           if (spaceSeparatedLists) {
-            String[] aarr = argValue.split(" +");
+            String[] aarr = argValue.split(" +", -1);
             for (String aval : aarr) {
               Object val = getRefArg(oi, argName, aval);
               oi.list.add(val); // uncheck cast
