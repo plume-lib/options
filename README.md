@@ -35,7 +35,7 @@ In a Gradle buildfile, write
 
 ```gradle
 dependencies {
-  implementation 'org.plumelib:options:2.0.3'
+  implementation("org.plumelib:options:2.0.3")
 }
 ```
 
@@ -45,9 +45,9 @@ To update user documentation after an option or its documentation has changed,
 use a rule like this:
 
 ```gradle
-task updateUserOptions(type: Javadoc, dependsOn: 'assemble') {
-  group "Documentation"
-  description "Updates printed documentation of command-line arguments."
+task updateUserOptions(type: Javadoc, dependsOn: "assemble") {
+  group = "Documentation"
+  description = "Updates printed documentation of command-line arguments."
   source = sourceSets.main.allJava.files.sort()
   classpath = project.sourceSets.main.compileClasspath
   options.memberLevel = JavadocMemberLevel.PRIVATE
