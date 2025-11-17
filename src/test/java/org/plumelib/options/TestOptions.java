@@ -401,8 +401,6 @@ public class TestOptions {
         });
     // Test that properly quoted strings work fine
     String[] result = Options.tokenize("--option \"closed quote\"");
-    assert result.length == 2;
-    assert result[0].equals("--option");
-    assert result[1].equals("\"closed quote\"");
+    Assertions.assertArrayEquals(new String[] {"--option", "\"closed quote\""}, result);
   }
 }
