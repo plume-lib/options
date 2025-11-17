@@ -379,4 +379,28 @@ public class TestOptions {
           options.parse(new String[] {"--firstpass", "smart-rle"});
         });
   }
+
+  /**
+   * Test that tokenize throws ArgException for unclosed quotes.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  public void testTokenizeUnclosedQuote() throws ArgException {
+    // Test unclosed double quote
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          Options.tokenize("--option \"unclosed quote");
+        });
+    // Test unclosed single quote
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          Options.tokenize("--option 'unclosed quote");
+        });
+    // Test that properly quoted strings work fine
+    String[] result = Options.tokenize("--option \"closed quote\"");
+    Assertions.assertArrayEquals(new String[] {"--option", "\"closed quote\""}, result);
+  }
 }

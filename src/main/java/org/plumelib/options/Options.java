@@ -943,10 +943,10 @@ public class Options {
    *
    * @param args the command line to be tokenized
    * @return a string array analogous to the argument to {@code main}
+   * @throws ArgException if the command line contains an unclosed quote
    */
-  // TODO: should this throw some exceptions?
   @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
-  public static String[] tokenize(String args) {
+  public static String[] tokenize(String args) throws ArgException {
 
     // Split the args string on whitespace boundaries accounting for quoted
     // strings.
@@ -960,6 +960,9 @@ public class Options {
         ii++;
         while ((ii < args.length()) && (args.charAt(ii) != ch)) {
           arg += args.charAt(ii++);
+        }
+        if (ii >= args.length()) {
+          throw new ArgException("Unclosed quote in command line: " + args);
         }
         arg += ch;
       } else if (Character.isWhitespace(ch)) {
