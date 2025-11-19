@@ -57,7 +57,7 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
-  public void testOptions() throws ArgException, IOException {
+  void testOptions() throws ArgException, IOException {
 
     new File("/tmp/TestOptions1.txt").createNewFile();
     new File("/tmp/TestOptions2.txt").createNewFile();
@@ -171,7 +171,7 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
-  public void testOptionsAliases() throws ArgException {
+  void testOptionsAliases() throws ArgException {
     ClassWithOptionsAliases t = new ClassWithOptionsAliases();
     Options options = new Options("test", t);
 
@@ -277,7 +277,7 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
-  public void testOptionGroups() throws ArgException {
+  void testOptionGroups() throws ArgException {
     // TODO: The following two exception tests are not adequate.  There must be
     // a better way to do these.
     try {
@@ -340,7 +340,7 @@ public class TestOptions {
   }
 
   @Test
-  public void testOptionsEnums() throws ArgException {
+  void testOptionsEnums() throws ArgException {
     Options options = new Options("test", ClassWithOptionsEnums.class);
 
     options.parse(new String[] {"--first-pass", "SMART_RLE"});
@@ -364,7 +364,7 @@ public class TestOptions {
   }
 
   @Test
-  public void testOptionsEnumsFail() throws ArgException {
+  void testOptionsEnumsFail() throws ArgException {
     Options options = new Options("test", ClassWithOptionsEnums.class);
     Assertions.assertThrows(
         ArgException.class,
@@ -386,7 +386,7 @@ public class TestOptions {
    * @throws ArgException if there is an illegal argument
    */
   @Test
-  public void testTokenizeUnclosedQuote() throws ArgException {
+  void testTokenizeUnclosedQuote() throws ArgException {
     // Test unclosed double quote
     Assertions.assertThrows(
         ArgException.class,
