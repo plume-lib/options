@@ -89,4 +89,4 @@ Run these steps on any filesystem, except the `javadocWeb` step.
     ```
     <!-- markdownlint-enable line-length -->
 
-* For Daikon: make compile junit test
+  * For Daikon: make compile junit test
