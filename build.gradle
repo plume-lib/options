@@ -261,7 +261,7 @@ configurations {
 dependencies {
   requireJavadoc("org.plumelib:require-javadoc:2.0.0")
 }
-tasks.register("requireJavadoc", JavaExec) {
+def requireJavadoc = tasks.register("requireJavadoc", JavaExec) {
   // Gradle resolves requireJavadoc's Option dependency to the jar built by this project,
   // so declare an explicit dependency on jar.
   dependsOn(jar)
