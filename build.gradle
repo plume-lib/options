@@ -115,15 +115,12 @@ tasks.withType(JavaCompile).configureEach {
   options.forkOptions.jvmArgs += "-Xmx6g"
   options.compilerArgs << "-Werror"
   // "-processing" avoids javac warning "No processor claimed any of these annotations".
-  // "-options" is because of JDK 21 warning "source value 8 is obsolete..."
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
   if (isJava21orHigher) {
-    options.compilerArgs << "-Xlint:all,-processing,-options,-classfile,-this-escape"
+    options.compilerArgs << "-Xlint:all,-processing,-classfile,-this-escape"
   } else {
-    options.compilerArgs << "-Xlint:all,-processing,-options,-classfile"
+    options.compilerArgs << "-Xlint:all,-processing,-classfile"
   }
-  // // Only needed when debugging.
-  // options.compilerArgs << "-g"
 }
 if (isJava21orHigher) {
   apply plugin: "net.ltgt.errorprone"
@@ -262,9 +259,6 @@ dependencies {
   requireJavadoc("org.plumelib:require-javadoc:2.0.0")
 }
 def requireJavadoc = tasks.register("requireJavadoc", JavaExec) {
-  // Gradle resolves requireJavadoc's Option dependency to the jar built by this project,
-  // so declare an explicit dependency on jar.
-  dependsOn(jar)
   group = "Documentation"
   description = "Ensures that Javadoc documentation exists."
   inputs.files(sourceSets.main.allJava)
