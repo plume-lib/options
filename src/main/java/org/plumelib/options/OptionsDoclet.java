@@ -612,7 +612,7 @@ public class OptionsDoclet implements Doclet {
     try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file.toPath(), UTF_8))) {
       out.println(output);
     } catch (IOException e) {
-      throw new Error("Problem writing to " + file, e);
+      throw new UncheckedIOException("Problem writing to " + file, e);
     }
   }
 
@@ -678,7 +678,7 @@ public class OptionsDoclet implements Doclet {
         System.err.println("Did not find start delimiter: " + startDelim);
       }
     } catch (IOException e) {
-      throw new Error(e);
+      throw new UncheckedIOException(e);
     }
     return b.toString();
   }
