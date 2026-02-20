@@ -1844,13 +1844,16 @@ public class Options {
    * @param c a collection defined in the JDK
    * @return true if the collection is modifiable
    */
+  @SuppressWarnings("UseEqualsToCompareStrings") // the strings are interned
   public static boolean isModifiable(Collection<?> c) {
     // This is a hack, but I don't know how else to implement it.
     // This implementation is error-prone because (per the documentation of `Class.getName()`)
     // "Distinct class objects can have the same name but different class loaders."
 
     String className = c.getClass().getName();
-    if (className.startsWith("java.util.Collections$")) {
+    if (className == "java.util.Arrays$ArrayList") { // interned
+      return false;
+    } else if (className.startsWith("java.util.Collections$")) {
       String nestedClassSimpleName = className.substring("java.util.Collections$".length());
       if (nestedClassSimpleName.startsWith("Copies")
           || nestedClassSimpleName.startsWith("Empty")
