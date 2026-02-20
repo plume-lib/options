@@ -1808,10 +1808,10 @@ public class Options {
   }
 
   /**
-   * Returns the value of the field represented by this Field, on the specified object. Wraps {@code
+   * Sets the value of the field represented by this Field, on the specified object. Wraps {@code
    * Field.set}, but throws no exceptions other than an informative Error.
    *
-   * @param field the field to extract
+   * @param field the field to set
    * @param obj object from which the field's value is to be extracted; may be null if the field is
    *     static
    * @param value the new value for the field {@code field} of {@code obj} being modified
