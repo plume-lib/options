@@ -995,7 +995,8 @@ public class Options {
   }
 
   /**
-   * Sets option variables from the given command line.
+   * Sets option variables from the given command line. {@code parse()} should only be called once
+   * on any given {@code Options} value.
    *
    * @param args the commandline to be parsed
    * @return all non-option arguments
@@ -1812,8 +1813,7 @@ public class Options {
    * Field.set}, but throws no exceptions other than an informative Error.
    *
    * @param field the field to set
-   * @param obj object from which the field's value is to be extracted; may be null if the field is
-   *     static
+   * @param obj object from whose field is to be set; may be null if the field is static
    * @param value the new value for the field {@code field} of {@code obj} being modified
    */
   @SuppressWarnings({
@@ -1844,14 +1844,13 @@ public class Options {
    * @param c a collection defined in the JDK
    * @return true if the collection is modifiable
    */
-  @SuppressWarnings("UseEqualsToCompareStrings") // the strings are interned
-  public static boolean isModifiable(Collection<?> c) {
+  static boolean isModifiable(Collection<?> c) {
     // This is a hack, but I don't know how else to implement it.
     // This implementation is error-prone because (per the documentation of `Class.getName()`)
     // "Distinct class objects can have the same name but different class loaders."
 
     String className = c.getClass().getName();
-    if (className == "java.util.Arrays$ArrayList") { // interned
+    if (className == "java.util.Arrays$ArrayList") { // NOPMD: UseEqualsToCompareStrings
       return false;
     } else if (className.startsWith("java.util.Collections$")) {
       String nestedClassSimpleName = className.substring("java.util.Collections$".length());

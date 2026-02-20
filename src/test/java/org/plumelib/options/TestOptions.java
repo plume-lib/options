@@ -151,7 +151,7 @@ public class TestOptions {
     assert t.ls2.get(0).equals("hello");
     assert t.ls2.get(1).equals("world");
 
-    // Test list with unmodifable default
+    // Test list with unmodifiable default
     args = options.parse(new String[] {"--ls3", "hello", "--ls3", "world"});
     assert args.length == 0 : "@AssumeAssertion(value)";
     assert t.ls3 != null
