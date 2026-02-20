@@ -414,8 +414,17 @@ public class Options {
      */
     boolean noDocDefault;
 
-    /** If the option is a list, this references that list. */
+    /**
+     * If the option is a list, this references that list. This value is side-effected rather than
+     * the field being set.
+     */
     @MonotonicNonNull List<Object> list = null;
+
+    /**
+     * If true, the {@link #list} field is set to the default value. If false, it contains
+     * command-line arguments.
+     */
+    boolean listIsDefault = true;
 
     /** Constructor that takes one String for the type. */
     @Nullable Constructor<?> constructor = null;
@@ -446,10 +455,6 @@ public class Options {
      * @param obj the object whose field will be set; if obj is null, the field must be static
      * @param unpublicized true if the option is unpublicized
      */
-    @SuppressWarnings({
-      "nullness:argument", // field is static when object is null
-      "interning:argument" // interning is not relevant to the call
-    })
     OptionInfo(
         Field field,
         Option option,
@@ -501,20 +506,20 @@ public class Options {
                   + field);
         }
         if (defaultObj == null) {
-          List<Object> newList = new ArrayList<>();
-          try {
-            field.set(obj, newList);
-          } catch (Exception e) {
-            throw new Error("Unexpected error setting default for " + field, e);
-          }
-          defaultObj = newList;
+          defaultObj = new ArrayList<>();
+          fieldSet(field, obj, defaultObj);
         }
         if (((List<?>) defaultObj).isEmpty()) {
           defaultStr = null;
         }
         @SuppressWarnings("unchecked")
         List<Object> defaultObjAsList = (List<Object>) defaultObj;
+        if (!isModifiable(defaultObjAsList)) {
+          defaultObjAsList = new ArrayList<>(defaultObjAsList);
+          fieldSet(field, obj, defaultObjAsList);
+        }
         this.list = defaultObjAsList;
+
         // System.out.printf ("list default = %s%n", list);
         Type[] listTypeArgs = pt.getActualTypeArguments();
         this.baseType = (Class<?>) (listTypeArgs.length == 0 ? Object.class : listTypeArgs[0]);
@@ -1472,6 +1477,10 @@ public class Options {
         // blank separated arguments to the list, otherwise just set the
         // argument value.
         if (oi.list != null) {
+          if (oi.listIsDefault) {
+            oi.list.clear();
+            oi.listIsDefault = false;
+          }
           if (spaceSeparatedLists) {
             String[] aarr = argValue.trim().split(" +", -1);
             for (String aval : aarr) {
@@ -1796,5 +1805,63 @@ public class Options {
       // possible problem here).
       throw new Error("Unexpected error reading " + field + " in " + obj, e);
     }
+  }
+
+  /**
+   * Returns the value of the field represented by this Field, on the specified object. Wraps {@code
+   * Field.set}, but throws no exceptions other than an informative Error.
+   *
+   * @param field the field to extract
+   * @param obj object from which the field's value is to be extracted; may be null if the field is
+   *     static
+   * @param value the new value for the field {@code field} of {@code obj} being modified
+   */
+  @SuppressWarnings({
+    "nullness", // should not be called with non-static field and null obj, but if so, the
+    // exception is caught and handled
+    "interning:argument" // interning is not relevant to the call to `Field.set()`
+  })
+  private static void fieldSet(
+      Field field, @UnknownInitialization @Nullable Object obj, @Nullable Object value) {
+    try {
+      field.set(obj, value);
+    } catch (Exception e) {
+      // TODO: Accessibility problems could be related to the field or to the class itself.
+      // This should diagnose those problems and report them (though accessibility is not the only
+      // possible problem here).
+      throw new Error("Unexpected error setting " + field + " in " + obj + " to " + value, e);
+    }
+  }
+
+  // ////////////////////////////////////////////////////////////////////////
+  // Temporary
+  //
+
+  // TODO: Copied from plume-util.  Remove it after plume-util >1.13.0 is released.
+  /**
+   * Given a collection defined in the JDK, returns true if it is modifiable.
+   *
+   * @param c a collection defined in the JDK
+   * @return true if the collection is modifiable
+   */
+  public static boolean isModifiable(Collection<?> c) {
+    // This is a hack, but I don't know how else to implement it.
+    // This implementation is error-prone because (per the documentation of `Class.getName()`)
+    // "Distinct class objects can have the same name but different class loaders."
+
+    String className = c.getClass().getName();
+    if (className.startsWith("java.util.Collections$")) {
+      String nestedClassSimpleName = className.substring("java.util.Collections$".length());
+      if (nestedClassSimpleName.startsWith("Copies")
+          || nestedClassSimpleName.startsWith("Empty")
+          || nestedClassSimpleName.startsWith("Singleton")
+          || nestedClassSimpleName.startsWith("Unmodifiable")) {
+        return false;
+      }
+    } else if (className.startsWith("java.util.ImmutableCollections$")) {
+      return false;
+    }
+
+    return true;
   }
 }

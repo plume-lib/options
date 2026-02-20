@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -49,6 +50,12 @@ public class TestOptions {
 
     @Option("list with no default")
     public @Nullable List<String> ls;
+
+    @Option("list with non-empty default")
+    public @Nullable List<String> ls2 = new ArrayList<>(Arrays.asList("Red", "Green", "Blue"));
+
+    @Option("list with immutable default")
+    public @Nullable List<String> ls3 = List.of("Red", "Green", "Blue");
   }
 
   /**
@@ -135,6 +142,27 @@ public class TestOptions {
     assert t.ls.get(0).equals("hello");
     assert t.ls.get(1).equals("world");
 
+    // Test list with non-empty default
+    args = options.parse(new String[] {"--ls2", "hello", "--ls2", "world"});
+    assert args.length == 0 : "@AssumeAssertion(value)";
+    assert t.ls2 != null
+        : "@AssumeAssertion(nullness): application invariant: parsed string with --ls2 just above";
+    assert t.ls2.size() == 2;
+    assert t.ls2.get(0).equals("hello");
+    assert t.ls2.get(1).equals("world");
+
+    // Test list with unmodifable default
+    args = options.parse(new String[] {"--ls3", "hello", "--ls3", "world"});
+    assert args.length == 0 : "@AssumeAssertion(value)";
+    assert t.ls3 != null
+        : "@AssumeAssertion(nullness): application invariant: parsed string with --ls3 just above";
+    assert t.ls3.size() == 2
+        : String.format(
+            "Expected size 2, got size %d: %s {%s}",
+            t.ls3.size(), t.ls3, System.identityHashCode(t.ls3));
+    assert t.ls3.get(0).equals("hello");
+    assert t.ls3.get(1).equals("world");
+
     // Test files and paths
     assert t.inputFile != null
         : "@AssumeAssertion(nullness): application invariant: parsed string with --input-file";
@@ -146,7 +174,6 @@ public class TestOptions {
     assert t.input_path != null
         : "@AssumeAssertion(nullness): annotated JDK doesn't contain toFile() yet";
     assert t.input_path.toString().equals("/tmp/TestOptions2.txt");
-    ;
   }
 
   /** Test class for option alias testing. */
