@@ -20,11 +20,9 @@ Run these steps on any filesystem, except the `javadocWeb` step.
 
 * Make and test a snapshot release, see below.
 * git pull
-* In `build.gradle`, ensure that "To use a snapshot version" is not enabled.
-* Update the version number in `README.md`, `build.gradle`, and in this file
-  (multiple times in each).
-  Ensure the version number in `build.gradle` does not contain "-SNAPSHOT".
 * Update `CHANGELOG.md`.
+* Update the version number in `gradle.properties`, `README.md`, and
+  this file (possibly multiple times in each).
 * Save files and stage changes.
 * ./gradlew publishToMavenCentral
 * Browse to <https://central.sonatype.com/publishing/deployments>, click "publish".
