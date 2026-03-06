@@ -32,7 +32,7 @@ error-prone-core = "com.google.errorprone:error_prone_core:2.48.0"
 
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
 
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-jupiter" }
 
 reflection-util = "org.plumelib:reflection-util:1.1.5"
 
