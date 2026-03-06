@@ -2,14 +2,14 @@ plugins {
   id("java-library")
 
   // To create a fat jar build/libs/...-all.jar, run: ./gradlew shadowJar
-  id("com.gradleup.shadow").version("9.3.2")
+  alias(libs.plugins.com.gradleup.shadow)
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
   // Version 8.0.0 and later requires Java 17+.
-  id("com.diffplug.spotless").version("8.3.0")
+  alias(libs.plugins.com.diffplug.spotless)
 
   // Error Prone linter
-  id("net.ltgt.errorprone").version("5.1.0") apply false
+  alias(libs.plugins.net.ltgt.errorprone) apply false
 
   // PMD linter
   id("pmd")
@@ -18,10 +18,10 @@ plugins {
   id("jacoco")
 
   // Checker Framework pluggable type-checking
-  id("org.checkerframework").version("1.0.2")
+  alias(libs.plugins.org.checkerframework)
 
   // Publishing to Maven Central.
-  id("com.vanniktech.maven.publish").version("0.36.0")
+  alias(libs.plugins.com.vanniktech.maven.publish)
 }
 
 repositories {
@@ -38,13 +38,13 @@ ext {
 }
 
 dependencies {
-  implementation("io.github.classgraph:classgraph:4.8.184")
-  implementation("org.apache.commons:commons-lang3:3.20.0")
-  implementation("org.apache.commons:commons-text:1.15.0")
-  implementation("org.plumelib:reflection-util:1.1.5")
+  implementation(libs.classgraph)
+  implementation(libs.commons.lang3)
+  implementation(libs.commons.text)
+  implementation(libs.reflection.util)
 
-  testImplementation("org.junit.jupiter:junit-jupiter:5.14.3")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation(libs.junit.jupiter)
+  testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 java {
@@ -125,7 +125,7 @@ tasks.withType(JavaCompile).configureEach {
 if (isJava21orHigher) {
   apply plugin: "net.ltgt.errorprone"
   dependencies {
-    errorprone("com.google.errorprone:error_prone_core:${errorproneVersion}")
+    errorprone(libs.error.prone.core)
   }
   tasks.withType(JavaCompile).configureEach {
     options.errorprone {
@@ -239,7 +239,7 @@ configurations {
   requireJavadoc
 }
 dependencies {
-  requireJavadoc("org.plumelib:require-javadoc:2.0.0")
+  requireJavadoc(libs.require.javadoc)
 }
 def requireJavadoc = tasks.register("requireJavadoc", JavaExec) {
   group = "Documentation"
