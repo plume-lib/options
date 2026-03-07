@@ -494,8 +494,7 @@ public class Options {
       // Handle lists.  When a list argument is specified multiple times,
       // each argument value is appended to the list.
       Type genType = field.getGenericType();
-      if (genType instanceof ParameterizedType) {
-        ParameterizedType pt = (ParameterizedType) genType;
+      if (genType instanceof ParameterizedType pt) {
         Type rawType = pt.getRawType();
         if (!rawType.equals(List.class)) {
           throw new Error(
