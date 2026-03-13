@@ -1736,7 +1736,6 @@ public class Options {
 
     // Get the short name, long name, and description
     String shortName;
-    String typeName;
     @NonNull String description;
 
     // Get the short name (if any)
@@ -1755,7 +1754,8 @@ public class Options {
       description = val;
     }
 
-    // Get the type name (if any)
+    // Get the type name (if any).
+    String typeName;
     if (description.startsWith("<")) {
       typeName = description.substring(1).replaceFirst(">.*", "");
       description = description.replaceFirst("<.*> ", "");
