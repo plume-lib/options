@@ -1,8 +1,8 @@
 # Plume-lib Options change log
 
-## 2.1.0 (2023-09-??)
+## 3.0.0 (????-??-??)
 
-- Require Java 11.
+- Requires Java 21 to run.
 
 ## 2.0.3 (2022-12-07)
 
