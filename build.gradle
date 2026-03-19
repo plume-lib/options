@@ -115,7 +115,11 @@ tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Werror"
   // "-processing" avoids javac warning "No processor claimed any of these annotations".
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
-  options.compilerArgs << "-Xlint:all,-processing,-classfile,-this-escape"
+  if (JavaVersion.current() < JavaVersion.VERSION_21) {
+    options.compilerArgs << "-Xlint:all,-processing"
+  } else {
+    options.compilerArgs << "-Xlint:all,-processing,-this-escape"
+  }
 }
 apply plugin: "net.ltgt.errorprone"
 dependencies {
