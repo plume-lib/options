@@ -47,8 +47,8 @@ java {
   }
 }
 tasks.withType(JavaCompile).configureEach {
-  // Set the language level and byte code to 21.
-  options.release = 21
+  // Set the language level and byte code to 17.
+  options.release = 17
 }
 
 // Work around https://github.com/johnrengelman/shadow/issues/324
@@ -115,7 +115,7 @@ tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Werror"
   // "-processing" avoids javac warning "No processor claimed any of these annotations".
   // "-classfile" is because of classgraph and https://bugs.openjdk.java.net/browse/JDK-8190452
-  options.compilerArgs << "-Xlint:all,-processing,-classfile,-this-escape"
+  options.compilerArgs << "-Xlint:all,-processing"
 }
 apply plugin: "net.ltgt.errorprone"
 dependencies {
