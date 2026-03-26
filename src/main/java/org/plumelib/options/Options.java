@@ -536,13 +536,13 @@ public class Options {
         throw new Error(
             "Error while processing @Option(\"" + option.value() + "\") on '" + field + "'", e);
       }
-      shortName = pr.shortName;
-      if (pr.typeName != null) {
-        typeName = pr.typeName;
+      shortName = pr.shortName();
+      if (pr.typeName() != null) {
+        typeName = pr.typeName();
       } else {
         typeName = typeShortName(baseType);
       }
-      description = pr.description;
+      description = pr.description();
 
       // Get a constructor for non-primitive base types
       if (!baseType.isPrimitive() && !baseType.isEnum()) {
@@ -956,23 +956,23 @@ public class Options {
     // strings.
     args = args.trim();
     List<String> argList = new ArrayList<>();
-    String arg = "";
+    StringBuilder arg = new StringBuilder();
     for (int ii = 0; ii < args.length(); ii++) {
       char ch = args.charAt(ii);
       if ((ch == '\'') || (ch == '"')) {
-        arg += ch;
+        arg.append(ch);
         ii++;
         while ((ii < args.length()) && (args.charAt(ii) != ch)) {
-          arg += args.charAt(ii++);
+          arg.append(args.charAt(ii++));
         }
         if (ii >= args.length()) {
           throw new ArgException("Unclosed quote in command line: " + args);
         }
-        arg += ch;
+        arg.append(ch);
       } else if (Character.isWhitespace(ch)) {
         // System.out.printf ("adding argument '%s'%n", arg);
-        argList.add(arg);
-        arg = "";
+        argList.add(arg.toString());
+        arg.setLength(0);
         while ((ii < args.length()) && Character.isWhitespace(args.charAt(ii))) {
           ii++;
         }
@@ -982,11 +982,11 @@ public class Options {
           ii--;
         }
       } else { // must be part of current argument
-        arg += ch;
+        arg.append(ch);
       }
     }
-    if (!arg.equals("")) {
-      argList.add(arg);
+    if (!arg.isEmpty()) {
+      argList.add(arg.toString());
     }
 
     String[] argsArray = argList.toArray(new String[0]);
@@ -1699,30 +1699,15 @@ public class Options {
     }
   }
 
-  /** The result of parsing the argument to {@code @Option}. */
-  private static class ParseResult {
-    /** The short name of an option, or null if none. */
-    @Nullable String shortName;
-
-    /** The type name of an option, or null if none. */
-    @Nullable String typeName;
-
-    /** The description of an option. */
-    String description;
-
-    /**
-     * Create a new ParseResult.
-     *
-     * @param shortName the short name of an option, or null if none
-     * @param typeName the type name of an option, or null if none
-     * @param description the description of an option
-     */
-    ParseResult(@Nullable String shortName, @Nullable String typeName, String description) {
-      this.shortName = shortName;
-      this.typeName = typeName;
-      this.description = description;
-    }
-  }
+  /**
+   * The result of parsing the argument to {@code @Option}.
+   *
+   * @param shortName the short name of an option, or null if none
+   * @param typeName the type name of an option, or null if none
+   * @param description the description of an option
+   */
+  private record ParseResult(
+      @Nullable String shortName, @Nullable String typeName, String description) {}
 
   /**
    * Parse an option value (the argument to {@code @Option}) and return its three components
