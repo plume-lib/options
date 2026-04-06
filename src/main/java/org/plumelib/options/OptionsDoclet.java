@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
 import javax.lang.model.SourceVersion;
@@ -152,7 +151,7 @@ import org.plumelib.reflection.Signatures;
  * "America/Chicago"}, which is incorrect for users elsewhere. Using {@code noDocDefault} keeps the
  * HTML documentation system-agnostic.
  *
- * <p><b>Uppublicized options</b>
+ * <p><b>Unpublicized options</b>
  *
  * <p>The generated HTML documentation omits {@code @}{@link Unpublicized} options. It includes
  * unpublicized option groups if they contain any publicized options.
@@ -175,7 +174,7 @@ import org.plumelib.reflection.Signatures;
 public class OptionsDoclet implements Doclet {
 
   /** The system-specific line separator. */
-  private static String lineSep = System.lineSeparator();
+  private static final String lineSep = System.lineSeparator();
 
   /** How to use the Options doclet. */
   private static final String USAGE =
@@ -229,7 +228,7 @@ public class OptionsDoclet implements Doclet {
   /** The command-line options. */
   private Options options;
 
-  /** The DocTrees instance assocated with {@link #denv}. */
+  /** The DocTrees instance associated with {@link #denv}. */
   private DocTrees docTrees;
 
   /** Used to report errors. */
@@ -240,9 +239,7 @@ public class OptionsDoclet implements Doclet {
     "nullness:initialization.fields.uninitialized", // init() sets reporter, run() sets denv
     "initializedfields:contracts.postcondition" // init() sets reporter, run() sets denv
   })
-  public OptionsDoclet() {
-    // this.options = options;
-  }
+  public OptionsDoclet() {}
 
   // //////////////////////////////////////////////////////////////////////
   // Doclet-specific methods
@@ -529,7 +526,7 @@ public class OptionsDoclet implements Doclet {
           });
 
   /**
-   * Sets variables that can only be set after all command-line options have been processed. Isuses
+   * Sets variables that can only be set after all command-line options have been processed. Issues
    * errors and halts if any command-line options are incompatible with one another.
    */
   private void postprocessOptions() {
@@ -547,15 +544,11 @@ public class OptionsDoclet implements Doclet {
       hasError = true;
     }
     if (inPlace && docFile == null) {
-      printError("-i supplied but -docfile was not");
+      printError("-i supplied but --docfile was not");
       hasError = true;
     }
     if (docFile != null && outFile != null && outFile.equals(docFile)) {
       printError("--docfile must be different from --outfile");
-      hasError = true;
-    }
-    if (inPlace && docFile == null) {
-      printError("-i supplied but --docfile was not");
       hasError = true;
     }
     if (hasError) {
@@ -690,19 +683,30 @@ public class OptionsDoclet implements Doclet {
   //
 
   /**
+   * Returns the enclosed elements of the given type that have the given kind.
+   *
+   * @param type a type
+   * @param kind the kind of elements to return
+   * @return the enclosed elements of the given type that have the given kind
+   */
+  private List<VariableElement> enclosedElementsOfKind(TypeElement type, ElementKind kind) {
+    List<VariableElement> result = new ArrayList<>();
+    for (Element ee : type.getEnclosedElements()) {
+      if (ee.getKind() == kind) {
+        result.add((VariableElement) ee);
+      }
+    }
+    return result;
+  }
+
+  /**
    * Returns the fields defined by the given type.
    *
    * @param type a type
    * @return the fields defined by the given type
    */
   private List<VariableElement> fields(TypeElement type) {
-    List<VariableElement> result = new ArrayList<>();
-    for (Element ee : type.getEnclosedElements()) {
-      if (ee.getKind() == ElementKind.FIELD) {
-        result.add((VariableElement) ee);
-      }
-    }
-    return result;
+    return enclosedElementsOfKind(type, ElementKind.FIELD);
   }
 
   /**
@@ -712,13 +716,7 @@ public class OptionsDoclet implements Doclet {
    * @return the enum constants defined by the given type
    */
   private List<VariableElement> enumConstants(TypeElement type) {
-    List<VariableElement> result = new ArrayList<>();
-    for (Element ee : type.getEnclosedElements()) {
-      if (ee.getKind() == ElementKind.ENUM_CONSTANT) {
-        result.add((VariableElement) ee);
-      }
-    }
-    return result;
+    return enclosedElementsOfKind(type, ElementKind.ENUM_CONSTANT);
   }
 
   /** Adds Javadoc info to each option in {@code options.getOptions()}. */
@@ -858,18 +856,15 @@ public class OptionsDoclet implements Doclet {
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
-    try (Scanner s = new Scanner(optionsToHtml(refillWidth - padding - 2))) {
-      while (s.hasNextLine()) {
-        String line = s.nextLine();
-        StringBuilder bb = new StringBuilder();
-        bb.append(StringUtils.repeat(' ', padding));
-        if (line.trim().equals("")) {
-          bb.append('*');
-        } else {
-          bb.append("* ").append(line);
-        }
-        b.add(bb);
+    for (String line : optionsToHtml(refillWidth - padding - 2).lines().toList()) {
+      StringBuilder bb = new StringBuilder();
+      bb.append(StringUtils.repeat(' ', padding));
+      if (line.isBlank()) {
+        bb.append('*');
+      } else {
+        bb.append("* ").append(line);
       }
+      b.add(bb);
     }
 
     return b.toString();
@@ -956,10 +951,8 @@ public class OptionsDoclet implements Doclet {
     }
     multiLine.add(oneLine);
     if (suffix != null) {
-      try (Scanner s = new Scanner(suffix)) {
-        while (s.hasNextLine()) {
-          multiLine.add(StringUtils.repeat(" ", padding) + s.nextLine());
-        }
+      for (String line : suffix.lines().toList()) {
+        multiLine.add(StringUtils.repeat(" ", padding) + line);
       }
     }
     return multiLine.toString();
@@ -969,7 +962,7 @@ public class OptionsDoclet implements Doclet {
    * Returns the line of HTML describing one Option.
    *
    * @param oi the option to describe
-   * @param padding the number of spaces to add at the begginning of the detail line (after the line
+   * @param padding the number of spaces to add at the beginning of the detail line (after the line
    *     with the option itself)
    * @return HTML describing oi
    */
