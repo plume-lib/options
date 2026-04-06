@@ -354,6 +354,7 @@ public class Options {
   }
 
   /** All of the argument options as a single string. Used for debugging. */
+  @SuppressWarnings("PMD.AvoidStringBufferField")
   private StringBuilder optionsString = new StringBuilder();
 
   /** The system-dependent line separator. */
@@ -691,9 +692,9 @@ public class Options {
 
   /**
    * Prepare for option processing. Creates an object that will set fields in all the given
-   * arguments. An argument to this method may be a Class, in which case it must be fully initialized
-   * and its static fields are set. The names of all the options (that is, the fields annotated with
-   * &#064;{@link Option}) must be unique across all the arguments.
+   * arguments. An argument to this method may be a Class, in which case it must be fully
+   * initialized and its static fields are set. The names of all the options (that is, the fields
+   * annotated with &#064;{@link Option}) must be unique across all the arguments.
    *
    * @param usageSynopsis a synopsis of how to call your program
    * @param args the classes whose options to process
