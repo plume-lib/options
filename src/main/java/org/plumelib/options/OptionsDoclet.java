@@ -643,8 +643,9 @@ public class OptionsDoclet implements Doclet {
       boolean replacedOnce = false;
 
       while ((docline = doc.readLine()) != null) {
+        String trimmedLine = docline.trim();
         if (replacing) {
-          if (docline.trim().equals(endDelim)) {
+          if (trimmedLine.equals(endDelim)) {
             replacing = false;
           } else {
             continue;
@@ -653,7 +654,7 @@ public class OptionsDoclet implements Doclet {
 
         b.add(docline);
 
-        if (!replacedOnce && docline.trim().equals(startDelim)) {
+        if (!replacedOnce && trimmedLine.equals(startDelim)) {
           if (formatJavadoc) {
             int starIndex = docline.indexOf('*');
             b.add(docline.substring(0, starIndex + 1));
@@ -856,9 +857,10 @@ public class OptionsDoclet implements Doclet {
    */
   public String optionsToJavadoc(int padding, int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
+    String paddingStr = StringUtils.repeat(' ', padding);
     for (String line : optionsToHtml(refillWidth - padding - 2).lines().toList()) {
       StringBuilder bb = new StringBuilder();
-      bb.append(StringUtils.repeat(' ', padding));
+      bb.append(paddingStr);
       if (line.isBlank()) {
         bb.append('*');
       } else {
@@ -884,13 +886,14 @@ public class OptionsDoclet implements Doclet {
   private String optionListToHtml(
       List<Options.OptionInfo> optList, int padding, int firstLinePadding, int refillWidth) {
     StringJoiner b = new StringJoiner(lineSep);
+    String paddingStr = StringUtils.repeat(" ", padding);
     for (Options.OptionInfo oi : optList) {
       if (oi.unpublicized) {
         continue;
       }
       StringBuilder bb = new StringBuilder(32);
       String optHtml = optionToHtml(oi, padding);
-      bb.append(StringUtils.repeat(" ", padding));
+      bb.append(paddingStr);
       bb.append("<li id=\"option:").append(oi.longName).append("\">").append(optHtml);
       // .append("</li>");
       if (refillWidth <= 0) {
@@ -936,6 +939,7 @@ public class OptionsDoclet implements Doclet {
       compressedSpaces = compressedSpaces.substring(1);
     }
     String oneLine = StringUtils.repeat(" ", firstLinePadding) + compressedSpaces;
+    String paddingStr = StringUtils.repeat(" ", padding);
     StringJoiner multiLine = new StringJoiner(lineSep);
     while (oneLine.length() > refillWidth) {
       int breakLoc = oneLine.lastIndexOf(' ', refillWidth);
@@ -947,12 +951,12 @@ public class OptionsDoclet implements Doclet {
         break;
       }
       multiLine.add(firstPart);
-      oneLine = StringUtils.repeat(" ", padding) + oneLine.substring(breakLoc + 1);
+      oneLine = paddingStr + oneLine.substring(breakLoc + 1);
     }
     multiLine.add(oneLine);
     if (suffix != null) {
       for (String line : suffix.lines().toList()) {
-        multiLine.add(StringUtils.repeat(" ", padding) + line);
+        multiLine.add(paddingStr + line);
       }
     }
     return multiLine.toString();
