@@ -488,7 +488,7 @@ public class Options {
         defaultStr = defaultObj.toString();
       }
 
-      if (field.getType().isArray()) {
+      if (baseType.isArray()) {
         throw new Error("@Option may not annotate a variable of array type: " + field);
       }
 
@@ -829,15 +829,17 @@ public class Options {
     // Add each option to the option name map
     for (OptionInfo oi : options) {
       if (oi.shortName != null) {
-        if (nameToOption.containsKey("-" + oi.shortName)) {
+        String shortOptionName = "-" + oi.shortName;
+        if (nameToOption.containsKey(shortOptionName)) {
           throw new Error("short name " + oi + " appears twice");
         }
-        nameToOption.put("-" + oi.shortName, oi);
+        nameToOption.put(shortOptionName, oi);
       }
-      if (nameToOption.containsKey(prefix + oi.longName)) {
+      String longOptionName = prefix + oi.longName;
+      if (nameToOption.containsKey(longOptionName)) {
         throw new Error("long name " + oi + " appears twice");
       }
-      nameToOption.put(prefix + oi.longName, oi);
+      nameToOption.put(longOptionName, oi);
       if (useDashes && oi.longName.contains("-")) {
         nameToOption.put(prefix + oi.longName.replace('-', '_'), oi);
       }
