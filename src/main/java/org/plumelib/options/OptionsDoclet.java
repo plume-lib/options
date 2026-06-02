@@ -633,7 +633,6 @@ public class OptionsDoclet implements Doclet {
    *
    * @return the docfile, but with the command-line argument documentation updated
    */
-  @SuppressWarnings("PMD.AssignmentInOperand") // BufferedReader does not support iterable
   @RequiresNonNull("docFile")
   private String newDocFileText() {
     StringJoiner b = new StringJoiner(lineSep);
