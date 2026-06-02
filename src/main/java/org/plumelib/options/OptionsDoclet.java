@@ -1120,6 +1120,8 @@ public class OptionsDoclet implements Doclet {
     @Override
     public Void visitSee(SeeTree node, StringBuilder sb) {
       List<? extends DocTree> references = node.getReference();
+      // This loop can't use `StringJoiner` because `visit(references.get(i), sb)` works by side
+      // effect.
       for (int i = 0; i < references.size(); i++) {
         if (i > 0) {
           sb.append(", ");
