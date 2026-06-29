@@ -43,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signedness.qual.Signed;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.plumelib.util.CollectionsPlume;
 
 /**
  * The Options class:
@@ -514,7 +515,7 @@ public class Options {
         }
         @SuppressWarnings("unchecked")
         List<Object> defaultObjAsList = (List<Object>) defaultObj;
-        if (!isModifiable(defaultObjAsList)) {
+        if (!CollectionsPlume.isModifiable(defaultObjAsList)) {
           defaultObjAsList = new ArrayList<>(defaultObjAsList);
           fieldSet(field, obj, defaultObjAsList);
         }
@@ -1820,39 +1821,5 @@ public class Options {
       // possible problem here).
       throw new Error("Unexpected error setting " + field + " in " + obj + " to " + value, e);
     }
-  }
-
-  // ////////////////////////////////////////////////////////////////////////
-  // Temporary
-  //
-
-  // TODO: Copied from plume-util.  Remove it after plume-util >1.13.0 is released.
-  /**
-   * Given a collection defined in the JDK, returns true if it is modifiable.
-   *
-   * @param c a collection defined in the JDK
-   * @return true if the collection is modifiable
-   */
-  static boolean isModifiable(Collection<?> c) {
-    // This is a hack, but I don't know how else to implement it.
-    // This implementation is error-prone because (per the documentation of `Class.getName()`)
-    // "Distinct class objects can have the same name but different class loaders."
-
-    String className = c.getClass().getName();
-    if (className == "java.util.Arrays$ArrayList") { // NOPMD: UseEqualsToCompareStrings
-      return false;
-    } else if (className.startsWith("java.util.Collections$")) {
-      String nestedClassSimpleName = className.substring("java.util.Collections$".length());
-      if (nestedClassSimpleName.startsWith("Copies")
-          || nestedClassSimpleName.startsWith("Empty")
-          || nestedClassSimpleName.startsWith("Singleton")
-          || nestedClassSimpleName.startsWith("Unmodifiable")) {
-        return false;
-      }
-    } else if (className.startsWith("java.util.ImmutableCollections$")) {
-      return false;
-    }
-
-    return true;
   }
 }
