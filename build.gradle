@@ -35,6 +35,7 @@ dependencies {
   implementation(libs.classgraph)
   implementation(libs.commons.lang3)
   implementation(libs.commons.text)
+  implementation(libs.plume.util)
   implementation(libs.reflection.util)
 
   testImplementation(libs.junit.jupiter)
