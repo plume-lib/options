@@ -5,7 +5,7 @@ plugins {
   alias(libs.plugins.com.gradleup.shadow)
 
   // Code formatting; defines targets "spotlessApply" and "spotlessCheck"
-  // which is run by "check" (which is itself run by "build").
+  // which are run by "check" (which is itself run by "build").
   alias(libs.plugins.com.diffplug.spotless)
 
   // Error Prone linter
@@ -49,7 +49,7 @@ java {
   }
 }
 tasks.withType(JavaCompile).configureEach {
-  // Set the language level and byte code to 17.
+  // Set the language level and bytecode to 17.
   options.release = 17
 }
 
