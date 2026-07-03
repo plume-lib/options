@@ -396,13 +396,13 @@ public class TestOptions {
     Assertions.assertThrows(
         ArgException.class,
         () -> {
-          // should fail: option argument can not leave out _ or -
+          // should fail: option argument cannot leave out _ or -
           options.parse(new String[] {"--first-pass", "smartrle"});
         });
     Assertions.assertThrows(
         ArgException.class,
         () -> {
-          // should fail: option name can not leave out _ or -
+          // should fail: option name cannot leave out _ or -
           options.parse(new String[] {"--firstpass", "smart-rle"});
         });
   }

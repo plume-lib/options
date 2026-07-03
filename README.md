@@ -72,6 +72,6 @@ manual.
 
 Another similar library is picocli.  It generates usage messages, and also
 man pages.  Its syntax is more verbose than that of plume-lib Options.  It
-does not support having multiple different programs share command lines
+does not support having multiple different programs share command-line
 arguments; if you want to do that, it suggests making them subcommands of a
 single program.

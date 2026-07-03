@@ -147,9 +147,9 @@ import org.plumelib.reflection.Signatures;
  * public static String timezone = TimeZone.getDefault().getID();</pre>
  *
  * <p>Suppose that HTML documentation is generated in Chicago. Without {@code noDocDefault}, the
- * HTML documentation would incorrectly state that the default time zone is {@code
- * "America/Chicago"}, which is incorrect for users elsewhere. Using {@code noDocDefault} keeps the
- * HTML documentation system-agnostic.
+ * HTML documentation would state that the default time zone is {@code "America/Chicago"}, which is
+ * incorrect for users elsewhere. Using {@code noDocDefault} keeps the HTML documentation
+ * system-agnostic.
  *
  * <p><b>Unpublicized options</b>
  *
@@ -540,7 +540,7 @@ public class OptionsDoclet implements Doclet {
 
     boolean hasError = false;
     if (inPlace && outFile != null) {
-      printError("-i and -outfile can not be used at the same time");
+      printError("-i and -outfile cannot be used at the same time");
       hasError = true;
     }
     if (inPlace && docFile == null) {
@@ -808,7 +808,7 @@ public class OptionsDoclet implements Doclet {
     if (includeClassDoc && !classes.isEmpty()) {
       Element firstElement = classes.iterator().next();
       b.add(docCommentToHtml(docTrees.getDocCommentTree(firstElement)));
-      b.add("<p>Command line options:</p>");
+      b.add("<p>Command-line options:</p>");
     }
 
     b.add("<ul>");
@@ -1039,7 +1039,7 @@ public class OptionsDoclet implements Doclet {
     return result.toString();
   }
 
-  /** Converts DocTree to a HTML string. . */
+  /** Converts a DocTree to an HTML string. */
   static class DocCommentToHtmlVisitor extends SimpleDocTreeVisitor<Void, StringBuilder> {
 
     /** Create a new DocCommentToHtmlVisitor. */

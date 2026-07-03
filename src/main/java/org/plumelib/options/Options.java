@@ -998,12 +998,12 @@ public class Options {
   }
 
   /**
-   * Sets option variables from the given command line. {@code parse()} should only be called once
-   * on any given {@code Options} value.
+   * Sets option variables from the given command line. This method should only be called once on
+   * any given {@code Options} value.
    *
-   * @param args the commandline to be parsed
+   * @param args the command line to be parsed
    * @return all non-option arguments
-   * @throws ArgException if the command line contains unknown option or misused options
+   * @throws ArgException if the command line contains an unknown or misused option
    */
   @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public String[] parse(String[] args) throws ArgException {
@@ -1603,7 +1603,7 @@ public class Options {
    * essentially the contents of args[] with all non-options removed. It can be used for calling a
    * subprocess or for debugging.
    *
-   * @return options, similarly to supplied on the command line
+   * @return the options, formatted as they were supplied on the command line
    * @see #settings()
    */
   public String getOptionsString() {
@@ -1803,7 +1803,7 @@ public class Options {
    * Field.set}, but throws no exceptions other than an informative Error.
    *
    * @param field the field to set
-   * @param obj object from whose field is to be set; may be null if the field is static
+   * @param obj object whose field is to be set; may be null if the field is static
    * @param value the new value for the field {@code field} of {@code obj} being modified
    */
   @SuppressWarnings({
