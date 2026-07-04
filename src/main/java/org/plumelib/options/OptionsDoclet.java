@@ -1218,8 +1218,8 @@ public class OptionsDoclet implements Doclet {
       startDelim = "* " + startDelim;
       endDelim = "* " + endDelim;
     } else if (!val && formatJavadoc) {
-      startDelim = Strings.CS.removeStart("* ", startDelim);
-      endDelim = Strings.CS.removeStart("* ", endDelim);
+      startDelim = Strings.CS.removeStart(startDelim, "* ");
+      endDelim = Strings.CS.removeStart(endDelim, "* ");
     }
     this.formatJavadoc = val;
   }
