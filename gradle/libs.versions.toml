@@ -34,8 +34,8 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.r
 
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-jupiter" }
 
-plume-util = "org.plumelib:plume-util:1.14.0"
+plume-util = "org.plumelib:plume-util:2.0.0-SNAPSHOT"
 
-reflection-util = "org.plumelib:reflection-util:1.1.6"
+reflection-util = "org.plumelib:reflection-util:2.0.0-SNAPSHOT"
 
-require-javadoc = "org.plumelib:require-javadoc:2.0.0"
+require-javadoc = "org.plumelib:require-javadoc:3.0.0-SNAPSHOT"

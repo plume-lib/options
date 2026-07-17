@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signedness.qual.Signed;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
-import org.plumelib.util.CollectionsPlume;
+import org.plumelib.util.CollectionsP;
 
 /**
  * The Options class:
@@ -515,7 +515,7 @@ public class Options {
         }
         @SuppressWarnings("unchecked")
         List<Object> defaultObjAsList = (List<Object>) defaultObj;
-        if (!CollectionsPlume.isModifiable(defaultObjAsList)) {
+        if (!CollectionsP.isModifiable(defaultObjAsList)) {
           defaultObjAsList = new ArrayList<>(defaultObjAsList);
           fieldSet(field, obj, defaultObjAsList);
         }
