@@ -634,6 +634,7 @@ public class OptionsDoclet implements Doclet {
    * @return the docfile, but with the command-line argument documentation updated
    */
   @RequiresNonNull("docFile")
+  @SuppressWarnings("PMD.AssignmentInOperand") // idiomatic read-until-null loop
   private String newDocFileText() {
     StringJoiner b = new StringJoiner(lineSep);
     try (BufferedReader doc = Files.newBufferedReader(docFile.toPath(), UTF_8)) {
@@ -641,7 +642,7 @@ public class OptionsDoclet implements Doclet {
       boolean replacing = false;
       boolean replacedOnce = false;
 
-      while ((docline = doc.readLine()) != null) { // NOPMD
+      while ((docline = doc.readLine()) != null) {
         String trimmedLine = docline.trim();
         if (replacing) {
           if (trimmedLine.equals(endDelim)) {
