@@ -641,7 +641,7 @@ public class OptionsDoclet implements Doclet {
       boolean replacing = false;
       boolean replacedOnce = false;
 
-      while ((docline = doc.readLine()) != null) {
+      while ((docline = doc.readLine()) != null) { // NOPMD
         String trimmedLine = docline.trim();
         if (replacing) {
           if (trimmedLine.equals(endDelim)) {
