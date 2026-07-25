@@ -407,6 +407,182 @@ public class TestOptions {
         });
   }
 
+  static class ClassWithWrapperOptions {
+    @Option("a Boolean")
+    public @Nullable Boolean booleanWrapper;
+
+    @Option("a Byte")
+    public @Nullable Byte byteWrapper;
+
+    @Option("a Short")
+    public @Nullable Short shortWrapper;
+
+    @Option("an Integer")
+    public @Nullable Integer integerWrapper;
+
+    @Option("a Long")
+    public @Nullable Long longWrapper;
+
+    @Option("a Float")
+    public @Nullable Float floatWrapper;
+
+    @Option("a Double")
+    public @Nullable Double doubleWrapper;
+  }
+
+  /**
+   * Test that every supported primitive type wrapper is converted, and that a wrapper field for
+   * which no command-line argument was supplied retains its null default.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testWrapperOptions() throws ArgException {
+    ClassWithWrapperOptions t = new ClassWithWrapperOptions();
+    Options options = new Options("test", t);
+
+    options.parse(
+        new String[] {
+          "--boolean-wrapper=false",
+          "--byte-wrapper=12",
+          "--short-wrapper=-1234",
+          "--integer-wrapper=123456",
+          "--long-wrapper=12345678901",
+          "--float-wrapper=1.5",
+        });
+
+    assert Boolean.FALSE.equals(t.booleanWrapper) : t.booleanWrapper;
+    assert Byte.valueOf((byte) 12).equals(t.byteWrapper) : t.byteWrapper;
+    assert Short.valueOf((short) -1234).equals(t.shortWrapper) : t.shortWrapper;
+    assert Integer.valueOf(123456).equals(t.integerWrapper) : t.integerWrapper;
+    assert Long.valueOf(12345678901L).equals(t.longWrapper) : t.longWrapper;
+    assert Float.valueOf(1.5f).equals(t.floatWrapper) : t.floatWrapper;
+    // Use of a wrapper type allows the argument to have no default value.
+    assert t.doubleWrapper == null : t.doubleWrapper;
+
+    // A Boolean option, like a boolean one, may be supplied without a value.
+    options.parse(new String[] {"--boolean-wrapper", "--double-wrapper=2.5"});
+    assert Boolean.TRUE.equals(t.booleanWrapper) : t.booleanWrapper;
+    assert Double.valueOf(2.5).equals(t.doubleWrapper) : t.doubleWrapper;
+  }
+
+  @Test
+  void testWrapperOptionsFail() throws ArgException {
+    ClassWithWrapperOptions t = new ClassWithWrapperOptions();
+    Options options = new Options("test", t);
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          // should fail: not an integer
+          options.parse(new String[] {"--integer-wrapper=hello"});
+        });
+    Assertions.assertThrows(
+        ArgException.class,
+        () -> {
+          // should fail: not a boolean.  A Boolean is validated just as a boolean is, rather
+          // than silently becoming false.
+          options.parse(new String[] {"--boolean-wrapper=maybe"});
+        });
+  }
+
+  static class ClassWithPrimitiveAndWrapperOptions {
+    @Option("an int")
+    public int intPrimitive;
+
+    @Option("an Integer")
+    public @Nullable Integer intWrapper;
+
+    @Option("a boolean")
+    public boolean boolPrimitive;
+
+    @Option("a Boolean")
+    public @Nullable Boolean boolWrapper;
+  }
+
+  /**
+   * Test that a primitive type and its wrapper accept the same arguments: the same numeric formats
+   * and the same boolean spellings.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testPrimitiveAndWrapperAgree() throws ArgException {
+    // Each argument is written in decimal, hexadecimal, and octal.
+    String[] integralArgs = {"16", "0x10", "0X10", "#10", "020", "-0x10"};
+    int[] expected = {16, 16, 16, 16, 16, -16};
+    for (int i = 0; i < integralArgs.length; i++) {
+      ClassWithPrimitiveAndWrapperOptions t = new ClassWithPrimitiveAndWrapperOptions();
+      Options options = new Options("test", t);
+      options.parse(
+          new String[] {"--int-primitive=" + integralArgs[i], "--int-wrapper=" + integralArgs[i]});
+      assert t.intPrimitive == expected[i] : integralArgs[i] + " -> " + t.intPrimitive;
+      assert Integer.valueOf(expected[i]).equals(t.intWrapper)
+          : integralArgs[i] + " -> " + t.intWrapper;
+    }
+
+    // Each spelling of a boolean, and the corresponding expected value.
+    String[] booleanArgs = {"true", "TRUE", "t", "T", "false", "False", "f", "F"};
+    boolean[] expectedBooleans = {true, true, true, true, false, false, false, false};
+    for (int i = 0; i < booleanArgs.length; i++) {
+      ClassWithPrimitiveAndWrapperOptions t = new ClassWithPrimitiveAndWrapperOptions();
+      Options options = new Options("test", t);
+      options.parse(
+          new String[] {"--bool-primitive=" + booleanArgs[i], "--bool-wrapper=" + booleanArgs[i]});
+      assert t.boolPrimitive == expectedBooleans[i] : booleanArgs[i];
+      assert Boolean.valueOf(expectedBooleans[i]).equals(t.boolWrapper) : booleanArgs[i];
+    }
+
+    // A value that neither a primitive nor a wrapper accepts.
+    for (String badArg : new String[] {"maybe", "yes", "", "2"}) {
+      ClassWithPrimitiveAndWrapperOptions t = new ClassWithPrimitiveAndWrapperOptions();
+      Options options = new Options("test", t);
+      Assertions.assertThrows(
+          ArgException.class, () -> options.parse(new String[] {"--bool-primitive=" + badArg}));
+      Assertions.assertThrows(
+          ArgException.class, () -> options.parse(new String[] {"--bool-wrapper=" + badArg}));
+    }
+  }
+
+  static class ClassWithCharacterOptions {
+    @Option("a char")
+    public char charPrimitive = ' ';
+
+    @Option("a Character")
+    public @Nullable Character charWrapper;
+  }
+
+  /**
+   * Test that char and Character accept the same arguments: exactly one character, and nothing
+   * else.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testCharacterOptions() throws ArgException {
+    for (String arg : new String[] {"x", "X", "7", "-", "=", " "}) {
+      ClassWithCharacterOptions t = new ClassWithCharacterOptions();
+      Options options = new Options("test", t);
+      options.parse(new String[] {"--char-primitive=" + arg, "--char-wrapper=" + arg});
+      assert t.charPrimitive == arg.charAt(0) : arg + " -> " + t.charPrimitive;
+      assert Character.valueOf(arg.charAt(0)).equals(t.charWrapper) : arg + " -> " + t.charWrapper;
+    }
+
+    // Use of a wrapper type allows the argument to have no default value.
+    ClassWithCharacterOptions unset = new ClassWithCharacterOptions();
+    new Options("test", unset);
+    assert unset.charWrapper == null : unset.charWrapper;
+
+    // Neither a char nor a Character accepts a value that is not exactly one character.
+    for (String badArg : new String[] {"", "xy", "abc"}) {
+      ClassWithCharacterOptions t = new ClassWithCharacterOptions();
+      Options options = new Options("test", t);
+      Assertions.assertThrows(
+          ArgException.class, () -> options.parse(new String[] {"--char-primitive=" + badArg}));
+      Assertions.assertThrows(
+          ArgException.class, () -> options.parse(new String[] {"--char-wrapper=" + badArg}));
+    }
+  }
+
   /**
    * Test that tokenize throws ArgException for unclosed quotes.
    *
