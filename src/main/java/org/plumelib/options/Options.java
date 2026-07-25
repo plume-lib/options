@@ -891,8 +891,8 @@ public class Options {
       // optionName contains no underscores, but does contain a capital letter.
       // Insert an underscore before each capital letter, which is downcased.
       StringBuilder lnb = new StringBuilder();
-      int optionNamelength = optionName.length();
-      for (int i = 0; i < optionNamelength; i++) {
+      int optionNameLength = optionName.length();
+      for (int i = 0; i < optionNameLength; i++) {
         char ch = optionName.charAt(i);
         if (Character.isUpperCase(ch)) {
           lnb.append('_');
@@ -1437,7 +1437,7 @@ public class Options {
             String[] aarr = argValue.trim().split(" +", -1);
             for (String aval : aarr) {
               Object val = getRefArg(oi, argName, aval);
-              oi.list.add(val); // uncheck cast
+              oi.list.add(val); // unchecked cast
             }
           } else {
             Object val = getRefArg(oi, argName, argValue);
