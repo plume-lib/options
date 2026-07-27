@@ -46,7 +46,7 @@ use a rule like this:
 
 ```gradle
 task updateUserOptions(type: Javadoc, dependsOn: "assemble") {
-  group = "Documentation"
+  group = "documentation"
   description = "Updates printed documentation of command-line arguments."
   source = sourceSets.main.allJava.files.sort()
   classpath = project.sourceSets.main.compileClasspath
