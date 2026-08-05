@@ -815,7 +815,7 @@ public class Options {
             // without including an @OptionGroup annotation on the first
             // @Option-annotated field, hence violating the requirement.
 
-            // NOTE: changing this error string requires changes to TestPlume
+            // NOTE: changing this error string requires changes to TestOptions
             throw new Error(
                 "missing @OptionGroup annotation on the first "
                     + "@Option-annotated field of class "
@@ -839,7 +839,7 @@ public class Options {
         // This is so we can check that the first @Option-annotated field of every class/object in
         // 'args' has an @OptionGroup annotation when hasGroups is true, as required.
         if (currentGroup == null) {
-          // NOTE: changing this error string requires changes to TestPlume
+          // NOTE: changing this error string requires changes to TestOptions
           throw new Error("missing @OptionGroup annotation in field " + f + " of class " + obj);
         }
 

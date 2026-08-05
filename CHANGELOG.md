@@ -1,6 +1,6 @@
 # Plume-lib Options change log
 
-## 3.0.0 (????-??-??)
+## 3.0.0 (2026-08-05)
 
 - Requires Java 17 to run.
 

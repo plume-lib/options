@@ -35,11 +35,11 @@ In a Gradle buildfile, write
 
 ```gradle
 dependencies {
-  implementation("org.plumelib:options:2.0.3")
+  implementation("org.plumelib:options:3.0.0")
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/3.0.0/jar).
 
 To update user documentation after an option or its documentation has changed,
 use a rule like this:
@@ -61,7 +61,7 @@ task updateUserOptions(type: Javadoc, dependsOn: "assemble") {
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/3.0.0/jar).
 
 ## Alternatives
 
