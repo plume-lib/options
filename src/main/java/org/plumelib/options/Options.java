@@ -384,7 +384,6 @@ public class Options {
           Double.class);
 
   /** Information about an option. */
-  @SuppressWarnings("PMD.TooManyFields")
   class OptionInfo {
 
     /** What variable the option sets. */
