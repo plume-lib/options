@@ -975,7 +975,6 @@ public class Options {
    * @return a string array analogous to the argument to {@code main}
    * @throws ArgException if the command line contains an unclosed quote
    */
-  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public static String[] tokenize(String args) throws ArgException {
 
     // Split the args string on whitespace boundaries accounting for quoted
@@ -1027,7 +1026,6 @@ public class Options {
    * @return all non-option arguments
    * @throws ArgException if the command line contains an unknown or misused option
    */
-  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public String[] parse(String[] args) throws ArgException {
 
     List<String> nonOptions = new ArrayList<>();
