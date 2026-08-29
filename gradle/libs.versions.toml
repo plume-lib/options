@@ -22,7 +22,7 @@ pmd = "7.27.0"
 # `checkerFramework.version`.
 checker-framework = { module = "org.checkerframework:checker", version.ref = "checker-framework" }
 
-classgraph = { module = "io.github.classgraph:classgraph", version = "4.8.193" }
+classgraph = { module = "io.github.classgraph:classgraph", version = "4.8.194" }
 
 commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.20.0" }
 
@@ -54,12 +54,12 @@ require-javadoc = { module = "org.plumelib:require-javadoc", version = "3.0.0" }
 
 [plugins]
 
-com-diffplug-spotless = { id = "com.diffplug.spotless", version = "8.10.0" }
+com-diffplug-spotless = { id = "com.diffplug.spotless", version = "8.10.1" }
 
 com-gradleup-shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
 
 com-vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version = "0.37.0" }
 
-net-ltgt-errorprone = { id = "net.ltgt.errorprone", version = "5.1.0" }
+net-ltgt-errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }
 
 org-checkerframework = { id = "org.checkerframework", version = "1.0.2" }
