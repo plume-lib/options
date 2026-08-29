@@ -563,7 +563,6 @@ public class OptionsDoclet implements Doclet {
    * @param clazz the class whose values will be created by command-line arguments
    * @return true if the class needs to be instantiated before command-line arguments are parsed
    */
-  @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName") // false positive
   private static boolean needsInstantiation(Class<?> clazz) {
     for (Field f : clazz.getDeclaredFields()) {
       if (f.isAnnotationPresent(org.plumelib.options.Option.class)
