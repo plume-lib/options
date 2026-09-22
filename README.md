@@ -35,18 +35,18 @@ In a Gradle buildfile, write
 
 ```gradle
 dependencies {
-  implementation("org.plumelib:options:2.0.3")
+  implementation("org.plumelib:options:3.0.0")
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/3.0.0/jar).
 
 To update user documentation after an option or its documentation has changed,
 use a rule like this:
 
 ```gradle
 task updateUserOptions(type: Javadoc, dependsOn: "assemble") {
-  group = "Documentation"
+  group = "documentation"
   description = "Updates printed documentation of command-line arguments."
   source = sourceSets.main.allJava.files.sort()
   classpath = project.sourceSets.main.compileClasspath
@@ -61,7 +61,7 @@ task updateUserOptions(type: Javadoc, dependsOn: "assemble") {
 }
 ```
 
-Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/2.0.3/jar).
+Other build systems are [similar](https://search.maven.org/artifact/org.plumelib/options/3.0.0/jar).
 
 ## Alternatives
 
@@ -72,6 +72,6 @@ manual.
 
 Another similar library is picocli.  It generates usage messages, and also
 man pages.  Its syntax is more verbose than that of plume-lib Options.  It
-does not support having multiple different programs share command lines
+does not support having multiple different programs share command-line
 arguments; if you want to do that, it suggests making them subcommands of a
 single program.

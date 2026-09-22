@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.formatter.qual.FormatMethod;
@@ -47,7 +48,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signedness.qual.Signed;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
-import org.plumelib.util.CollectionsPlume;
+import org.plumelib.util.CollectionsP;
 
 /**
  * The Options class:
@@ -223,13 +224,18 @@ import org.plumelib.util.CollectionsPlume;
  *
  * <ul>
  *   <li>Primitive types: boolean, byte, char, short, int, long, float, double.
- *   <li>Primitive type wrappers: Boolean, Byte, Char, Short, Integer, Long, Float, Double. Use of a
- *       wrapper type allows the argument to have no default value.
+ *   <li>Primitive type wrappers: Boolean, Byte, Character, Short, Integer, Long, Float, Double. Use
+ *       of a wrapper type allows the argument to have no default value. A wrapper type accepts
+ *       exactly the same arguments as its corresponding primitive type.
  *   <li>Reference types that have a constructor with a single string parameter.
  *   <li>java.util.regex.Pattern.
  *   <li>enums.
  *   <li>Lists of any of the above reference types.
  * </ul>
+ *
+ * <p>A boolean or Boolean argument must be "true", "t", "false", or "f", ignoring case. An integral
+ * argument may be written in decimal, in hexadecimal (with prefix "0x", "0X", or "#"), or in octal
+ * (with prefix "0"), as by {@link Integer#decode}.
  *
  * <p><b>Customization</b>
  *
@@ -365,8 +371,23 @@ public class Options {
   /** The system-dependent line separator. */
   private static final String lineSeparator = System.lineSeparator();
 
+  /**
+   * The primitive type wrappers. Each is converted by {@link #getScalarArg}, exactly as the
+   * corresponding primitive type is, so that (for example) {@code Integer} and {@code int} accept
+   * the same command-line arguments.
+   */
+  private static final Set<Class<?>> PRIMITIVE_WRAPPERS =
+      Set.of(
+          Boolean.class,
+          Byte.class,
+          Character.class,
+          Short.class,
+          Integer.class,
+          Long.class,
+          Float.class,
+          Double.class);
+
   /** Information about an option. */
-  @SuppressWarnings("PMD.TooManyFields")
   class OptionInfo {
 
     /** What variable the option sets. */
@@ -519,7 +540,7 @@ public class Options {
         }
         @SuppressWarnings("unchecked")
         List<Object> defaultObjAsList = (List<Object>) defaultObj;
-        if (!CollectionsPlume.isModifiable(defaultObjAsList)) {
+        if (!CollectionsP.isModifiable(defaultObjAsList)) {
           defaultObjAsList = new ArrayList<>(defaultObjAsList);
           fieldSet(field, obj, defaultObjAsList);
         }
@@ -550,8 +571,9 @@ public class Options {
       }
       description = pr.description();
 
-      // Get a constructor for non-primitive base types
-      if (!baseType.isPrimitive() && !baseType.isEnum()) {
+      // Get a constructor for non-primitive base types.  Primitive type wrappers need neither a
+      // constructor nor a factory, because getScalarArg converts them.
+      if (!baseType.isPrimitive() && !baseType.isEnum() && !PRIMITIVE_WRAPPERS.contains(baseType)) {
         try {
           if (baseType == Path.class) {
             factory = Paths.class.getMethod("get", String.class, String[].class);
@@ -796,7 +818,7 @@ public class Options {
             // without including an @OptionGroup annotation on the first
             // @Option-annotated field, hence violating the requirement.
 
-            // NOTE: changing this error string requires changes to TestPlume
+            // NOTE: changing this error string requires changes to TestOptions
             throw new Error(
                 "missing @OptionGroup annotation on the first "
                     + "@Option-annotated field of class "
@@ -820,7 +842,7 @@ public class Options {
         // This is so we can check that the first @Option-annotated field of every class/object in
         // 'args' has an @OptionGroup annotation when hasGroups is true, as required.
         if (currentGroup == null) {
-          // NOTE: changing this error string requires changes to TestPlume
+          // NOTE: changing this error string requires changes to TestOptions
           throw new Error("missing @OptionGroup annotation in field " + f + " of class " + obj);
         }
 
@@ -872,8 +894,8 @@ public class Options {
       // optionName contains no underscores, but does contain a capital letter.
       // Insert an underscore before each capital letter, which is downcased.
       StringBuilder lnb = new StringBuilder();
-      int optionNamelength = optionName.length();
-      for (int i = 0; i < optionNamelength; i++) {
+      int optionNameLength = optionName.length();
+      for (int i = 0; i < optionNameLength; i++) {
         char ch = optionName.charAt(i);
         if (Character.isUpperCase(ch)) {
           lnb.append('_');
@@ -957,7 +979,6 @@ public class Options {
    * @return a string array analogous to the argument to {@code main}
    * @throws ArgException if the command line contains an unclosed quote
    */
-  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public static String[] tokenize(String args) throws ArgException {
 
     // Split the args string on whitespace boundaries accounting for quoted
@@ -1002,14 +1023,13 @@ public class Options {
   }
 
   /**
-   * Sets option variables from the given command line. {@code parse()} should only be called once
-   * on any given {@code Options} value.
+   * Sets option variables from the given command line. This method should only be called once on
+   * any given {@code Options} value.
    *
-   * @param args the commandline to be parsed
+   * @param args the command line to be parsed
    * @return all non-option arguments
-   * @throws ArgException if the command line contains unknown option or misused options
+   * @throws ArgException if the command line contains an unknown or misused option
    */
-  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   public String[] parse(String[] args) throws ArgException {
 
     List<String> nonOptions = new ArrayList<>();
@@ -1032,7 +1052,7 @@ public class Options {
 
       if (arg.equals("--")) {
         ignoreOptions = true;
-      } else if ((arg.startsWith("--") || arg.startsWith("-")) && !ignoreOptions) {
+      } else if (arg.startsWith("-") && !ignoreOptions) {
         String argName;
         String argValue;
 
@@ -1402,82 +1422,8 @@ public class Options {
 
     try {
       if (type.isPrimitive()) {
-        if (type == Boolean.TYPE) {
-          boolean val;
-          String argValueLowercase = argValue.toLowerCase(Locale.getDefault());
-          if (argValueLowercase.equals("true") || argValueLowercase.equals("t")) {
-            val = true;
-          } else if (argValueLowercase.equals("false") || argValueLowercase.equals("f")) {
-            val = false;
-          } else {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a boolean", argValue, argName);
-          }
-          // System.out.printf ("Setting %s to %s%n", argName, val);
-          f.setBoolean(oi.obj, val);
-        } else if (type == Byte.TYPE) {
-          byte val;
-          try {
-            val = Byte.decode(argValue);
-          } catch (Exception e) {
-            throw new ArgException("Value \"%s\" for argument %s is not a byte", argValue, argName);
-          }
-          f.setByte(oi.obj, val);
-        } else if (type == Character.TYPE) {
-          if (argValue.length() != 1) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a single character", argValue, argName);
-          }
-          char val = argValue.charAt(0);
-          f.setChar(oi.obj, val);
-        } else if (type == Short.TYPE) {
-          short val;
-          try {
-            val = Short.decode(argValue);
-          } catch (Exception e) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a short integer", argValue, argName);
-          }
-          f.setShort(oi.obj, val);
-        } else if (type == Integer.TYPE) {
-          int val;
-          try {
-            val = Integer.decode(argValue);
-          } catch (Exception e) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not an integer", argValue, argName);
-          }
-          f.setInt(oi.obj, val);
-        } else if (type == Long.TYPE) {
-          long val;
-          try {
-            val = Long.decode(argValue);
-          } catch (Exception e) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a long integer", argValue, argName);
-          }
-          f.setLong(oi.obj, val);
-        } else if (type == Float.TYPE) {
-          Float val;
-          try {
-            val = Float.valueOf(argValue);
-          } catch (Exception e) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a float", argValue, argName);
-          }
-          f.setFloat(oi.obj, val);
-        } else if (type == Double.TYPE) {
-          Double val;
-          try {
-            val = Double.valueOf(argValue);
-          } catch (Exception e) {
-            throw new ArgException(
-                "Value \"%s\" for argument %s is not a double", argValue, argName);
-          }
-          f.setDouble(oi.obj, val);
-        } else { // unexpected type
-          throw new Error("Unexpected type " + type);
-        }
+        // Field.set performs the unwrapping conversion to the field's primitive type.
+        f.set(oi.obj, getScalarArg(type, argName, argValue));
       } else { // reference type
 
         // If the argument is a list, add repeated arguments or multiple
@@ -1492,7 +1438,7 @@ public class Options {
             String[] aarr = argValue.trim().split(" +", -1);
             for (String aval : aarr) {
               Object val = getRefArg(oi, argName, aval);
-              oi.list.add(val); // uncheck cast
+              oi.list.add(val); // unchecked cast
             }
           } else {
             Object val = getRefArg(oi, argName, argValue);
@@ -1511,6 +1457,81 @@ public class Options {
   }
 
   /**
+   * Given a value string supplied on the command line, create a value of a primitive type or of a
+   * primitive type wrapper.
+   *
+   * <p>A primitive type and its wrapper are converted identically, so that (for example) {@code
+   * int} and {@code Integer} accept the same command-line arguments. The integral types accept the
+   * formats of {@link Integer#decode}: decimal, hexadecimal (prefix {@code 0x}, {@code 0X}, or
+   * {@code #}), and octal (prefix {@code 0}).
+   *
+   * @param type a primitive type, or one of {@link #PRIMITIVE_WRAPPERS}
+   * @param argName the argument name -- used only for diagnostics
+   * @param argValue the command-line argument
+   * @return a value of the given type, whose printed representation is {@code argValue}
+   * @throws ArgException if {@code argValue} is not parsable as {@code type}
+   */
+  private static Object getScalarArg(Class<?> type, String argName, String argValue)
+      throws ArgException {
+    if (type == Boolean.TYPE || type == Boolean.class) {
+      String argValueLowercase = argValue.toLowerCase(Locale.getDefault());
+      if (argValueLowercase.equals("true") || argValueLowercase.equals("t")) {
+        return true;
+      } else if (argValueLowercase.equals("false") || argValueLowercase.equals("f")) {
+        return false;
+      } else {
+        throw new ArgException("Value \"%s\" for argument %s is not a boolean", argValue, argName);
+      }
+    } else if (type == Byte.TYPE || type == Byte.class) {
+      try {
+        return Byte.decode(argValue);
+      } catch (Exception e) {
+        throw new ArgException("Value \"%s\" for argument %s is not a byte", argValue, argName);
+      }
+    } else if (type == Character.TYPE || type == Character.class) {
+      if (argValue.length() != 1) {
+        throw new ArgException(
+            "Value \"%s\" for argument %s is not a single character", argValue, argName);
+      }
+      return argValue.charAt(0);
+    } else if (type == Short.TYPE || type == Short.class) {
+      try {
+        return Short.decode(argValue);
+      } catch (Exception e) {
+        throw new ArgException(
+            "Value \"%s\" for argument %s is not a short integer", argValue, argName);
+      }
+    } else if (type == Integer.TYPE || type == Integer.class) {
+      try {
+        return Integer.decode(argValue);
+      } catch (Exception e) {
+        throw new ArgException("Value \"%s\" for argument %s is not an integer", argValue, argName);
+      }
+    } else if (type == Long.TYPE || type == Long.class) {
+      try {
+        return Long.decode(argValue);
+      } catch (Exception e) {
+        throw new ArgException(
+            "Value \"%s\" for argument %s is not a long integer", argValue, argName);
+      }
+    } else if (type == Float.TYPE || type == Float.class) {
+      try {
+        return Float.valueOf(argValue);
+      } catch (Exception e) {
+        throw new ArgException("Value \"%s\" for argument %s is not a float", argValue, argName);
+      }
+    } else if (type == Double.TYPE || type == Double.class) {
+      try {
+        return Double.valueOf(argValue);
+      } catch (Exception e) {
+        throw new ArgException("Value \"%s\" for argument %s is not a double", argValue, argName);
+      }
+    } else { // unexpected type
+      throw new Error("Unexpected type " + type);
+    }
+  }
+
+  /**
    * Given a value string supplied on the command line, create an object. The only expected error is
    * some sort of parse error from the constructor.
    *
@@ -1523,6 +1544,11 @@ public class Options {
   @SuppressWarnings("nullness") // static method, so null first arg is OK: oi.factory
   private @NonNull Object getRefArg(OptionInfo oi, String argName, String argValue)
       throws ArgException {
+
+    // Converted like the corresponding primitive type, rather than by a constructor or factory.
+    if (PRIMITIVE_WRAPPERS.contains(oi.baseType)) {
+      return getScalarArg(oi.baseType, argName, argValue);
+    }
 
     Object val;
     try {
@@ -1569,8 +1595,9 @@ public class Options {
     if (constants == null) {
       throw new IllegalArgumentException(enumType.getName() + " is not an enum type");
     }
+    String nameWithUnderscores = name.replace('-', '_');
     for (T constant : constants) {
-      if (constant.name().equalsIgnoreCase(name.replace('-', '_'))) {
+      if (constant.name().equalsIgnoreCase(nameWithUnderscores)) {
         return constant;
       }
     }
@@ -1607,7 +1634,7 @@ public class Options {
    * essentially the contents of args[] with all non-options removed. It can be used for calling a
    * subprocess or for debugging.
    *
-   * @return options, similarly to supplied on the command line
+   * @return the options, formatted as they were supplied on the command line
    * @see #settings()
    */
   public String getOptionsString() {
@@ -1807,7 +1834,7 @@ public class Options {
    * Field.set}, but throws no exceptions other than an informative Error.
    *
    * @param field the field to set
-   * @param obj object from whose field is to be set; may be null if the field is static
+   * @param obj object whose field is to be set; may be null if the field is static
    * @param value the new value for the field {@code field} of {@code obj} being modified
    */
   @SuppressWarnings({
