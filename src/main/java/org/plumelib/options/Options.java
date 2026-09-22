@@ -38,9 +38,9 @@ import org.checkerframework.checker.initialization.qual.Initialized;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.modifiability.qual.Growable;
+import org.checkerframework.checker.modifiability.qual.IteratorPolyMod;
 import org.checkerframework.checker.modifiability.qual.Modifiable;
 import org.checkerframework.checker.modifiability.qual.Shrinkable;
-import org.checkerframework.checker.modifiability.qual.IteratorPolyMod;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -337,7 +337,8 @@ public class Options {
   private final @Modifiable Map<String, OptionInfo> nameToOption = new LinkedHashMap<>();
 
   /** Map from option group name to option group information. */
-  private final @Modifiable Map<String, OptionGroupInfo> groupNameToOptionGroup = new LinkedHashMap<>();
+  private final @Modifiable Map<String, OptionGroupInfo> groupNameToOptionGroup =
+      new LinkedHashMap<>();
 
   /**
    * If true, then the user is using {@code @OptionGroup} annotations correctly (as per the
