@@ -539,8 +539,14 @@ public class Options {
         if (((List<?>) defaultObj).isEmpty()) {
           defaultStr = null;
         }
-        @SuppressWarnings("unchecked")
-        List<Object> defaultObjAsList = (List<Object>) defaultObj;
+        @SuppressWarnings({
+          "unchecked",
+          "modifiability:assignment",
+          "modifiability:cast.unsafe" // dynamically checked just below
+        })
+        @Modifiable
+        @IteratorPolyMod
+        List<Object> defaultObjAsList = (@Modifiable List<Object>) defaultObj;
         if (!CollectionsP.isModifiable(defaultObjAsList)) {
           defaultObjAsList = new ArrayList<>(defaultObjAsList);
           fieldSet(field, obj, defaultObjAsList);
