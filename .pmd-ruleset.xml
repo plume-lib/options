@@ -154,14 +154,15 @@
     <rule ref="category/java/design.xml/ExceptionAsFlowControl" />
     <rule ref="category/java/design.xml/ExcessiveParameterList" />
     <rule ref="category/java/design.xml/FinalFieldCouldBeStatic" />
+    <rule ref="category/java/design.xml/InstantiableUtilityClass" />
     <rule ref="category/java/design.xml/InvalidJavaBean" />
     <rule ref="category/java/design.xml/LogicInversion" />
+    <rule ref="category/java/design.xml/ProtectedMemberInFinalClass" />
     <rule ref="category/java/design.xml/SignatureDeclareThrowsException" />
     <rule ref="category/java/design.xml/SimplifiedTernary" />
     <rule ref="category/java/design.xml/SimplifyBooleanExpressions" />
     <rule ref="category/java/design.xml/SimplifyConditional" />
     <rule ref="category/java/design.xml/UselessOverridingMethod" />
-    <rule ref="category/java/design.xml/InstantiableUtilityClass" />
 
     <!-- design rules that seem to be broken.
     <rule ref="category/java/design.xml/SingularField" />
@@ -287,6 +288,7 @@
     <rule ref="category/java/errorprone.xml/UnnecessaryBooleanAssertion" />
     <rule ref="category/java/errorprone.xml/UnnecessaryCaseChange" />
     <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
+    <rule ref="category/java/errorprone.xml/UnusedReturnValue" />
     <rule ref="category/java/errorprone.xml/UseCorrectExceptionLogging" />
     <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings" />
     <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions" />
