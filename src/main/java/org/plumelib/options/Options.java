@@ -37,6 +37,10 @@ import org.checkerframework.checker.formatter.qual.FormatMethod;
 import org.checkerframework.checker.initialization.qual.Initialized;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.modifiability.qual.Growable;
+import org.checkerframework.checker.modifiability.qual.IteratorPolyMod;
+import org.checkerframework.checker.modifiability.qual.Modifiable;
+import org.checkerframework.checker.modifiability.qual.Shrinkable;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -327,13 +331,14 @@ public class Options {
 
   /** List of all of the defined options. */
   @SuppressWarnings("PMD.AvoidFieldNameMatchingTypeName")
-  private final List<OptionInfo> options = new ArrayList<>();
+  private final @Modifiable List<OptionInfo> options = new ArrayList<>();
 
   /** Map from short or long option names (with leading dashes) to option information. */
-  private final Map<String, OptionInfo> nameToOption = new LinkedHashMap<>();
+  private final @Modifiable Map<String, OptionInfo> nameToOption = new LinkedHashMap<>();
 
   /** Map from option group name to option group information. */
-  private final Map<String, OptionGroupInfo> groupNameToOptionGroup = new LinkedHashMap<>();
+  private final @Modifiable Map<String, OptionGroupInfo> groupNameToOptionGroup =
+      new LinkedHashMap<>();
 
   /**
    * If true, then the user is using {@code @OptionGroup} annotations correctly (as per the
@@ -417,7 +422,7 @@ public class Options {
      * Maps names of enum constants to their corresponding Javadoc. This is used by OptionsDoclet to
      * generate documentation for enum-type options. Null if the baseType is not an Enum.
      */
-    @MonotonicNonNull Map<String, String> enumJdoc;
+    @Modifiable @MonotonicNonNull Map<String, String> enumJdoc;
 
     /**
      * Name of the argument type. Defaults to the type of the field, but user can override this in
@@ -441,7 +446,7 @@ public class Options {
      * If the option is a list, this references that list. This value is side-effected rather than
      * the field being set.
      */
-    @MonotonicNonNull List<Object> list = null;
+    @Growable @Shrinkable @IteratorPolyMod @MonotonicNonNull List<Object> list = null;
 
     /**
      * If true, the {@link #list} field is set to the default value. If false, it contains
@@ -534,8 +539,14 @@ public class Options {
         if (((List<?>) defaultObj).isEmpty()) {
           defaultStr = null;
         }
-        @SuppressWarnings("unchecked")
-        List<Object> defaultObjAsList = (List<Object>) defaultObj;
+        @SuppressWarnings({
+          "unchecked",
+          "modifiability:assignment",
+          "modifiability:cast.unsafe" // dynamically checked just below
+        })
+        @Modifiable
+        @IteratorPolyMod
+        List<Object> defaultObjAsList = (@Modifiable List<Object>) defaultObj;
         if (!CollectionsP.isModifiable(defaultObjAsList)) {
           defaultObjAsList = new ArrayList<>(defaultObjAsList);
           fieldSet(field, obj, defaultObjAsList);
@@ -660,7 +671,7 @@ public class Options {
     boolean unpublicized;
 
     /** List of options that belong to this group. */
-    List<OptionInfo> optionList;
+    @Modifiable @IteratorPolyMod List<OptionInfo> optionList;
 
     /**
      * Create a new option group.

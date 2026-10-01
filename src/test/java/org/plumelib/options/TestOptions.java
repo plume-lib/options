@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.modifiability.qual.IteratorPolyMod;
+import org.checkerframework.checker.modifiability.qual.Modifiable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,7 @@ public class TestOptions {
     public @Nullable Integer IntegerReference;
 
     @Option("list of doubles")
-    public List<Double> ld = new ArrayList<>();
+    public @Modifiable @IteratorPolyMod List<Double> ld = new ArrayList<>();
 
     @Option("list with no default")
     public @Nullable List<String> ls;
