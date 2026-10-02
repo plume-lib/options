@@ -24,7 +24,7 @@ checker-framework = { module = "org.checkerframework:checker", version.ref = "ch
 
 classgraph = { module = "io.github.classgraph:classgraph", version = "4.8.196" }
 
-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.20.0" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.21.0" }
 
 commons-text = { module = "org.apache.commons:commons-text", version = "1.15.0" }
 
