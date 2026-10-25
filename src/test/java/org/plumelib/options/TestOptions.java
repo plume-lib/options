@@ -606,9 +606,8 @@ public class TestOptions {
         });
     ArgException e =
         Assertions.assertThrows(ArgException.class, () -> Options.tokenize("a 'b c\"d\" e"));
-    Assertions.assertTrue(
-        e.getMessage().startsWith("Unclosed single quote at index 2 in command line"),
-        e.getMessage());
+    Assertions.assertEquals(
+        "Unclosed single quote at index 2 in command line: a 'b c\"d\" e", e.getMessage());
     // Test that properly quoted strings work fine
     String[] result = Options.tokenize("--option \"closed quote\"");
     Assertions.assertArrayEquals(new String[] {"--option", "closed quote"}, result);
