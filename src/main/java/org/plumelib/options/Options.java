@@ -977,7 +977,11 @@ public class Options {
 
   /**
    * Splits the argument string into an array of tokens (command-line flags and arguments),
-   * respecting single and double quotes.
+   * respecting single and double quotes as a shell does. Tokens are separated by whitespace. Text
+   * between a pair of single quotes or a pair of double quotes is part of the current token, even
+   * if it contains whitespace or the other quote character; the quote characters themselves are not
+   * part of the token. For example, {@code --file='my file' it"'"s} yields the two tokens {@code
+   * --file=my file} and {@code it's}. There is no escape character.
    *
    * <p>This method is only appropriate when the {@code String[]} version of the arguments is not
    * available &mdash; for example, for the {@code premain} method of a Java agent.
@@ -993,35 +997,30 @@ public class Options {
     args = args.trim();
     List<String> argList = new ArrayList<>();
     StringBuilder arg = new StringBuilder();
+    // True if the current argument has started.  It may be empty, as for ''.
+    boolean inArg = false;
     for (int ii = 0; ii < args.length(); ii++) {
       char ch = args.charAt(ii);
       if ((ch == '\'') || (ch == '"')) {
-        arg.append(ch);
-        ii++;
-        while ((ii < args.length()) && (args.charAt(ii) != ch)) {
-          arg.append(args.charAt(ii++));
-        }
-        if (ii >= args.length()) {
+        int closeQuote = args.indexOf(ch, ii + 1);
+        if (closeQuote == -1) {
           throw new ArgException("Unclosed quote in command line: " + args);
         }
-        arg.append(ch);
+        arg.append(args, ii + 1, closeQuote);
+        ii = closeQuote;
+        inArg = true;
       } else if (Character.isWhitespace(ch)) {
-        // System.out.printf ("adding argument '%s'%n", arg);
-        argList.add(arg.toString());
-        arg.setLength(0);
-        while ((ii < args.length()) && Character.isWhitespace(args.charAt(ii))) {
-          ii++;
-        }
-        if (ii < args.length()) {
-          // Encountered a non-whitespace character.
-          // Back up to process it on the next loop iteration.
-          ii--;
+        if (inArg) {
+          argList.add(arg.toString());
+          arg.setLength(0);
+          inArg = false;
         }
       } else { // must be part of current argument
         arg.append(ch);
+        inArg = true;
       }
     }
-    if (!arg.isEmpty()) {
+    if (inArg) {
       argList.add(arg.toString());
     }
 

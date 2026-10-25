@@ -4,6 +4,8 @@
 
 - Tested under Java 27.
 - Requires Java 21 to run.
+- Incompatible change: `tokenize` removes the quote characters that delimit
+  quoted text, as a shell does.  Previously, the returned tokens contained them.
 
 ## 3.0.0 (2026-08-05)
 

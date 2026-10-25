@@ -606,6 +606,23 @@ public class TestOptions {
         });
     // Test that properly quoted strings work fine
     String[] result = Options.tokenize("--option \"closed quote\"");
-    Assertions.assertArrayEquals(new String[] {"--option", "\"closed quote\""}, result);
+    Assertions.assertArrayEquals(new String[] {"--option", "closed quote"}, result);
+  }
+
+  /**
+   * Test that tokenize removes quote characters.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testTokenizeQuotes() throws ArgException {
+    Assertions.assertArrayEquals(
+        new String[] {"--file=/my dir/f.txt", "-x"}, Options.tokenize("--file='/my dir/f.txt' -x"));
+    Assertions.assertArrayEquals(
+        new String[] {"--name=a 'b' c"}, Options.tokenize("--name=\"a 'b' c\""));
+    Assertions.assertArrayEquals(new String[] {"it's"}, Options.tokenize("'it'\"'\"'s'"));
+    Assertions.assertArrayEquals(new String[] {"a", "", "b"}, Options.tokenize(" a  ''  b "));
+    Assertions.assertArrayEquals(new String[] {""}, Options.tokenize("\"\""));
+    Assertions.assertArrayEquals(new String[] {}, Options.tokenize("  "));
   }
 }
