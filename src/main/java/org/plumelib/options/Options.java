@@ -1650,12 +1650,14 @@ public class Options {
 
   // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
-   * Returns a string containing the current setting for each option, in command-line format that
-   * can be parsed by Options. Contains every known option even if the option was not specified on
-   * the command line. Never contains duplicates.
+   * Returns a string containing the current setting for each publicized option. Each option appears
+   * on its own line, in the form <code>name = value</code>, where name is the option's long name.
+   * Contains every publicized option even if the option was not specified on the command line.
+   * Never contains duplicates.
    *
-   * @return a command line that can be tokenized with {@link #tokenize}, containing the current
-   *     setting for each option
+   * <p>The result is not a command line. For a command line, see {@link #getOptionsString}.
+   *
+   * @return the current setting for each publicized option, one per line
    */
   public String settings() {
     return settings(false);
@@ -1663,13 +1665,15 @@ public class Options {
 
   // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
-   * Returns a string containing the current setting for each option, in command-line format that
-   * can be parsed by Options. Contains every known option even if the option was not specified on
-   * the command line. Never contains duplicates.
+   * Returns a string containing the current setting for each publicized option. Each option appears
+   * on its own line, in the form <code>name = value</code>, where name is the option's long name.
+   * Contains every publicized option even if the option was not specified on the command line.
+   * Never contains duplicates.
+   *
+   * <p>The result is not a command line. For a command line, see {@link #getOptionsString}.
    *
    * @param showUnpublicized if true, treat all unpublicized options and option groups as publicized
-   * @return a command line that can be tokenized with {@link #tokenize}, containing the current
-   *     setting for each option
+   * @return the current setting for each publicized option, one per line
    */
   public String settings(boolean showUnpublicized) {
     StringJoiner out = new StringJoiner(lineSeparator);
