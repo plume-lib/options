@@ -1008,9 +1008,8 @@ public class Options {
         int closeQuote = args.indexOf(ch, ii + 1);
         if (closeQuote == -1) {
           throw new ArgException(
-              String.format(
-                  "Unclosed %s quote at index %d in command line: %s",
-                  (ch == '\'') ? "single" : "double", ii, args));
+              "Unclosed %s quote at index %d in command line: %s",
+              (ch == '\'') ? "single" : "double", ii, args);
         }
         arg.append(args, ii + 1, closeQuote);
         ii = closeQuote;
