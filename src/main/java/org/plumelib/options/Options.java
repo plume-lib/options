@@ -1648,32 +1648,34 @@ public class Options {
     return optionsString.toString();
   }
 
-  // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
-   * Returns a string containing the current setting for each publicized option. Each option appears
-   * on its own line, in the form <code>name = value</code>, where name is the option's long name.
-   * Contains every publicized option even if the option was not specified on the command line.
-   * Never contains duplicates.
+   * Returns a string containing the current setting of each option, omitting options annotated with
+   * {@code @}{@link Unpublicized}. Equivalent to {@code settings(false)}.
    *
-   * <p>The result is not a command line. For a command line, see {@link #getOptionsString}.
-   *
-   * @return the current setting for each publicized option, one per line
+   * @return the current setting of each option, one per line
+   * @see #settings(boolean)
    */
   public String settings() {
     return settings(false);
   }
 
-  // TODO: document what this is good for.  Debugging?  Invoking other programs?
   /**
-   * Returns a string containing the current setting for each publicized option. Each option appears
-   * on its own line, in the form <code>name = value</code>, where name is the option's long name.
-   * Contains every publicized option even if the option was not specified on the command line.
-   * Never contains duplicates.
+   * Returns a string containing the current setting of each option. This is useful for debugging
+   * and logging.
    *
-   * <p>The result is not a command line. For a command line, see {@link #getOptionsString}.
+   * <p>Each option appears on its own line, in the form {@code name = value}, where {@code name} is
+   * the option's long name and {@code value} is its current value. Each option appears exactly
+   * once, whether or not it was specified on the command line.
    *
-   * @param showUnpublicized if true, treat all unpublicized options and option groups as publicized
-   * @return the current setting for each publicized option, one per line
+   * <p>If {@code showUnpublicized} is false, the result omits each option that has an
+   * {@code @}{@link Unpublicized} annotation. Unlike {@link #usage(boolean, String...)}, this
+   * method does not consider whether an option's group is unpublicized.
+   *
+   * <p>The result is not a command line. To obtain the options that were set, formatted as they
+   * were supplied on the command line, use {@link #getOptionsString}.
+   *
+   * @param showUnpublicized if true, include options annotated with {@code @}{@link Unpublicized}
+   * @return the current setting of each option, one per line
    */
   public String settings(boolean showUnpublicized) {
     StringJoiner out = new StringJoiner(lineSeparator);
