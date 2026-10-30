@@ -604,8 +604,57 @@ public class TestOptions {
         () -> {
           Options.tokenize("--option 'unclosed quote");
         });
+    ArgException e =
+        Assertions.assertThrows(ArgException.class, () -> Options.tokenize("a 'b c\"d\" e"));
+    Assertions.assertEquals(
+        "Unclosed single quote at index 2 in command line: a 'b c\"d\" e", e.getMessage());
     // Test that properly quoted strings work fine
     String[] result = Options.tokenize("--option \"closed quote\"");
-    Assertions.assertArrayEquals(new String[] {"--option", "\"closed quote\""}, result);
+    Assertions.assertArrayEquals(new String[] {"--option", "closed quote"}, result);
+  }
+
+  /**
+   * Test that tokenize removes quote characters.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testTokenizeQuotes() throws ArgException {
+    Assertions.assertArrayEquals(
+        new String[] {"--file=/my dir/f.txt", "-x"}, Options.tokenize("--file='/my dir/f.txt' -x"));
+    Assertions.assertArrayEquals(
+        new String[] {"--name=a 'b' c"}, Options.tokenize("--name=\"a 'b' c\""));
+    Assertions.assertArrayEquals(new String[] {"it's"}, Options.tokenize("'it'\"'\"'s'"));
+    Assertions.assertArrayEquals(new String[] {"a", "", "b"}, Options.tokenize(" a  ''  b "));
+    Assertions.assertArrayEquals(new String[] {""}, Options.tokenize("\"\""));
+    Assertions.assertArrayEquals(new String[] {}, Options.tokenize("  "));
+    // A control character is not whitespace.
+    Assertions.assertArrayEquals(new String[] {"\u0001a"}, Options.tokenize("\u0001a"));
+  }
+
+  /**
+   * Test that tokenize converts the result of getOptionsString back into the original arguments.
+   *
+   * @throws ArgException if there is an illegal argument
+   */
+  @Test
+  void testOptionsStringRoundTrip() throws ArgException {
+    ClassWithOptions withSpace = new ClassWithOptions();
+    Options withSpaceOptions = new Options("test", withSpace);
+    withSpaceOptions.parse(Options.tokenize("--arg2='/my dir/f.txt' -b"));
+    Assertions.assertEquals("/my dir/f.txt", withSpace.arg2);
+    Assertions.assertEquals("--arg2='/my dir/f.txt' -b", withSpaceOptions.getOptionsString());
+
+    for (String value :
+        new String[] {
+          "plain", "", "a b", "a\tb", "a\nb", "it's", "say \"hi\"", "say \"hi\" it's"
+        }) {
+      ClassWithOptions t = new ClassWithOptions();
+      Options options = new Options("test", t);
+      options.parse(new String[] {"--arg2=" + value, "-b"});
+      Assertions.assertEquals(value, t.arg2);
+      Assertions.assertArrayEquals(
+          new String[] {"--arg2=" + value, "-b"}, Options.tokenize(options.getOptionsString()));
+    }
   }
 }

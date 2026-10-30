@@ -977,7 +977,15 @@ public class Options {
 
   /**
    * Splits the argument string into an array of tokens (command-line flags and arguments),
-   * respecting single and double quotes.
+   * respecting single and double quotes. Tokens are separated by whitespace. Text between a pair of
+   * single quotes or a pair of double quotes is part of the current token, even if it contains
+   * whitespace or the other quote character; the quote characters themselves are not part of the
+   * token. For example, {@code --file='my file' it"'"s} yields the two tokens {@code --file=my
+   * file} and {@code it's}.
+   *
+   * <p>Unlike in a shell, there is no escape character: a backslash is an ordinary character, both
+   * inside and outside quotes. To include a quote character in a token, enclose it in the other
+   * kind of quotes.
    *
    * <p>This method is only appropriate when the {@code String[]} version of the arguments is not
    * available &mdash; for example, for the {@code premain} method of a Java agent.
@@ -990,43 +998,68 @@ public class Options {
 
     // Split the args string on whitespace boundaries accounting for quoted
     // strings.
-    args = args.trim();
     List<String> argList = new ArrayList<>();
     StringBuilder arg = new StringBuilder();
+    // True if the current argument has started.  It may be empty, as for ''.
+    boolean inArg = false;
     for (int ii = 0; ii < args.length(); ii++) {
       char ch = args.charAt(ii);
       if ((ch == '\'') || (ch == '"')) {
-        arg.append(ch);
-        ii++;
-        while ((ii < args.length()) && (args.charAt(ii) != ch)) {
-          arg.append(args.charAt(ii++));
+        int closeQuote = args.indexOf(ch, ii + 1);
+        if (closeQuote == -1) {
+          throw new ArgException(
+              "Unclosed %s quote at index %d in command line: %s",
+              (ch == '\'') ? "single" : "double", ii, args);
         }
-        if (ii >= args.length()) {
-          throw new ArgException("Unclosed quote in command line: " + args);
-        }
-        arg.append(ch);
+        arg.append(args, ii + 1, closeQuote);
+        ii = closeQuote;
+        inArg = true;
       } else if (Character.isWhitespace(ch)) {
-        // System.out.printf ("adding argument '%s'%n", arg);
-        argList.add(arg.toString());
-        arg.setLength(0);
-        while ((ii < args.length()) && Character.isWhitespace(args.charAt(ii))) {
-          ii++;
-        }
-        if (ii < args.length()) {
-          // Encountered a non-whitespace character.
-          // Back up to process it on the next loop iteration.
-          ii--;
+        if (inArg) {
+          argList.add(arg.toString());
+          arg.setLength(0);
+          inArg = false;
         }
       } else { // must be part of current argument
         arg.append(ch);
+        inArg = true;
       }
     }
-    if (!arg.isEmpty()) {
+    if (inArg) {
       argList.add(arg.toString());
     }
 
     String[] argsArray = argList.toArray(new String[0]);
     return argsArray;
+  }
+
+  /**
+   * Quotes the given text so that {@link #tokenize} converts it back into the text itself, as part
+   * of a single token. The text is returned unchanged if it contains no whitespace or quote
+   * characters; in particular, if the text is empty, so is the result.
+   *
+   * @param s the text to quote
+   * @return the text, quoted if necessary
+   */
+  private static String quote(String s) {
+    boolean needsQuotes = false;
+    for (int ii = 0; ii < s.length(); ii++) {
+      char ch = s.charAt(ii);
+      if ((ch == '\'') || (ch == '"') || Character.isWhitespace(ch)) {
+        needsQuotes = true;
+        break;
+      }
+    }
+    if (!needsQuotes) {
+      return s;
+    } else if (s.indexOf('\'') == -1) {
+      return "'" + s + "'";
+    } else if (s.indexOf('"') == -1) {
+      return "\"" + s + "\"";
+    } else {
+      // Close the single-quoted text, add a double-quoted single quote, and reopen.
+      return "'" + s.replace("'", "'\"'\"'") + "'";
+    }
   }
 
   /**
@@ -1408,15 +1441,7 @@ public class Options {
     }
     optionsString.append(argName);
     if (argValue != null) {
-      if (!argValue.contains(" ")) {
-        optionsString.append('=').append(argValue);
-      } else if (!argValue.contains("'")) {
-        optionsString.append("='").append(argValue).append('\'');
-      } else if (!argValue.contains("\"")) {
-        optionsString.append("=\"").append(argValue).append('"');
-      } else {
-        throw new ArgException("Can't quote for internal debugging: " + argValue);
-      }
+      optionsString.append('=').append(quote(argValue));
     }
     // Argument values are required for everything but booleans
     if (argValue == null) {
