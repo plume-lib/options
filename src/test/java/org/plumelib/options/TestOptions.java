@@ -657,8 +657,9 @@ public class TestOptions {
           new String[] {"--arg2=" + value, "-b"}, Options.tokenize(options.getOptionsString()));
     }
 
-    // A value that contains the ",-" separator is a separate token.
-    for (String value : new String[] {"a,-b", "a '\" ,-b", ",-b"}) {
+    // A value that is a separate token remains a separate token.  This preserves a value that
+    // contains the ",-" separator.
+    for (String value : new String[] {"plain", "", "a b", "-x", "a,-b", "a '\" ,-b", ",-b"}) {
       ClassWithOptions t = new ClassWithOptions();
       Options options = new Options("test", t);
       options.parse(new String[] {"--arg2", value, "-b"});

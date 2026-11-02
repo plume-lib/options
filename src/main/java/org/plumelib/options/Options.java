@@ -976,16 +976,22 @@ public class Options {
   }
 
   /**
-   * Splits the argument string into an array of tokens (command-line flags and arguments),
-   * respecting single and double quotes. Tokens are separated by whitespace. Text between a pair of
-   * single quotes or a pair of double quotes is part of the current token, even if it contains
-   * whitespace or the other quote character; the quote characters themselves are not part of the
-   * token. For example, {@code --file='my file' it"'"s} yields the two tokens {@code --file=my
-   * file} and {@code it's}.
+   * Returns the tokens (command-line flags and arguments) in the given argument string, respecting
+   * single and double quotes. Tokens are separated by whitespace. Text between a pair of single
+   * quotes or a pair of double quotes is part of the current token, even if it contains whitespace
+   * or the other quote character; the quote characters themselves are not part of the token. For
+   * example, {@code --file='my file' it"'"s} yields the two tokens {@code --file=my file} and
+   * {@code it's}.
    *
    * <p>Unlike in a shell, there is no escape character: a backslash is an ordinary character, both
    * inside and outside quotes. To include a quote character in a token, enclose it in the other
    * kind of quotes.
+   *
+   * <p>Quoting affects only how the argument string is split into tokens. For example, {@link
+   * #parse} splits an option token at {@code ,-}, so it splits {@code --file='a,-b'} (which this
+   * method converts into {@code --file=a,-b}) into {@code --file=a} and {@code -b}. To supply a
+   * value that contains {@code ,-}, write the value as a separate token, as in {@code --file
+   * 'a,-b'}.
    *
    * <p>This method is only appropriate when the {@code String[]} version of the arguments is not
    * available &mdash; for example, for the {@code premain} method of a Java agent.
@@ -1000,7 +1006,7 @@ public class Options {
     // strings.
     List<String> argList = new ArrayList<>();
     StringBuilder arg = new StringBuilder();
-    // True if the current argument has started.  It may be empty, as for ''.
+    // True if the current argument has started.  It can be empty, as for ''.
     boolean inArg = false;
     for (int ii = 0; ii < args.length(); ii++) {
       char ch = args.charAt(ii);
@@ -1034,15 +1040,16 @@ public class Options {
   }
 
   /**
-   * Quotes the given text so that {@link #tokenize} converts it back into the text itself, as part
-   * of a single token. The text is returned unchanged if it contains no whitespace or quote
-   * characters; in particular, if the text is empty, so is the result.
+   * Returns the given text, quoted if necessary so that {@link #tokenize} converts the result back
+   * into the text itself, as a token or as part of a token. The text is returned unchanged if it is
+   * non-empty and contains no whitespace or quote characters. The result is never empty, so it is a
+   * token even if the text is empty.
    *
-   * @param s the text to quote
+   * @param s a text to quote
    * @return the text, quoted if necessary
    */
   private static String quote(String s) {
-    boolean needsQuotes = false;
+    boolean needsQuotes = s.isEmpty();
     for (int ii = 0; ii < s.length(); ii++) {
       char ch = s.charAt(ii);
       if ((ch == '\'') || (ch == '"') || Character.isWhitespace(ch)) {
@@ -1134,16 +1141,18 @@ public class Options {
           }
           throw new ArgException(msg.toString());
         }
+        boolean valueIsSeparateToken = false;
         if (oi.argumentRequired() && (argValue == null)) {
           ii++;
           if (ii >= args.length) {
             throw new ArgException("option %s requires an argument", arg);
           }
           argValue = args[ii];
+          valueIsSeparateToken = true;
         }
         // System.out.printf ("argName = '%s', argValue='%s'%n", argName,
         //                    argValue);
-        setArg(oi, argName, argValue);
+        setArg(oi, argName, argValue, valueIsSeparateToken);
       } else { // not an option
         if (!parseAfterArg) {
           ignoreOptions = true;
@@ -1424,13 +1433,16 @@ public class Options {
    * @param oi the option to set
    * @param argName the name of the argument as passed on the command line; used only for debugging
    * @param argValue a string representation of the value
+   * @param valueIsSeparateToken true if argValue was supplied as a separate token, as in {@code
+   *     --name value}, rather than in the same token as argName, as in {@code --name=value}
    * @throws ArgException if there are any errors
    */
   @SuppressWarnings({
     "nullness:argument", // object can be null if field is static
     "interning:argument" // interning is not relevant to the call
   })
-  private void setArg(OptionInfo oi, String argName, @Nullable String argValue)
+  private void setArg(
+      OptionInfo oi, String argName, @Nullable String argValue, boolean valueIsSeparateToken)
       throws ArgException {
 
     Field f = oi.field;
@@ -1441,10 +1453,9 @@ public class Options {
     }
     optionsString.append(argName);
     if (argValue != null) {
-      // `parse` splits a "--name=value" token at ",-", but it never splits a value that is a
-      // separate token.  Such a value contains ",-" only if it was supplied as a separate token,
-      // which implies that the option requires an argument.
-      optionsString.append(argValue.contains(",-") ? ' ' : '=').append(quote(argValue));
+      // Emit the value as it was supplied.  A value in the same token as the option name would not
+      // round-trip if it contained ",-", because `parse` splits such a token at ",-".
+      optionsString.append(valueIsSeparateToken ? ' ' : '=').append(quote(argValue));
     }
     // Argument values are required for everything but booleans
     if (argValue == null) {
@@ -1666,10 +1677,11 @@ public class Options {
 
   /**
    * Returns a string containing all of the options that were set and their arguments. This is
-   * essentially the contents of args[] with all non-options removed. It can be used for calling a
-   * subprocess or for debugging.
+   * essentially the contents of args[] with all non-options removed. Each argument is quoted if
+   * necessary, so {@link #tokenize} converts the result into the options and arguments that were
+   * supplied. It can be used for calling a subprocess or for debugging.
    *
-   * @return the options, formatted as they were supplied on the command line
+   * @return the options that were set and their arguments, in a form that {@link #tokenize} accepts
    * @see #settings()
    */
   public String getOptionsString() {
