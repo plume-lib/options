@@ -1660,22 +1660,24 @@ public class Options {
   }
 
   /**
-   * Returns a string containing the current setting of each option. This is useful for debugging
-   * and logging.
+   * Returns a string containing the current setting of each option, optionally omitting options
+   * annotated with {@code @}{@link Unpublicized}. This is useful for debugging and logging.
    *
    * <p>Each option appears on its own line, in the form {@code name = value}, where {@code name} is
-   * the option's long name and {@code value} is its current value. Each option appears exactly
-   * once, whether or not it was specified on the command line.
+   * the option's long name and {@code value} is its current value. Each name is padded with spaces
+   * so that the {@code =} signs line up. Each included option appears exactly once, whether or not
+   * it was specified on the command line.
    *
    * <p>If {@code showUnpublicized} is false, the result omits each option that has an
    * {@code @}{@link Unpublicized} annotation. Unlike {@link #usage(boolean, String...)}, this
    * method does not consider whether an option's group is unpublicized.
    *
-   * <p>The result is not a command line. To obtain the options that were set, formatted as they
-   * were supplied on the command line, use {@link #getOptionsString}.
+   * <p>The result is not a command line. To obtain the options that were set, formatted as
+   * command-line arguments, use {@link #getOptionsString}.
    *
-   * @param showUnpublicized if true, include options annotated with {@code @}{@link Unpublicized}
-   * @return the current setting of each option, one per line
+   * @param showUnpublicized true if the result should include options annotated with
+   *     {@code @}{@link Unpublicized}
+   * @return the current setting of each included option, one per line
    */
   public String settings(boolean showUnpublicized) {
     StringJoiner out = new StringJoiner(lineSeparator);
