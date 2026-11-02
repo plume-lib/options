@@ -656,5 +656,19 @@ public class TestOptions {
       Assertions.assertArrayEquals(
           new String[] {"--arg2=" + value, "-b"}, Options.tokenize(options.getOptionsString()));
     }
+
+    // A value that contains the ",-" separator is a separate token.
+    for (String value : new String[] {"a,-b", "a '\" ,-b", ",-b"}) {
+      ClassWithOptions t = new ClassWithOptions();
+      Options options = new Options("test", t);
+      options.parse(new String[] {"--arg2", value, "-b"});
+      Assertions.assertEquals(value, t.arg2);
+      String[] tokens = Options.tokenize(options.getOptionsString());
+      Assertions.assertArrayEquals(new String[] {"--arg2", value, "-b"}, tokens);
+      ClassWithOptions t2 = new ClassWithOptions();
+      new Options("test", t2).parse(tokens);
+      Assertions.assertEquals(value, t2.arg2);
+      Assertions.assertTrue(t2.bool);
+    }
   }
 }

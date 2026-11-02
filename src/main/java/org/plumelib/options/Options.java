@@ -1441,7 +1441,10 @@ public class Options {
     }
     optionsString.append(argName);
     if (argValue != null) {
-      optionsString.append('=').append(quote(argValue));
+      // `parse` splits a "--name=value" token at ",-", but it never splits a value that is a
+      // separate token.  Such a value contains ",-" only if it was supplied as a separate token,
+      // which implies that the option requires an argument.
+      optionsString.append(argValue.contains(",-") ? ' ' : '=').append(quote(argValue));
     }
     // Argument values are required for everything but booleans
     if (argValue == null) {
